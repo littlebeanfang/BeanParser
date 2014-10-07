@@ -31,12 +31,12 @@ import DataStructure.RelationalFeature;
  */
 public class CONLLReader extends DependencyReader {
 
-    protected boolean discourseMode = false;
+    /*protected boolean discourseMode = false;
 
     public CONLLReader (boolean discourseMode) {
 	this.discourseMode = discourseMode;
     }
-
+*/
     public DependencyInstance getNext() throws IOException {
 
 	ArrayList<String[]> lineList = new ArrayList<String[]>();
@@ -89,7 +89,7 @@ public class CONLLReader extends DependencyReader {
 	feats[0] = new String[feats[1].length];
 	for (int i = 0; i< feats[1].length; i++)
 	    feats[0][i] = "<root-feat>"+i;
-	
+	/*
 	// The following stuff is for discourse and can be safely
 	// ignored if you are doing sentential parsing. (In theory it
 	// could be useful for sentential parsing.)
@@ -102,7 +102,7 @@ public class CONLLReader extends DependencyReader {
 	
 	    feats = extended_feats;
 	}
-
+*/
 	ArrayList<RelationalFeature> rfeats = 
 	    new ArrayList<RelationalFeature>();
 	

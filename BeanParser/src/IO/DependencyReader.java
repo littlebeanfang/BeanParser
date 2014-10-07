@@ -43,11 +43,11 @@ public abstract class DependencyReader {
 	    */
 		return null;
 	} else if (format.equals("CONLL")) {
-	    return new CONLLReader(discourseMode);
+	    return new CONLLReader();
 	} else {
 	    System.out.println("!!!!!!!  Not a supported format: " + format);
 	    System.out.println("********* Assuming CONLL format. **********");
-	    return new CONLLReader(discourseMode);
+	    return new CONLLReader();
 	}
     }
 
