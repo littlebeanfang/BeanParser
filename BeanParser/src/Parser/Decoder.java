@@ -3,7 +3,7 @@ package Parser;
 import DataStructure.DependencyInstance;
 
 public class Decoder {
-	public void decode(DependencyInstance inst, ){
+	public void decode(DependencyInstance inst){
 		
 	}
 }
