@@ -17,7 +17,7 @@ public class Decoder {
 		for(int parseindex=1;parseindex<inst.length();parseindex++){
 			//skip root node
 			int parsehead=this.FindHeadForOneWord(inst, parseindex, pa);
-			pa.AddArc(parsehead, parsehead);
+			pa.AddArc(parseindex, parsehead);
 		}
 		pa.AddArc(0, -1);//add root
 		return pa;
@@ -26,6 +26,7 @@ public class Decoder {
 		boolean verbose=true;
 		int headindex=-1;
 		double score=Double.NEGATIVE_INFINITY;
+		FeatureVector actfv=new FeatureVector();
 		for(int head=0; head<inst.length();head++){
 			if(head!=childindex){
 				FeatureVector fv=new FeatureVector();
@@ -34,6 +35,8 @@ public class Decoder {
 				if(temp>score){
 					score=temp;
 					headindex=head;
+					//must store best fv in DependencyInstance
+					actfv=fv;
 				}
 			}
 		}
@@ -43,6 +46,7 @@ public class Decoder {
 			System.out.println("Head index:"+headindex);
 			System.out.println("Score:"+score);
 		}
+		inst.fv.cat(actfv);
 		return headindex;
 	}
 }
