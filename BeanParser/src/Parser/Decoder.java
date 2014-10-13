@@ -39,7 +39,8 @@ public class Decoder {
 		for(int head=0; head<inst.length();head++){
 			if(head!=childindex){
 				FeatureVector fv=new FeatureVector();
-				pipe.AddNewFeature(inst, childindex, head, pa, fv);
+				//pipe.AddNewFeature(inst, childindex, head, pa, fv);
+				pipe.extractFeatures(inst, childindex, head, pa, fv);
 				double temp=fv.getScore(param.parameters);
 				if(temp>score){
 					score=temp;
