@@ -12,6 +12,8 @@
 
 package IO;
 
+import gnu.trove.TIntIntHashMap;
+
 import java.io.*;
 import java.util.*;
 
@@ -63,6 +65,7 @@ public class CONLLReader extends DependencyReader {
 	String[] deprels = new String[length+1];
 	int[] heads = new int[length+1];
 	double[] confscores = confScores ? new double[length+1] : null;
+	TIntIntHashMap ordermap=new TIntIntHashMap();
 
 	forms[0] = "<root>";
 	lemmas[0] = "<root-LEMMA>";
@@ -84,6 +87,9 @@ public class CONLLReader extends DependencyReader {
 	    heads[i+1] = Integer.parseInt(info[6]);
 		if (confScores)
 			confscores[i+1] = Double.parseDouble(info[10]);
+		if(ordered){
+			ordermap.put(Integer.parseInt(info[10]), i+1);
+		}
 	}
 	
 	feats[0] = new String[feats[1].length];
@@ -116,7 +122,7 @@ public class CONLLReader extends DependencyReader {
 
 	// End of discourse stuff.
 
-	return new DependencyInstance(forms, lemmas, cpos, pos, feats, deprels, heads, rfeatsList, confscores);
+	return new DependencyInstance(forms, pos, deprels, heads,ordermap);
 
     }
 

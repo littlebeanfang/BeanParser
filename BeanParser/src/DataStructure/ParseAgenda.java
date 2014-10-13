@@ -20,7 +20,8 @@ public class ParseAgenda extends TIntIntHashMap{
 		StringBuffer sb=new StringBuffer();
 		sb.append("Agenda Size:"+this.tii.size()+"\n");
 		for(int key:this.tii.keys()){
-			sb.append("Child:"+key+", Head:"+this.tii.get(key)+"\n");
+			//sb.append("Child:"+key+", Head:"+this.tii.get(key)+"\n");
+			sb.append(this.tii.get(key)+"-->"+key+"\n");
 		}
 		return sb.toString();
 	}

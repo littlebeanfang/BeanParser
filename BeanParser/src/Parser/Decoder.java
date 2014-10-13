@@ -1,5 +1,10 @@
 package Parser;
 
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileNotFoundException;
+
+import gnu.trove.TIntIntHashMap;
 import DataStructure.DependencyInstance;
 import DataStructure.FeatureVector;
 import DataStructure.Parameters;
@@ -8,20 +13,24 @@ import DataStructure.ParseAgenda;
 public class Decoder {
 	private MyPipe pipe;
 	private Parameters param;
-	public Decoder(MyPipe pipe, Parameters param){
-		this.pipe=pipe;
+	
+	public Decoder(DependencyPipe pipe, Parameters param){
+		this.pipe=(MyPipe) pipe;
 		this.param=param;
 	}
-	public ParseAgenda DecodeInstance(DependencyInstance inst){
+	
+	public ParseAgenda DecodeInstance(DependencyInstance inst, TIntIntHashMap ordermap) throws FileNotFoundException{
 		ParseAgenda pa=new ParseAgenda();
-		for(int parseindex=1;parseindex<inst.length();parseindex++){
+		for(int orderindex=1;orderindex<inst.length();orderindex++){
 			//skip root node
+			int parseindex=ordermap.get(orderindex);
 			int parsehead=this.FindHeadForOneWord(inst, parseindex, pa);
 			pa.AddArc(parseindex, parsehead);
 		}
 		pa.AddArc(0, -1);//add root
 		return pa;
 	}
+	
 	public int FindHeadForOneWord(DependencyInstance inst,int childindex, ParseAgenda pa){
 		boolean verbose=true;
 		int headindex=-1;
@@ -36,7 +45,7 @@ public class Decoder {
 					score=temp;
 					headindex=head;
 					//must store best fv in DependencyInstance
-					actfv=fv;
+					//actfv=fv;
 				}
 			}
 		}
@@ -46,7 +55,7 @@ public class Decoder {
 			System.out.println("Head index:"+headindex);
 			System.out.println("Score:"+score);
 		}
-		inst.fv.cat(actfv);
+		//inst.fv.cat(actfv);
 		return headindex;
 	}
 }

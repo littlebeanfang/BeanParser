@@ -42,6 +42,9 @@ public class DependencyInstance implements Serializable {
 	
     // Confidence scores per edge
     public double[] confidenceScores;
+    
+    //Bean
+    public TIntIntHashMap orders;
 
     public DependencyInstance() {}
 
@@ -72,6 +75,14 @@ public class DependencyInstance implements Serializable {
 	this.postags = postags;
 	this.deprels = labs;
 	this.heads = heads;
+    }
+    public DependencyInstance(String[] forms, String[] postags, 
+		      String[] labs, int[] heads,TIntIntHashMap orders) {
+		this.forms = forms;
+		this.postags = postags;
+		this.deprels = labs;
+		this.heads = heads;
+		this.orders=orders;
     }
 
     public DependencyInstance(String[] forms, String[] postags, 
@@ -108,6 +119,11 @@ public class DependencyInstance implements Serializable {
     public String toString () {
 	StringBuffer sb = new StringBuffer();
 	sb.append(Arrays.toString(forms)).append("\n");
+	int[] keys=this.orders.keys();
+	for(int key:keys){
+		sb.append("order:"+key+", index:"+orders.get(key)+"\n");
+	}
+	sb.append(this.length()+"\n");
 	return sb.toString();
     }
 

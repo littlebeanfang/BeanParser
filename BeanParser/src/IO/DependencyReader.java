@@ -32,6 +32,7 @@ public abstract class DependencyReader {
     protected BufferedReader inputReader;
     protected boolean labeled = true;
     protected boolean confScores = false;
+    protected boolean ordered = true;
 
     public static DependencyReader createDependencyReader (String format, 
 							   boolean discourseMode) 
