@@ -122,7 +122,7 @@ public class CONLLReader extends DependencyReader {
 
 	// End of discourse stuff.
 
-	return new DependencyInstance(forms, pos, deprels, heads,ordermap);
+	return new DependencyInstance(forms, lemmas, cpos, pos, feats, deprels, heads,ordermap);
 
     }
 

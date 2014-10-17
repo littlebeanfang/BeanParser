@@ -6,7 +6,7 @@ import gnu.trove.*;
 
 import java.util.*;
 
-import DataStructure.Alphabet;
+import mstparser.Alphabet;
 import DataStructure.DependencyInstance;
 import DataStructure.FeatureVector;
 import DataStructure.Parameters;

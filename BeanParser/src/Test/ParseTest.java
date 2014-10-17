@@ -13,6 +13,6 @@ public class ParseTest {
 		DependencyPipe dp=new MyPipe(options);
 		Parser test=new Parser(dp,options);
 		test.loadModel(options.modelName);
-		test.Parse(options.testfile);
+		test.Parse(options.testfile,options.outfile);
 	}
 }

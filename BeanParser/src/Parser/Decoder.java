@@ -26,6 +26,7 @@ public class Decoder {
 			int parseindex=ordermap.get(orderindex);
 			int parsehead=this.FindHeadForOneWord(inst, parseindex, pa);
 			pa.AddArc(parseindex, parsehead);
+            inst.heads[parseindex]=parsehead;
 		}
 		pa.AddArc(0, -1);//add root
 		return pa;

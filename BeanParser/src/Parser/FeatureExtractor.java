@@ -1,12 +1,11 @@
 package Parser;
-import DataStructure.Alphabet;
+
+import mstparser.Alphabet;
 import DataStructure.DependencyInstance;
 import DataStructure.FeatureVector;
 import DataStructure.ParserOptions;
 import DataStructure.ParseAgenda;
 import gnu.trove.TIntIntIterator;
-
-
 
 public class FeatureExtractor{
     public Alphabet dataAlphabet;

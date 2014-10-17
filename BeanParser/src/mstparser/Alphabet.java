@@ -12,7 +12,7 @@
     @author Andrew McCallum <a href="mailto:mccallum@cs.umass.edu">mccallum@cs.umass.edu</a>
 */
 
-package DataStructure;
+package mstparser;
 
 import java.util.ArrayList;
 import java.io.*;
