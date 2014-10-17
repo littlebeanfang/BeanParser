@@ -33,23 +33,30 @@ public class MyPipe extends DependencyPipe {
 
 	private final void addTwoOrderFeatures(DependencyInstance instance,
 			int parentindex, int childindex, ParseAgenda pa, FeatureVector fv) {
-		if (pa.containsKey(parentindex)) { // this shows that the parent
+		//System.out.println(childindex + "\t" + parentindex);
+		
+		if (pa.tii.containsKey(parentindex)) { // this shows that the parent
 											// candidate already has head,so we
 											// can add grandparent-parent-child
 											// feature
 
 		}
 
-		if (pa.containsValue(childindex)) { // this shows that the child
+		if (pa.tii.containsValue(childindex)) { // this shows that the child
 											// candidate is already used as
 											// another word's parent
 
 		}
-
-		if (pa.containsValue(parentindex)) { // this shows that the parent
+		
+        //for (TIntIntIterator iter = pa.tii.iterator(); iter.hasNext();){
+        //	iter.advance();
+        //	System.out.println(iter.key() + "\t" + iter.value());
+        //}
+        
+		if (pa.tii.containsValue(parentindex)) { // this shows that the parent
 												// candidate has already been
 												// another word's parent
-			for (TIntIntIterator iter = pa.iterator(); iter.hasNext();) {
+			for (TIntIntIterator iter = pa.tii.iterator(); iter.hasNext();) {
 				iter.advance();
 				int existing_child = iter.key();
 				int parent = iter.value();

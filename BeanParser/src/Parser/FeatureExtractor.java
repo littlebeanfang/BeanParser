@@ -17,42 +17,6 @@ public class FeatureExtractor{
         dataAlphabet = new Alphabet();
     }
 
-    public void extractFeatures(DependencyInstance instance,
-                                int childindex, int parentindex,
-                                ParseAgenda pa, FeatureVector fv){   //given an unparsed instance,extract features from it
-        //boolean labeled;
-        boolean leftToRight = (childindex > parentindex);
-        int small = leftToRight?parentindex:childindex;
-        int large = leftToRight?childindex:parentindex;
-        addCoreFeatures(instance, small, large, leftToRight, fv);
-        
-        addTwoOrderFeatures(instance, parentindex, childindex, pa, fv);
-        
-    }
-
-    private final void addTwoOrderFeatures(DependencyInstance instance, int parentindex, int childindex, ParseAgenda pa, FeatureVector fv){
-        if(pa.containsKey(parentindex)){    //this shows that the parent candidate already has head,so we can add grandparent-parent-child feature
-
-        }
-
-        if(pa.containsValue(childindex)){   // this shows that the child candidate is already used as another word's parent
-
-        }
-
-        if(pa.containsValue(parentindex)){       //this shows that the parent candidate has already been another word's parent
-            for(TIntIntIterator iter = pa.iterator();iter.hasNext();) {
-                iter.advance();
-                int existing_child = iter.key();
-                int parent = iter.value();
-                if(parent == parentindex){
-                    addTripFeatures(instance,childindex,existing_child,parentindex,fv);   //parent can be in any place
-                    addSiblingFeatures(instance,childindex,existing_child,false,fv);
-                    addSiblingFeatures(instance,childindex,existing_child,true,fv);
-                }
-            }
-        }
-    };
-
     public FeatureVector extractParsedFeatures(DependencyInstance instance){  // given a parsed sentence instance,extract features
         final int instanceLength = instance.length();
         String[] labels = instance.deprels;

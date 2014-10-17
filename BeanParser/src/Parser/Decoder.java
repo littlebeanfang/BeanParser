@@ -1,8 +1,13 @@
 package Parser;
 
 import java.io.BufferedReader;
+import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.OutputStreamWriter;
+import java.io.Writer;
 
 import gnu.trove.TIntIntHashMap;
 import DataStructure.DependencyInstance;
@@ -19,7 +24,7 @@ public class Decoder {
 		this.param=param;
 	}
 	
-	public ParseAgenda DecodeInstance(DependencyInstance inst, TIntIntHashMap ordermap) throws FileNotFoundException{
+	public ParseAgenda DecodeInstance(DependencyInstance inst, TIntIntHashMap ordermap) throws IOException{
 		ParseAgenda pa=new ParseAgenda();
 		for(int orderindex=1;orderindex<inst.length();orderindex++){
 			//skip root node
@@ -29,11 +34,38 @@ public class Decoder {
             inst.heads[parseindex]=parsehead;
 		}
 		pa.AddArc(0, -1);//add root
+		
+		//PrintScores(inst, pa);
 		return pa;
 	}
 	
+	public void PrintScores(DependencyInstance inst, ParseAgenda pa) throws IOException {
+		int length = inst.length();
+		Writer writer = new BufferedWriter(new OutputStreamWriter(new FileOutputStream("Scores_PA.txt")));
+		writer.write("child");
+		for (int i = 0;i < length;i++)
+			writer.write("\t" + i);
+		writer.write("\n");
+		for (int i = 0;i < length;i++){
+			writer.write(i + "\t");
+			for (int j = 0;j < length;j++){
+				if (i != j) {
+					FeatureVector fv = new FeatureVector();
+					pipe.extractFeatures(inst, i, j, pa, fv);
+					double tmp = fv.getScore(param.parameters);
+					writer.write(String.format("%.2f\t",tmp));
+				}
+				else {
+					writer.write("0\t");
+				}
+			}
+			writer.write("\n");
+		}
+		writer.close();
+	}
+	
 	public int FindHeadForOneWord(DependencyInstance inst,int childindex, ParseAgenda pa){
-		boolean verbose=true;
+		boolean verbose=false;
 		int headindex=-1;
 		double score=Double.NEGATIVE_INFINITY;
 		FeatureVector actfv=new FeatureVector();

@@ -8,7 +8,7 @@ import gnu.trove.TIntIntIterator;
  * @author Wenjing
  *
  */
-public class ParseAgenda extends TIntIntHashMap{
+public class ParseAgenda {
 	public TIntIntHashMap tii;
 	public ParseAgenda(){
 		this.tii=new TIntIntHashMap();
