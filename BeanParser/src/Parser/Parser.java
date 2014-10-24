@@ -3,8 +3,10 @@ package Parser;
 import java.io.BufferedInputStream;
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
 
 import IO.CONLLWriter;
 import mstparser.Alphabet;
@@ -39,10 +41,17 @@ public class Parser {
 		in.close();
 		pipe.closeAlphabets();
 	}
+	public void saveModel(String file) throws IOException {
+		ObjectOutputStream out = new ObjectOutputStream(new FileOutputStream(file));
+		out.writeObject(params.parameters);
+		out.writeObject(pipe.dataAlphabet);
+		out.writeObject(pipe.typeAlphabet);
+		out.close();
+	    }
 	public void Parse(String parsefile,String writefile) throws IOException{
 		 CONLLReader reader=new CONLLReader();
 		 //String filename="wsj_00_malt_processindex.txt";
-		 reader.startReading(System.getenv("CODEDATA")+File.separator+parsefile);
+		reader.startReading(System.getenv("CODEDATA")+File.separator+parsefile);
         File out=new File(writefile);
         if(!out.exists()){
             out.createNewFile();
@@ -57,6 +66,13 @@ public class Parser {
              writer.write(new DependencyInstance(RemoveRoot(di.forms),RemoveRoot(di.postags),RemoveRoot(di.deprels),RemoveRoot(di.heads)));
 		 }
         writer.finishWriting();
+	}
+	public void Train(){
+		/**
+		 * TODO: Bean
+		 * call Train class and organize the training process
+		 */
+		
 	}
     private String[] RemoveRoot(String[] form){
         String[] ret=new String[form.length-1];
