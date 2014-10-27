@@ -1,5 +1,7 @@
 package DataStructure;
 
+import java.awt.BufferCapabilities;
+
 import gnu.trove.TIntIntHashMap;
 import gnu.trove.TIntIntIterator;
 
@@ -24,5 +26,13 @@ public class ParseAgenda {
 			sb.append(this.tii.get(key)+"-->"+key+"\n");
 		}
 		return sb.toString();
+	}
+	public String toActParseTree(){
+		StringBuffer sb=new StringBuffer();
+		for(int i = 1; i < tii.size(); i++) {
+			//.append(":").append(typeAlphabet.lookupIndex(labs[i]))
+			sb.append(tii.get(i)).append("|").append(i).append(" ");
+		}
+		return sb.substring(0,sb.length()-1);
 	}
 }

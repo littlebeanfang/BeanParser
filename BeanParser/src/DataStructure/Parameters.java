@@ -165,7 +165,8 @@ public class Parameters {
     public double numErrors(DependencyInstance inst, String pred, String act) {
 	if(lossType.equals("nopunc"))
 	    return numErrorsDepNoPunc(inst,pred,act)+numErrorsLabelNoPunc(inst,pred,act);
-	return numErrorsDep(inst,pred,act)+numErrorsLabel(inst,pred,act);
+	//Bean: ignore deprel first
+	return numErrorsDep(inst,pred,act);//+numErrorsLabel(inst,pred,act);
     }
 
     public double numErrorsDep(DependencyInstance inst, String pred, String act) {

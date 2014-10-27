@@ -24,12 +24,12 @@ public class Decoder {
 		this.param=param;
 	}
 	
-	public ParseAgenda DecodeInstance(DependencyInstance inst, TIntIntHashMap ordermap) throws IOException{
+	public ParseAgenda DecodeInstance(DependencyInstance inst, TIntIntHashMap ordermap,FeatureVector fvforinst) throws IOException{
 		ParseAgenda pa=new ParseAgenda();
 		for(int orderindex=1;orderindex<inst.length();orderindex++){
 			//skip root node
 			int parseindex=ordermap.get(orderindex);
-			int parsehead=this.FindHeadForOneWord(inst, parseindex, pa);
+			int parsehead=this.FindHeadForOneWord(inst, parseindex, pa, fvforinst);
 			pa.AddArc(parseindex, parsehead);
             inst.heads[parseindex]=parsehead;
 		}
@@ -64,7 +64,7 @@ public class Decoder {
 		writer.close();
 	}
 	
-	public int FindHeadForOneWord(DependencyInstance inst,int childindex, ParseAgenda pa){
+	public int FindHeadForOneWord(DependencyInstance inst,int childindex, ParseAgenda pa, FeatureVector fvforinst){
 		boolean verbose=false;
 		int headindex=-1;
 		double score=Double.NEGATIVE_INFINITY;
@@ -79,7 +79,8 @@ public class Decoder {
 					score=temp;
 					headindex=head;
 					//must store best fv in DependencyInstance
-					//actfv=fv;
+					actfv=fv;
+					
 				}
 			}
 		}
@@ -90,6 +91,8 @@ public class Decoder {
 			System.out.println("Score:"+score);
 		}
 		//inst.fv.cat(actfv);
+		//Bean: store feature vector in fvforinst, for Object d[][]
+		fvforinst.cat(actfv);
 		return headindex;
 	}
 }

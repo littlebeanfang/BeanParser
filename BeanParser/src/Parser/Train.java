@@ -1,22 +1,25 @@
 package Parser;
 
+import gnu.trove.TIntIntHashMap;
+
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 
-import mstparser.DependencyParser;
-import mstparser.DependencyPipe;
-import mstparser.DependencyPipe2O;
+
+import DataStructure.DependencyInstance;
+import DataStructure.FeatureVector;
 import DataStructure.Parameters;
+import DataStructure.ParseAgenda;
 import DataStructure.ParserOptions;
 
 public class Train {
 	public ParserOptions options;
 	public Parameters params;
-	public Train(ParserOptions options, Parameters params){
+	public Train(ParserOptions options){
 		this.options = options;
-		this.params=params;
+		//this.params=params;
 	}
 	public void callTrain(){
 		DependencyPipe pipe = new MyPipe (options);
@@ -30,20 +33,19 @@ public class Train {
 				pipe.createInstances(options.trainfile);
 		
 			    pipe.closeAlphabets();
-			    Parser dp = new Parser(pipe, options);
 			    
 			    int numFeats = pipe.dataAlphabet.size();
 			    int numTypes = pipe.typeAlphabet.size();
 			    System.out.print("Num Feats: " + numFeats);	
 			    System.out.println(".\tNum Edge Labels: " + numTypes);
-			    
-			    train(instanceLengths,options.trainfile);
-			    
+			    params=new Parameters(pipe.dataAlphabet.size());
+			    train(instanceLengths,options.trainfile,pipe);
+			    Parser dp = new Parser(pipe, options,params);
 			    System.out.print("Saving model...");
 			    dp.saveModel(options.modelName);
 			    System.out.print("done.");
 	}
-	public void train(int[] instanceLengths, String trainfile) 
+	public void train(int[] instanceLengths, String trainfile, DependencyPipe  pipe) 
 			throws IOException {
 				
 			//System.out.print("About to train. ");
@@ -60,7 +62,7 @@ public class Train {
 
 			    long start = System.currentTimeMillis();
 
-			    trainingIter(instanceLengths,trainfile,i+1);
+			    trainingIter(instanceLengths,trainfile,i+1,pipe);
 
 			    long end = System.currentTimeMillis();
 			    //System.out.println("Training iter took: " + (end-start));
@@ -71,7 +73,7 @@ public class Train {
 				
 		    }
 
-		    private void trainingIter(int[] instanceLengths, String trainfile, int iter) throws IOException {
+		    private void trainingIter(int[] instanceLengths, String trainfile, int iter, DependencyPipe pipe) throws IOException {
 		    /**
 		     * TODO: Yizhong
 		     * create reader for trainfile, for instance reading later
@@ -93,6 +95,12 @@ public class Train {
 			     * 1. read an instance from train file: named inst for calling
 			     * 2. must fill actParseTree and fv 
 			     */
+			    
+			    //bean
+			    DependencyInstance inst;
+			    TIntIntHashMap ordermap;
+			    
+			    
 			    //int length = instanceLengths[i];
 
 			    /* we don't need to get these vectors
@@ -130,6 +138,13 @@ public class Train {
 			     * 2. may call decoder and turn ParseAgenda into tree string
 			     * 3. send pipe in createInstance and param in train
 			     */
+			    Decoder decoder=new Decoder(pipe, params);
+			    FeatureVector fvforinst=new FeatureVector();
+				ParseAgenda parseAgenda=decoder.DecodeInstance(inst, ordermap,fvforinst);
+				d=new Object[1][2];//K=1, means best parse
+				d[0][0]=fvforinst;
+				d[0][1]=parseAgenda.toActParseTree();
+				//Bean: ignore labeled errors in inst
 			    /*
 			    if(options.decodeType.equals("proj")) {
 				if(options.secondOrder)

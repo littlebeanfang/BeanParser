@@ -11,6 +11,7 @@ import java.io.ObjectOutputStream;
 import IO.CONLLWriter;
 import mstparser.Alphabet;
 import DataStructure.DependencyInstance;
+import DataStructure.FeatureVector;
 import DataStructure.Parameters;
 import DataStructure.ParseAgenda;
 import DataStructure.ParserOptions;
@@ -20,18 +21,26 @@ public class Parser {
 	public ParserOptions options;
 	private DependencyPipe pipe;
     private Decoder decoder;
+    private Train trainer;
     private Parameters params;
     
 	//private 
+    //constractor for decoder
     public Parser(DependencyPipe pipe, ParserOptions options) {
     	this.pipe=pipe;
     	this.options = options;
     	// Set up arrays
     	params = new Parameters(pipe.dataAlphabet.size());
     	decoder = new Decoder(pipe, params);
-        }
+    }
+    //constructor for trainer
+    public Parser(DependencyPipe pipe, ParserOptions options, Parameters params){
+    	this.pipe=pipe;
+    	this.options=options;
+    	this.params=params;
+    }
 	public void loadModel(String file) throws Exception {
-		ObjectInputStream in = new ObjectInputStream(new BufferedInputStream(new FileInputStream(file)));
+		ObjectInputStream in = new ObjectInputStream(new BufferedInputStream(new FileInputStream(System.getenv("CODEDATA")+File.separator+file)));
 		params.parameters = (double[])in.readObject();
 		System.out.println("Parameters loaded!");
 		pipe.dataAlphabet = (Alphabet)in.readObject();
@@ -61,7 +70,8 @@ public class Parser {
 
 		 DependencyInstance di;
 		 while((di=reader.getNext())!=null){
-			 ParseAgenda pa=decoder.DecodeInstance(di, di.orders);
+			 FeatureVector fv=new FeatureVector();//useless here, just align the param for DecodeInstance
+			 ParseAgenda pa=decoder.DecodeInstance(di, di.orders,fv);
 			 System.out.println(pa);
              writer.write(new DependencyInstance(RemoveRoot(di.forms),RemoveRoot(di.postags),RemoveRoot(di.deprels),RemoveRoot(di.heads)));
 		 }
@@ -72,7 +82,8 @@ public class Parser {
 		 * TODO: Bean
 		 * call Train class and organize the training process
 		 */
-		
+		this.trainer=new Train(options);
+		trainer.callTrain();
 	}
     private String[] RemoveRoot(String[] form){
         String[] ret=new String[form.length-1];
