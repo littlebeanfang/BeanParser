@@ -20,7 +20,7 @@ public class DependencyPipe {
 	
     public Alphabet typeAlphabet;
 
-    private DependencyReader depReader;
+    protected DependencyReader depReader;
     private DependencyWriter depWriter;
 
     public String[] types;
@@ -138,7 +138,7 @@ public class DependencyPipe {
 		
     }
 
-    private final void createAlphabet(String file) throws IOException {
+    public void createAlphabet(String file) throws IOException {
 
 	System.out.print("Creating Alphabet ... ");
 

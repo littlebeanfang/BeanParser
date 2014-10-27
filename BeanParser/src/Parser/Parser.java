@@ -77,7 +77,7 @@ public class Parser {
 		 }
         writer.finishWriting();
 	}
-	public void Train(){
+	public void Train() throws IOException{
 		/**
 		 * TODO: Bean
 		 * call Train class and organize the training process

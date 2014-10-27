@@ -8,11 +8,13 @@ import java.io.IOException;
 import java.io.ObjectInputStream;
 
 
+
 import DataStructure.DependencyInstance;
 import DataStructure.FeatureVector;
 import DataStructure.Parameters;
 import DataStructure.ParseAgenda;
 import DataStructure.ParserOptions;
+import IO.CONLLReader;
 
 public class Train {
 	public ParserOptions options;
@@ -21,31 +23,31 @@ public class Train {
 		this.options = options;
 		//this.params=params;
 	}
-	public void callTrain(){
-		DependencyPipe pipe = new MyPipe (options);
+	public void callTrain() throws IOException{
+		MyPipe pipe = new MyPipe (options);
 		/*TODO Yizhong 
 		 *Rewrite createInstances function, call our feature extraction function, delete second param
 		 *Attentoin: 
 		 *1. Add feature according to the gold parse
 		 *2. Write function in MyPipe.java
 		 */
-		int[] instanceLengths = 
-				pipe.createInstances(options.trainfile);
+		int numInstances = pipe.createMyAlphabet(options.trainfile);
+        //pipe.closeAlphabets();
 		
-			    pipe.closeAlphabets();
+			    //pipe.closeAlphabets();
 			    
 			    int numFeats = pipe.dataAlphabet.size();
 			    int numTypes = pipe.typeAlphabet.size();
 			    System.out.print("Num Feats: " + numFeats);	
 			    System.out.println(".\tNum Edge Labels: " + numTypes);
 			    params=new Parameters(pipe.dataAlphabet.size());
-			    train(instanceLengths,options.trainfile,pipe);
+			    train(numInstances,options.trainfile,pipe);
 			    Parser dp = new Parser(pipe, options,params);
 			    System.out.print("Saving model...");
 			    dp.saveModel(options.modelName);
 			    System.out.print("done.");
 	}
-	public void train(int[] instanceLengths, String trainfile, DependencyPipe  pipe) 
+	public void train(int numInstances, String trainfile, MyPipe  pipe) 
 			throws IOException {
 				
 			//System.out.print("About to train. ");
@@ -62,18 +64,18 @@ public class Train {
 
 			    long start = System.currentTimeMillis();
 
-			    trainingIter(instanceLengths,trainfile,i+1,pipe);
+			    trainingIter(numInstances,trainfile,i+1,pipe);
 
 			    long end = System.currentTimeMillis();
 			    //System.out.println("Training iter took: " + (end-start));
 			    System.out.println("|Time:"+(end-start)+"]");			
 			}
 
-			params.averageParams(i*instanceLengths.length);
+			params.averageParams(i*numInstances);
 				
 		    }
 
-		    private void trainingIter(int[] instanceLengths, String trainfile, int iter, DependencyPipe pipe) throws IOException {
+		    private void trainingIter(int numInstances, String trainfile, int iter, MyPipe pipe) throws IOException {
 		    /**
 		     * TODO: Yizhong
 		     * create reader for trainfile, for instance reading later
@@ -82,13 +84,29 @@ public class Train {
 			//ObjectInputStream in = new ObjectInputStream(new FileInputStream(train_forest));
 			boolean evaluateI = true;
 
-			int numInstances = instanceLengths.length;
+			//int numInstances = instanceLengths.length;
 
-			for(int i = 0; i < numInstances; i++) {
-			    if((i+1) % 500 == 0) {
-				System.out.print((i+1)+",");
-				//System.out.println("  "+(i+1)+" instances");
-			    }
+			
+	        CONLLReader reader = new CONLLReader();
+	        reader.startReading(System.getenv("CODEDATA") + File.separator + trainfile);
+	        DependencyInstance inst;
+	        int currentInstance = 0;
+	        while((inst=reader.getNext())!=null){
+	            currentInstance++;
+	            if (currentInstance % 500 == 0) {
+	                System.out.print(currentInstance + ",");
+	            }
+	            inst.setFeatureVector(pipe.extractFeatureVector(inst));
+	            String[] labs = inst.deprels;
+	            int[] heads = inst.heads;
+
+	            StringBuffer spans = new StringBuffer(heads.length * 5);
+	            for (int i = 1; i < heads.length; i++) {
+	                spans.append(heads[i]).append("|").append(i).append(":").append(pipe.typeAlphabet.lookupIndex(labs[i])).append(" ");
+	            }
+	            inst.actParseTree = spans.substring(0, spans.length() - 1);
+			
+		
 			    /**
 			     * TODO: Yizhong
 			     * Here, 
@@ -97,8 +115,7 @@ public class Train {
 			     */
 			    
 			    //bean
-			    DependencyInstance inst;
-			    TIntIntHashMap ordermap;
+			   // TIntIntHashMap ordermap;
 			    
 			    
 			    //int length = instanceLengths[i];
@@ -126,7 +143,7 @@ public class Train {
 			    else
 				inst = pipe.readInstance(in,length,fvs,probs,nt_fvs,nt_probs,params);
 */
-			    double upd = (double)(options.numIters*numInstances - (numInstances*(iter-1)+(i+1)) + 1);
+			    double upd = (double)(options.numIters*numInstances - (numInstances*(iter-1)+currentInstance) + 1);
 			    //int K = options.trainK;
 			    int K=1;//let's only consider best parse now
 			    Object[][] d = null;
@@ -140,7 +157,7 @@ public class Train {
 			     */
 			    Decoder decoder=new Decoder(pipe, params);
 			    FeatureVector fvforinst=new FeatureVector();
-				ParseAgenda parseAgenda=decoder.DecodeInstance(inst, ordermap,fvforinst);
+				ParseAgenda parseAgenda=decoder.DecodeInstance(inst, inst.orders,fvforinst);
 				d=new Object[1][2];//K=1, means best parse
 				d[0][0]=fvforinst;
 				d[0][1]=parseAgenda.toActParseTree();
