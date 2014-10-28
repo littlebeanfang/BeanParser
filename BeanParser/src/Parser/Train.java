@@ -31,7 +31,9 @@ public class Train {
 		 *1. Add feature according to the gold parse
 		 *2. Write function in MyPipe.java
 		 */
+		//System.out.println("Train file:"+options.trainfile);
 		int numInstances = pipe.createMyAlphabet(options.trainfile);
+		
         //pipe.closeAlphabets();
 		
 			    //pipe.closeAlphabets();

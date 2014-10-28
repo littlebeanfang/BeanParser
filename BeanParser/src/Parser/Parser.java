@@ -51,7 +51,7 @@ public class Parser {
 		pipe.closeAlphabets();
 	}
 	public void saveModel(String file) throws IOException {
-		ObjectOutputStream out = new ObjectOutputStream(new FileOutputStream(file));
+		ObjectOutputStream out = new ObjectOutputStream(new FileOutputStream(System.getenv("CODEDATA")+File.separator+file));
 		out.writeObject(params.parameters);
 		out.writeObject(pipe.dataAlphabet);
 		out.writeObject(pipe.typeAlphabet);
