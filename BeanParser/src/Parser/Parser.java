@@ -61,7 +61,7 @@ public class Parser {
 		 CONLLReader reader=new CONLLReader();
 		 //String filename="wsj_00_malt_processindex.txt";
 		reader.startReading(System.getenv("CODEDATA")+File.separator+parsefile);
-        File out=new File(writefile);
+        File out=new File(System.getenv("CODEDATA")+File.separator+writefile);
         if(!out.exists()){
             out.createNewFile();
         }

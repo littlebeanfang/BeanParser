@@ -54,7 +54,7 @@ public class Train {
 				
 			//System.out.print("About to train. ");
 			//System.out.print("Num Feats: " + pipe.dataAlphabet.size());
-				
+			long traintimestart=System.currentTimeMillis();	
 			int i = 0;
 			for(i = 0; i < options.numIters; i++) {
 					
@@ -74,7 +74,14 @@ public class Train {
 			}
 
 			params.averageParams(i*numInstances);
-				
+			long traintimeend=System.currentTimeMillis();
+			System.out.println("==============================================");
+			System.out.println("Train File:"+options.trainfile);
+			System.out.println("Model Name:"+options.modelName);
+			System.out.println("Sentence Number:"+numInstances);
+			System.out.println("Iteration Number:"+options.numIters);
+			System.out.println("Train Time Total:"+(traintimeend-traintimestart)/1000.0);
+			System.out.println("==============================================");
 		    }
 
 		    private void trainingIter(int numInstances, String trainfile, int iter, MyPipe pipe) throws IOException {
