@@ -42,16 +42,17 @@ public class Parser {
 	public void loadModel(String file) throws Exception {
 		ObjectInputStream in = new ObjectInputStream(new BufferedInputStream(new FileInputStream(System.getenv("CODEDATA")+File.separator+file)));
 		params.parameters = (double[])in.readObject();
-		System.out.println("Parameters loaded!");
+		//System.out.println("Parameters loaded!");
 		pipe.dataAlphabet = (Alphabet)in.readObject();
-		System.out.println("dataAlphabet loaded!");
+		//System.out.println("dataAlphabet loaded!");
 		pipe.typeAlphabet = (Alphabet)in.readObject();
-		System.out.println("typeAlphabet loaded!");
+		//System.out.println("typeAlphabet loaded!");
+		System.out.println("Model loaded!");
 		in.close();
 		pipe.closeAlphabets();
 	}
 	public void saveModel(String file) throws IOException {
-		ObjectOutputStream out = new ObjectOutputStream(new FileOutputStream(file));
+		ObjectOutputStream out = new ObjectOutputStream(new FileOutputStream(System.getenv("CODEDATA")+File.separator+file));
 		out.writeObject(params.parameters);
 		out.writeObject(pipe.dataAlphabet);
 		out.writeObject(pipe.typeAlphabet);
@@ -69,12 +70,23 @@ public class Parser {
         writer.startWriting(System.getenv("CODEDATA")+File.separator+writefile);
 
 		 DependencyInstance di;
+		 int instcount=0;
+		 System.out.println("Process index:");
+		 long parsestart=System.currentTimeMillis();
 		 while((di=reader.getNext())!=null){
+			 System.out.print((++instcount)+"   ");
 			 FeatureVector fv=new FeatureVector();//useless here, just align the param for DecodeInstance
-			 ParseAgenda pa=decoder.DecodeInstance(di, di.orders,fv);
-			 System.out.println(pa);
+			 ParseAgenda pa=(ParseAgenda) decoder.DecodeInstance(di, di.orders)[0];
+			 //System.out.println(pa);
              writer.write(new DependencyInstance(RemoveRoot(di.forms),RemoveRoot(di.postags),RemoveRoot(di.deprels),RemoveRoot(di.heads)));
 		 }
+		 long parseend=System.currentTimeMillis();
+		System.out.println("\n==============================================");
+		System.out.println("Test File:"+options.testfile);
+		System.out.println("Model Name:"+options.modelName);
+		System.out.println("Sentence Number:"+instcount);
+		System.out.println("Train Time Total:"+(parseend-parsestart)/1000.0);
+		System.out.println("==============================================");
         writer.finishWriting();
 	}
 	public void Train() throws IOException{

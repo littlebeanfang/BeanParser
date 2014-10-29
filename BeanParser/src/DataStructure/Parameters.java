@@ -41,7 +41,11 @@ public class Parameters {
 		
 	String actParseTree = inst.actParseTree;
 	FeatureVector actFV = inst.fv;
-
+//	System.out.println("updateParamsMIRA==============");
+//	System.out.println("updateParamsMIRA_actParseTree:"+actParseTree);
+//	System.out.println("updateParamsMIRA_actFV: length "+actFV.toString().split(" ").length+",fv:"+actFV);
+//	System.out.println("updateParamsMIRA_d[][0] fv length:"+d[0][0].toString().split(" ").length+",fv:"+d[0][0].toString());
+//	System.out.println("updateParamsMIRA_d[][0] tree:"+d[0][1]);
 	int K = 0;
 	for(int i = 0; i < d.length && d[i][0] != null; i++) {
 	    K = i+1;
@@ -58,7 +62,9 @@ public class Parameters {
 	    b[k] -= lam_dist[k];
 	    dist[k] = actFV.getDistVector((FeatureVector)d[k][0]);
 	}
-
+//	System.out.println("updateParamsMIRA_disk[]:"+java.util.Arrays.toString(lam_dist));
+//	System.out.println("updateParamsMIRA_b[]:"+java.util.Arrays.toString(b));
+//	System.out.println(dist.toString());
 	double[] alpha = hildreth(dist,b);
 		
 	FeatureVector fv  = null;
@@ -76,7 +82,7 @@ public class Parameters {
             //}
 	    
 	}
-
+//	System.out.println("updateParamsMIRA END==============");
     }
 
     public double getScore(FeatureVector fv) {

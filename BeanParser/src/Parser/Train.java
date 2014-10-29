@@ -41,8 +41,10 @@ public class Train {
 			    System.out.print("Num Feats: " + numFeats);	
 			    System.out.println(".\tNum Edge Labels: " + numTypes);
 			    params=new Parameters(pipe.dataAlphabet.size());
+//			    System.out.println("Init param:"+java.util.Arrays.toString(params.parameters));
 			    train(numInstances,options.trainfile,pipe);
 			    Parser dp = new Parser(pipe, options,params);
+//			    System.out.println("Train param:"+java.util.Arrays.toString(params.parameters));
 			    System.out.print("Saving model...");
 			    dp.saveModel(options.modelName);
 			    System.out.print("done.");
@@ -163,9 +165,14 @@ public class Train {
 			     * 3. send pipe in createInstance and param in train
 			     */
 			    Decoder decoder=new Decoder(pipe, params);
-			    FeatureVector fvforinst=new FeatureVector();
-				ParseAgenda parseAgenda=decoder.DecodeInstance(inst, inst.orders,fvforinst);
+			    //FeatureVector fvforinst=new FeatureVector();
+			    Object[] decodeinstret=decoder.DecodeInstance(inst, inst.orders);
+				ParseAgenda parseAgenda=(ParseAgenda) decodeinstret[0];
+				FeatureVector fvforinst=(FeatureVector) decodeinstret[1];
 				d=new Object[1][2];//K=1, means best parse
+//				System.out.println("trainingIter===================");
+//				System.out.println("fvforinst:"+fvforinst.toString());
+//				System.out.println("trainingIter END===================");
 				d[0][0]=fvforinst;
 				d[0][1]=parseAgenda.toActParseTree();
 				//Bean: ignore labeled errors in inst

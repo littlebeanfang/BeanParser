@@ -24,19 +24,26 @@ public class Decoder {
 		this.param=param;
 	}
 	
-	public ParseAgenda DecodeInstance(DependencyInstance inst, TIntIntHashMap ordermap,FeatureVector fvforinst) throws IOException{
+	public Object[] DecodeInstance(DependencyInstance inst, TIntIntHashMap ordermap) throws IOException{
 		ParseAgenda pa=new ParseAgenda();
+		Object[] instret=new Object[2];
+		FeatureVector fvforinst=new FeatureVector();
 		for(int orderindex=1;orderindex<inst.length();orderindex++){
 			//skip root node
 			int parseindex=ordermap.get(orderindex);
-			int parsehead=this.FindHeadForOneWord(inst, parseindex, pa, fvforinst);
+			Object[] ret=this.FindHeadForOneWord(inst, parseindex, pa);
+			int parsehead=(int) ret[0];
+//			System.out.println("DecodeInstance fvforinst after call findhead:"+ret[1].toString().split(" ").length);
 			pa.AddArc(parseindex, parsehead);
+			fvforinst=fvforinst.cat((FeatureVector) ret[1]);
             inst.heads[parseindex]=parsehead;
 		}
-		pa.AddArc(0, -1);//add root
 		
+		pa.AddArc(0, -1);//add root
 		//PrintScores(inst, pa);
-		return pa;
+		instret[0]=pa;
+		instret[1]=fvforinst;
+		return instret;
 	}
 	
 	public void PrintScores(DependencyInstance inst, ParseAgenda pa) throws IOException {
@@ -64,7 +71,8 @@ public class Decoder {
 		writer.close();
 	}
 	
-	public int FindHeadForOneWord(DependencyInstance inst,int childindex, ParseAgenda pa, FeatureVector fvforinst){
+	public Object[] FindHeadForOneWord(DependencyInstance inst,int childindex, ParseAgenda pa){
+		Object[] ret=new Object[2];
 		boolean verbose=false;
 		int headindex=-1;
 		double score=Double.NEGATIVE_INFINITY;
@@ -92,7 +100,14 @@ public class Decoder {
 		}
 		//inst.fv.cat(actfv);
 		//Bean: store feature vector in fvforinst, for Object d[][]
-		fvforinst.cat(actfv);
-		return headindex;
+//		System.out.println("==================FindHeadForOneWord");
+//		System.out.println("actfv while decoding:"+actfv.toString().split(" ").length+"   fv:"+actfv.toString());
+		//System.out.println("fvforinst while decoding before cat:length"+fvforinst.toString().split(" ").length);
+		//fvforinst=fvforinst.cat(actfv);
+		//System.out.println("fvforinst while decoding:length"+fvforinst.toString().split(" ").length+"   fv:"+fvforinst.toString());
+//		System.out.println("==================FindHeadForOneWord END");
+		ret[0]=headindex;
+		ret[1]=actfv;
+		return ret;
 	}
 }
