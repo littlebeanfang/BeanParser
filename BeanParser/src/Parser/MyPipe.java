@@ -235,6 +235,7 @@ public class MyPipe extends DependencyPipe {
         DependencyInstance instance = reader.getNext();
         while (instance != null) {
             numInstances++;
+            System.out.print("sent "+numInstances+",");
             String[] labs = instance.deprels;
             for (int i = 0; i < labs.length; i++) {
                 typeAlphabet.lookupIndex(labs[i]);
