@@ -9,6 +9,8 @@ import java.io.ObjectInputStream;
 
 
 
+import java.util.Arrays;
+
 import DataStructure.DependencyInstance;
 import DataStructure.FeatureVector;
 import DataStructure.Parameters;
@@ -17,6 +19,8 @@ import DataStructure.ParserOptions;
 import IO.CONLLReader;
 
 public class Train {
+	//TODO: change this to decide whether predict label
+		boolean parsewithrelation=true;
 	public ParserOptions options;
 	public Parameters params;
 	public Train(ParserOptions options){
@@ -40,6 +44,7 @@ public class Train {
 			    int numTypes = pipe.typeAlphabet.size();
 			    System.out.print("Num Feats: " + numFeats);	
 			    System.out.println(".\tNum Edge Labels: " + numTypes);
+			    //System.out.println(Arrays.toString(pipe.typeAlphabet.toArray()));
 			    params=new Parameters(pipe.dataAlphabet.size());
 //			    System.out.println("Init param:"+java.util.Arrays.toString(params.parameters));
 			    train(numInstances,options.trainfile,pipe);
@@ -105,7 +110,8 @@ public class Train {
 	            if (currentInstance % 500 == 0) {
 	                System.out.print(currentInstance + ",");
 	            }
-	            inst.setFeatureVector(pipe.extractFeatureVector(inst));
+	            FeatureVector[] retfv=pipe.extractFeatureVector(inst);
+	            inst.setFeatureVector(retfv[0]);
 	            String[] labs = inst.deprels;
 	            int[] heads = inst.heads;
 
@@ -166,15 +172,21 @@ public class Train {
 			     */
 			    Decoder decoder=new Decoder(pipe, params);
 			    //FeatureVector fvforinst=new FeatureVector();
+			    FeatureVector checkparamupdate=new FeatureVector();
 			    Object[] decodeinstret=decoder.DecodeInstance(inst, inst.orders);
+			    checkparamupdate=(FeatureVector)decodeinstret[2];
 				ParseAgenda parseAgenda=(ParseAgenda) decodeinstret[0];
 				FeatureVector fvforinst=(FeatureVector) decodeinstret[1];
 				d=new Object[1][2];//K=1, means best parse
 //				System.out.println("trainingIter===================");
 //				System.out.println("fvforinst:"+fvforinst.toString());
 //				System.out.println("trainingIter END===================");
+				System.out.println("star:"+Arrays.toString(inst.deprels));
 				d[0][0]=fvforinst;
-				d[0][1]=parseAgenda.toActParseTree();
+				System.out.println("fvforinst size:"+fvforinst.size());
+				d[0][1]=parsewithrelation?parseAgenda.toActParseTree(inst):parseAgenda.toActParseTree();
+				System.out.println("d[0][1]="+d[0][1]);
+				System.out.println("actparse:"+inst.actParseTree);
 				//Bean: ignore labeled errors in inst
 			    /*
 			    if(options.decodeType.equals("proj")) {
@@ -196,8 +208,14 @@ public class Train {
 				    d = decoder.decodeNonProjective(inst,fvs,probs,nt_fvs,nt_probs,K);
 			    }
 			    */
+//				System.out.println("fvforinst decode:"+fvforinst.size());
+//				System.out.println("+++++++Before update:");
+				//pipe.PrintFVScore(checkparamupdate, params.parameters);
+//				pipe.PrintFVScore(retfv[1], params.parameters);
 			    params.updateParamsMIRA(inst,d,upd);
-
+//			    System.out.println("+++++++After update:");
+			    //pipe.PrintFVScore(checkparamupdate, params.parameters);
+//			    pipe.PrintFVScore(retfv[1], params.parameters);
 			}
 
 			//System.out.println("");	

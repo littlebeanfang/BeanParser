@@ -35,8 +35,8 @@ import java.util.*;
  * @see mstparser.Feature
  */
 public final class FeatureVector extends TLinkedList {
-    private FeatureVector subfv1 = null;
-    private FeatureVector subfv2 = null;
+    public FeatureVector subfv1 = null;
+    public FeatureVector subfv2 = null;
     private boolean negateSecondSubFV = false;
 
     public FeatureVector () {}
@@ -238,5 +238,14 @@ public final class FeatureVector extends TLinkedList {
 	while (it.hasNext())
 	    sb.append(it.next().toString()).append(' ');
     }
-
+    public int size(){
+    	int sum=super.size();
+    	if(subfv1!=null){
+    		sum+=subfv1.size();
+    	}
+    	if(subfv2!=null){
+    		sum+=subfv2.size();
+    	}
+    	return sum;
+    }
 }

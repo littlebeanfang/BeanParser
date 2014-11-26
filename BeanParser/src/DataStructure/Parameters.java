@@ -6,6 +6,8 @@ import java.util.ListIterator;
 import gnu.trove.*;
 
 public class Parameters {
+	//TODO: change this to decide whether predict label
+		boolean parsewithrelation=true;
 
     private double SCORE = 0.0;
 
@@ -45,7 +47,7 @@ public class Parameters {
 //	System.out.println("updateParamsMIRA_actParseTree:"+actParseTree);
 //	System.out.println("updateParamsMIRA_actFV: length "+actFV.toString().split(" ").length+",fv:"+actFV);
 //	System.out.println("updateParamsMIRA_d[][0] fv length:"+d[0][0].toString().split(" ").length+",fv:"+d[0][0].toString());
-//	System.out.println("updateParamsMIRA_d[][0] tree:"+d[0][1]);
+//	System.out.println("updateParamsMIRA_d[][1] tree:"+d[0][1]);
 	int K = 0;
 	for(int i = 0; i < d.length && d[i][0] != null; i++) {
 	    K = i+1;
@@ -171,8 +173,12 @@ public class Parameters {
     public double numErrors(DependencyInstance inst, String pred, String act) {
 	if(lossType.equals("nopunc"))
 	    return numErrorsDepNoPunc(inst,pred,act)+numErrorsLabelNoPunc(inst,pred,act);
-	//Bean: ignore deprel first
-	return numErrorsDep(inst,pred,act);//+numErrorsLabel(inst,pred,act);
+		if(parsewithrelation){
+			return numErrorsDep(inst,pred,act)+numErrorsLabel(inst,pred,act);
+		}else{
+			//Bean: ignore deprel first
+			return numErrorsDep(inst,pred,act);//+numErrorsLabel(inst,pred,act);
+		}
     }
 
     public double numErrorsDep(DependencyInstance inst, String pred, String act) {
@@ -188,7 +194,7 @@ public class Parameters {
 		correct++;
 	    }
 	}		
-
+	System.out.println("Dep Error:"+((double)act_spans.length - correct));
 	return ((double)act_spans.length - correct);
 		
     }
@@ -206,7 +212,7 @@ public class Parameters {
 		correct++;
 	    }
 	}		
-
+	System.out.println("Label Error:"+((double)act_spans.length - correct));
 	return ((double)act_spans.length - correct);
 		
     }

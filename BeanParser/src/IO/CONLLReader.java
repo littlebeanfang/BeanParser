@@ -84,6 +84,8 @@ public class CONLLReader extends DependencyReader {
 	    pos[i+1] = info[4];
 	    feats[i+1] = info[5].split("\\|");
 	    deprels[i+1] = labeled ? info[7] : "<no-type>";
+	    //System.out.println("labeled:"+labeled);
+	    
 	    heads[i+1] = Integer.parseInt(info[6]);
 		if (confScores)
 			confscores[i+1] = Double.parseDouble(info[10]);
@@ -91,7 +93,7 @@ public class CONLLReader extends DependencyReader {
 			ordermap.put(Integer.parseInt(info[10]), i+1);
 		}
 	}
-	
+	//System.out.println(Arrays.toString(deprels));
 	feats[0] = new String[feats[1].length];
 	for (int i = 0; i< feats[1].length; i++)
 	    feats[0][i] = "<root-feat>"+i;

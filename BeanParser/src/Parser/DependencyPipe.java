@@ -180,6 +180,7 @@ public class DependencyPipe {
     // add with default 1.0
     public final void add(String feat, FeatureVector fv) {
 	int num = dataAlphabet.lookupIndex(feat);
+	//System.out.println("feat:"+feat+",num:"+num);
 	if(num >= 0)
 	    fv.add(num, 1.0);
     }
