@@ -79,8 +79,6 @@ public class MyPipe extends DependencyPipe {
         }
     }
 
-    ;
-
     private final void addSiblingFeatures(DependencyInstance instance, int ch1,
                                           int ch2, boolean isST, FeatureVector fv) {
 
@@ -144,12 +142,73 @@ public class MyPipe extends DependencyPipe {
 
     }
 
-    /*
-        public void AddNewFeature(DependencyInstance inst, int childindex,
-                int parentindex, ParseAgenda pa, FeatureVector fv) {
+    //New features mentioned in Carreras's paper added to original MST parser for the structure of Grandparent-Head-Modifier
+    //Written by Yizhong
+    private final void addGHMFeatures(DependencyInstance instance, int grandparent,
+                                      int head, int modifier, FeatureVector fv) {
 
-        }
-        */
+        String[] forms = instance.forms;
+        String[] pos = instance.postags;
+
+        String G_H_dir = grandparent < head ? "RA" : "LA";
+        String H_M_dir = head < modifier ? "RA" : "LA";
+
+        String G_pos = pos[grandparent];
+        String G_word = forms[grandparent];
+        String H_pos = pos[head];
+        String H_word = forms[head];
+        String M_pos = pos[modifier];
+        String M_word = forms[modifier];
+
+        add("YZ_PGPHPM=" + G_H_dir + "_" + H_M_dir + "_" + G_pos + "_" + H_pos + "_" + M_pos, 1.0, fv);
+        add("YZ_PGPM=" + G_H_dir + "_" + H_M_dir + "_" + G_pos + "_" + M_pos, 1.0, fv);
+        add("YZ_PHPM=" + G_H_dir + "_" + H_M_dir + "_" + H_pos + "_" + M_pos, 1.0, fv);
+        add("YZ_WGWM=" + G_H_dir + "_" + H_M_dir + "_" + G_word + "_" + M_word, 1.0, fv);
+        add("YZ_WHWM=" + G_H_dir + "_" + H_M_dir + "_" + H_word + "_" + M_word, 1.0, fv);
+        add("YZ_PGWM=" + G_H_dir + "_" + H_M_dir + "_" + G_pos + "_" + M_word, 1.0, fv);
+        add("YZ_PHWM=" + G_H_dir + "_" + H_M_dir + "_" + H_pos + "_" + M_word, 1.0, fv);
+        add("YZ_WGPM=" + G_H_dir + "_" + H_M_dir + "_" + G_word + "_" + M_pos, 1.0, fv);
+        add("YZ_WHPM=" + G_H_dir + "_" + H_M_dir + "_" + H_word + "_" + M_pos, 1.0, fv);
+    }
+
+
+    //The new features Yue Zhang used in her beam search algorithm parser
+    //written by yizhong
+    private final void addBeamFeatures(DependencyInstance instance, ParseAgenda pa, int head,
+                                       int modifier, FeatureVector fv) {
+
+        String[] forms = instance.forms;
+        String[] pos = instance.postags;
+
+        //String H_M_dir = head < modifier ? "RA" : "LA";
+
+        String H_pos = pos[head];
+        String H_word = forms[head];
+        String M_pos = pos[modifier];
+        String M_word = forms[modifier];
+
+        int clc_index;
+        int crc_index;
+        //TODO: find the clc and crc index of the head-modifier pair
+        String CLC_pos = pos[clc_index];
+        String CRC_pos = pos[crc_index];
+
+        String la;
+        String ra;
+
+        //TODO: la and ra is the number of children to the left or right
+
+        add("YZ_PtCtCLCt=" + H_pos + "_" + M_pos + "_" + CLC_pos, 1.0, fv);
+        add("YZ_PtCtCRCt=" + H_pos + "_" + M_pos + "_" + CRC_pos, 1.0, fv);
+
+        add("YZ_Ptla=" + H_pos + "_" + la, 1.0, fv);
+        add("YZ_PtRa=" + H_pos + "_" + ra, 1.0, fv);
+        add("YZ_Pwtla=" + H_pos + "_" + H_word + "_" + la, 1.0, fv);
+        add("YZ_Pwtra=" + H_pos + "_" + H_word + "_" + ra, 1.0, fv);
+    }
+
+
+
 //-----------------------------Functions for Training-------------------------------------
     public int[] createInstances(String file) throws IOException {
 
