@@ -11,6 +11,7 @@ import gnu.trove.TIntIntIterator;
 
 import java.io.File;
 import java.io.IOException;
+import java.sql.PseudoColumnUsage;
 
 public class MyPipe extends DependencyPipe {
 
@@ -276,6 +277,9 @@ public class MyPipe extends DependencyPipe {
             //skip root node
             int parseindex = ordermap.get(orderindex);
             int parsehead = heads[parseindex];
+            
+            pa.ChildProcess(parseindex, parsehead);
+            
             extractFeatures(instance, parseindex, parsehead, pa, fv);
             pa.AddArc(parseindex, parsehead);
         }
