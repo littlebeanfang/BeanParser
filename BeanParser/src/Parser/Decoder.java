@@ -40,6 +40,7 @@ public class Decoder {
 			int parsehead=(int) ret[0];
 //			System.out.println("DecodeInstance fvforinst after call findhead:"+ret[1].toString().split(" ").length);
 			pa.AddArc(parseindex, parsehead);
+			pa.ChildProcess(parseindex, parsehead);
 			fvforinst=fvforinst.cat((FeatureVector) ret[1]);
             inst.heads[parseindex]=parsehead;
 		}
