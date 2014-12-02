@@ -1,12 +1,10 @@
 package DataStructure;
 
-import java.awt.BufferCapabilities;
+import gnu.trove.TIntIntHashMap;
+import mstparser.Alphabet;
+
 import java.util.HashMap;
 import java.util.Map;
-
-import mstparser.Alphabet;
-import gnu.trove.TIntIntHashMap;
-import gnu.trove.TIntIntIterator;
 
 /**
  * used to store partial parse, child-head key-value pairs
@@ -15,11 +13,11 @@ import gnu.trove.TIntIntIterator;
  */
 public class ParseAgenda {
 	public TIntIntHashMap tii;
-	private Alphabet typealphabet;
 	public TIntIntHashMap numofleftchild;
 	public TIntIntHashMap numofrightchild;
-	public Map<Integer,StringBuffer> rightchilds=new HashMap<Integer,StringBuffer>();//split by \t
-	public Map<Integer,StringBuffer> leftchilds=new HashMap<Integer,StringBuffer>();
+	public Map<Integer, StringBuffer> rightchilds = new HashMap<Integer, StringBuffer>();//split by \t
+	public Map<Integer, StringBuffer> leftchilds = new HashMap<Integer, StringBuffer>(); //StringBuffer is unordered
+	private Alphabet typealphabet;
 	
 	public ParseAgenda(){
 		this.tii=new TIntIntHashMap();
