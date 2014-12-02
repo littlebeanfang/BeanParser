@@ -19,10 +19,10 @@ import IO.CONLLReader;
 
 public class Parser {
 	public ParserOptions options;
-	private DependencyPipe pipe;
+	public DependencyPipe pipe;
     private Decoder decoder;
     private Train trainer;
-    private Parameters params;
+    public Parameters params;
     
 	//private 
     //constractor for decoder
