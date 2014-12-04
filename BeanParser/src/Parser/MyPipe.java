@@ -5,13 +5,10 @@ import DataStructure.FeatureVector;
 import DataStructure.ParseAgenda;
 import DataStructure.ParserOptions;
 import IO.CONLLReader;
-import gnu.trove.TIntArrayList;
 import gnu.trove.TIntIntHashMap;
-import gnu.trove.TIntIntIterator;
 
 import java.io.File;
 import java.io.IOException;
-import java.sql.PseudoColumnUsage;
 
 public class MyPipe extends DependencyPipe {
 
@@ -37,6 +34,8 @@ public class MyPipe extends DependencyPipe {
 
         addTwoOrderFeatures(instance, parentindex, childindex, pa, fv);
 
+        addBeamFeatures(instance, parentindex, childindex, pa, fv);
+
     }
 
     private final void addTwoOrderFeatures(DependencyInstance instance,
@@ -47,23 +46,68 @@ public class MyPipe extends DependencyPipe {
             // candidate already has head,so we
             // can add grandparent-parent-child
             // feature
-
         }
 
         if (pa.tii.containsValue(childindex)) { // this shows that the child
             // candidate is already used as
             // another word's parent
+            StringBuffer lsb = pa.leftchilds.get(childindex);
+            StringBuffer rsb = pa.rightchilds.get(childindex);
+            String[] grandchildren = {};
+
+            if (lsb != null && rsb != null) {
+                grandchildren = (lsb.append("\t").append(rsb)).toString().split("\t");
+            } else {
+                if (lsb == null && rsb != null) {
+                    grandchildren = rsb.toString().split("\t");
+                } else {
+                    if (lsb != null && rsb == null) {
+                        grandchildren = lsb.toString().split("\t");
+                    }
+                }
+            }
+            //TODO: It still needs further discussion how to add this structure : the GHM or GMH or MGH or MHG and so on.
+            for (String grandchild : grandchildren) {    // add parent-child-grandchild structure features
+                //System.out.print(grandchild);
+                int grandchild_index = Integer.parseInt(grandchild);
+                addGHMFeatures(instance, parentindex, childindex, grandchild_index, fv);
+            }
 
         }
 
-        //for (TIntIntIterator iter = pa.tii.iterator(); iter.hasNext();){
-        //	iter.advance();
-        //	System.out.println(iter.key() + "\t" + iter.value());
-        //}
 
         if (pa.tii.containsValue(parentindex)) { // this shows that the parent
             // candidate has already been
             // another word's parent
+
+            StringBuffer lsb = pa.leftchilds.get(parentindex);
+            if (lsb != null) {
+                String[] left_childrens = lsb.toString().split("\t");
+                for (String existing_child : left_childrens) {     //MST 2nd order features
+                    int existing_child_index = Integer.parseInt(existing_child);
+                    addTripFeatures(instance, childindex, existing_child_index,
+                            parentindex, fv); // parent can be in any place
+                    addSiblingFeatures(instance, childindex, existing_child_index,
+                            false, fv);
+                    addSiblingFeatures(instance, childindex, existing_child_index,
+                            true, fv);
+                }
+            }
+            StringBuffer rsb = pa.rightchilds.get(parentindex);
+            if (rsb != null) {
+                String[] right_childrens = rsb.toString().split("\t");
+                for (String existing_child : right_childrens) {    //MST 2nd order features
+                    int existing_child_index = Integer.parseInt(existing_child);
+                    addTripFeatures(instance, childindex, existing_child_index,
+                            parentindex, fv); // parent can be in any place
+                    addSiblingFeatures(instance, childindex, existing_child_index,
+                            false, fv);
+                    addSiblingFeatures(instance, childindex, existing_child_index,
+                            true, fv);
+                }
+            }
+            /*
+            //Since parseagenda is changed, this laborious work is unnecessary
             for (TIntIntIterator iter = pa.tii.iterator(); iter.hasNext(); ) {
                 iter.advance();
                 int existing_child = iter.key();
@@ -76,7 +120,7 @@ public class MyPipe extends DependencyPipe {
                     addSiblingFeatures(instance, childindex, existing_child,
                             true, fv);
                 }
-            }
+            }*/
         }
     }
 
@@ -175,122 +219,86 @@ public class MyPipe extends DependencyPipe {
 
     //The new features Yue Zhang used in her beam search algorithm parser
     //written by yizhong
-    private final void addBeamFeatures(DependencyInstance instance, ParseAgenda pa, int head,
-                                       int modifier, FeatureVector fv) {
+    private final void addBeamFeatures(DependencyInstance instance, int head,
+                                       int modifier, ParseAgenda pa, FeatureVector fv) {
 
         String[] forms = instance.forms;
         String[] pos = instance.postags;
 
-        //String H_M_dir = head < modifier ? "RA" : "LA";
-
         String H_pos = pos[head];
         String H_word = forms[head];
         String M_pos = pos[modifier];
-        String M_word = forms[modifier];
 
-        int clc_index;
-        int crc_index;
-        //TODO: find the clc and crc index of the head-modifier pair
+        int clc_index = modifier;
+        StringBuffer lsb = pa.leftchilds.get(modifier);
+        if (lsb != null) {
+            String[] left_children = lsb.toString().split("\t");
+            for (String child : left_children) {
+                int child_index = Integer.parseInt(child);
+                if (child_index < clc_index)
+                    clc_index = child_index;
+            }
+        }
+
+        int crc_index = modifier;
+        StringBuffer rsb = pa.rightchilds.get(modifier);
+        if (rsb != null) {
+            String[] right_children = rsb.toString().split("\t");
+            for (String child : right_children) {
+                int child_index = Integer.parseInt(child);
+                if (child_index > crc_index)
+                    crc_index = child_index;
+            }
+        }
+
         String CLC_pos = pos[clc_index];
         String CRC_pos = pos[crc_index];
-
-        String la;
-        String ra;
-
-        //TODO: la and ra is the number of children to the left or right
 
         add("YZ_PtCtCLCt=" + H_pos + "_" + M_pos + "_" + CLC_pos, 1.0, fv);
         add("YZ_PtCtCRCt=" + H_pos + "_" + M_pos + "_" + CRC_pos, 1.0, fv);
 
-        add("YZ_Ptla=" + H_pos + "_" + la, 1.0, fv);
-        add("YZ_PtRa=" + H_pos + "_" + ra, 1.0, fv);
-        add("YZ_Pwtla=" + H_pos + "_" + H_word + "_" + la, 1.0, fv);
-        add("YZ_Pwtra=" + H_pos + "_" + H_word + "_" + ra, 1.0, fv);
+
+        // The features that include the left children num and right children num of parent
+        int left_ch_num = pa.numofleftchild.get(head);
+        int right_ch_num = pa.numofrightchild.get(head);
+
+        //System.out.println("The left children num"+left_ch_num);
+
+
+        add("YZ_Ptla=" + H_pos + "_" + left_ch_num, 1.0, fv);
+        add("YZ_PtRa=" + H_pos + "_" + right_ch_num, 1.0, fv);
+        add("YZ_Pwtla=" + H_pos + "_" + H_word + "_" + left_ch_num, 1.0, fv);
+        add("YZ_Pwtra=" + H_pos + "_" + H_word + "_" + right_ch_num, 1.0, fv);
     }
 
 
-
-//-----------------------------Functions for Training-------------------------------------
-    public int[] createInstances(String file) throws IOException {
-
-        createAlphabet(file);
-
-        System.out.println("Num Features: " + dataAlphabet.size());
-
-        labeled = depReader.startReading(file);              //There is a question why some funcions are abstract??????
-
-        TIntArrayList lengths = new TIntArrayList();
-
-        /*ObjectOutputStream out = options.createForest
-                ? new ObjectOutputStream(new FileOutputStream(featFileName))
-                : null;
-        */
-        DependencyInstance instance = depReader.getNext();
-        int num1 = 0;
-
-        System.out.println("Creating Feature Vector Instances: ");
-        while (instance != null) {
-            System.out.print(num1 + " ");
-
-            instance.setFeatureVector(createFeatureVector(instance));
-
-            String[] labs = instance.deprels;
-            int[] heads = instance.heads;
-
-            StringBuffer spans = new StringBuffer(heads.length * 5);
-            for (int i = 1; i < heads.length; i++) {
-                spans.append(heads[i]).append("|").append(i).append(":").append(typeAlphabet.lookupIndex(labs[i])).append(" ");
-            }
-            instance.actParseTree = spans.substring(0, spans.length() - 1);
-
-            lengths.add(instance.length());
-
-            /*if (options.createForest)
-                writeInstance(instance, out);*/
-            //instance = null;
-            instance = depReader.getNext();
-
-            num1++;
-        }
-
-        System.out.println();
-
-        closeAlphabets();
-
-        /*if (options.createForest)
-            out.close();
-        */
-        return lengths.toNativeArray();
-
-    }
+    //-----------------------------Functions for Training-------------------------------------
 
     public FeatureVector extractFeatureVector(DependencyInstance instance) {
 
-        final int instanceLength = instance.length();
+        //final int instanceLength = instance.length();
 
-        String[] labs = instance.deprels;
+        //String[] labs = instance.deprels;
         int[] heads = instance.heads;
-        TIntIntHashMap ordermap = instance.orders;
+        TIntIntHashMap order_map = instance.orders;
         FeatureVector fv = new FeatureVector();
         ParseAgenda pa = new ParseAgenda();
-        for (int orderindex = 1; orderindex < instance.length(); orderindex++) {
+        for (int order_index = 1; order_index < instance.length(); order_index++) {
             //skip root node
-            int parseindex = ordermap.get(orderindex);
-            int parsehead = heads[parseindex];
-            
-            pa.ChildProcess(parseindex, parsehead);
-            
-            extractFeatures(instance, parseindex, parsehead, pa, fv);
-            pa.AddArc(parseindex, parsehead);
+            int parse_index = order_map.get(order_index);
+            int parse_head = heads[parse_index];
+
+            pa.ChildProcess(parse_index, parse_head);
+
+            extractFeatures(instance, parse_index, parse_head, pa, fv);
+            pa.AddArc(parse_index, parse_head);
         }
+
         pa.AddArc(0, -1);//add root
-
-
         return fv;
     }
 
     public final int createMyAlphabet(String file) throws IOException {
-
         System.out.print("Creating Alphabet ... ");
         CONLLReader reader = new CONLLReader();
         labeled = reader.startReading(System.getenv("CODEDATA") + File.separator + file);
@@ -306,7 +314,7 @@ public class MyPipe extends DependencyPipe {
             instance = reader.getNext();
         }
         closeAlphabets();
-        System.out.println("Done.");
+        System.out.println("Creating Alphabet Done.");
         return numInstances;
     }
 
