@@ -38,7 +38,7 @@ public class MyPipe extends DependencyPipe {
 
     }
 
-    private final void addTwoOrderFeatures(DependencyInstance instance,
+    private void addTwoOrderFeatures(DependencyInstance instance,
                                            int parentindex, int childindex, ParseAgenda pa, FeatureVector fv) {
         //System.out.println(childindex + "\t" + parentindex);
 
@@ -48,6 +48,7 @@ public class MyPipe extends DependencyPipe {
             // feature
         }
 
+        //TODO: It still needs further discussion how to add this structure : the GHM or GMH or MGH or MHG and so on.
         if (pa.tii.containsValue(childindex)) { // this shows that the child
             // candidate is already used as
             // another word's parent
@@ -55,7 +56,17 @@ public class MyPipe extends DependencyPipe {
             StringBuffer rsb = pa.rightchilds.get(childindex);
             String[] grandchildren = {};
 
-            if (lsb != null && rsb != null) {
+            if (childindex > parentindex) {
+                if (rsb != null) {  // add the structure G-H-M
+                    grandchildren = rsb.toString().split("\t");
+                }
+            } else {
+                if (lsb != null) { // add the structure M-H-G
+                    grandchildren = lsb.toString().split("\t");
+                }
+            }
+
+            /*if (lsb != null && rsb != null) {
                 grandchildren = (lsb.append("\t").append(rsb)).toString().split("\t");
             } else {
                 if (lsb == null && rsb != null) {
@@ -65,8 +76,8 @@ public class MyPipe extends DependencyPipe {
                         grandchildren = lsb.toString().split("\t");
                     }
                 }
-            }
-            //TODO: It still needs further discussion how to add this structure : the GHM or GMH or MGH or MHG and so on.
+            }*/
+
             for (String grandchild : grandchildren) {    // add parent-child-grandchild structure features
                 //System.out.print(grandchild);
                 int grandchild_index = Integer.parseInt(grandchild);
@@ -79,7 +90,7 @@ public class MyPipe extends DependencyPipe {
         if (pa.tii.containsValue(parentindex)) { // this shows that the parent
             // candidate has already been
             // another word's parent
-
+            //System.out.print("\nMy: ");
             StringBuffer lsb = pa.leftchilds.get(parentindex);
             if (lsb != null) {
                 String[] left_childrens = lsb.toString().split("\t");
@@ -91,6 +102,7 @@ public class MyPipe extends DependencyPipe {
                             false, fv);
                     addSiblingFeatures(instance, childindex, existing_child_index,
                             true, fv);
+                    //System.out.print(existing_child_index+"\t");
                 }
             }
             StringBuffer rsb = pa.rightchilds.get(parentindex);
@@ -104,11 +116,12 @@ public class MyPipe extends DependencyPipe {
                             false, fv);
                     addSiblingFeatures(instance, childindex, existing_child_index,
                             true, fv);
+                    //System.out.print(existing_child_index+"\t");
                 }
             }
-            /*
+            //System.out.print("\nMST: ");
             //Since parseagenda is changed, this laborious work is unnecessary
-            for (TIntIntIterator iter = pa.tii.iterator(); iter.hasNext(); ) {
+            /*for (TIntIntIterator iter = pa.tii.iterator(); iter.hasNext(); ) {
                 iter.advance();
                 int existing_child = iter.key();
                 int parent = iter.value();
@@ -119,12 +132,16 @@ public class MyPipe extends DependencyPipe {
                             false, fv);
                     addSiblingFeatures(instance, childindex, existing_child,
                             true, fv);
+                    //System.out.print(existing_child+"\t");
                 }
             }*/
+            //System.out.print("\n");
+            //System.out.println(parentindex);
+            //System.out.println(childindex);
         }
     }
 
-    private final void addSiblingFeatures(DependencyInstance instance, int ch1,
+    private void addSiblingFeatures(DependencyInstance instance, int ch1,
                                           int ch2, boolean isST, FeatureVector fv) {
 
         String[] forms = instance.forms;
@@ -169,7 +186,7 @@ public class MyPipe extends DependencyPipe {
                 fv);
     }
 
-    private final void addTripFeatures(DependencyInstance instance, int par,
+    private void addTripFeatures(DependencyInstance instance, int par,
                                        int ch1, int ch2, FeatureVector fv) {
 
         String[] pos = instance.postags;
@@ -189,7 +206,7 @@ public class MyPipe extends DependencyPipe {
 
     //New features mentioned in Carreras's paper added to original MST parser for the structure of Grandparent-Head-Modifier
     //Written by Yizhong
-    private final void addGHMFeatures(DependencyInstance instance, int grandparent,
+    private void addGHMFeatures(DependencyInstance instance, int grandparent,
                                       int head, int modifier, FeatureVector fv) {
 
         String[] forms = instance.forms;
@@ -219,7 +236,7 @@ public class MyPipe extends DependencyPipe {
 
     //The new features Yue Zhang used in her beam search algorithm parser
     //written by yizhong
-    private final void addBeamFeatures(DependencyInstance instance, int head,
+    private void addBeamFeatures(DependencyInstance instance, int head,
                                        int modifier, ParseAgenda pa, FeatureVector fv) {
 
         String[] forms = instance.forms;
@@ -288,9 +305,8 @@ public class MyPipe extends DependencyPipe {
             int parse_index = order_map.get(order_index);
             int parse_head = heads[parse_index];
 
-            pa.ChildProcess(parse_index, parse_head);
-
             extractFeatures(instance, parse_index, parse_head, pa, fv);
+            pa.ChildProcess(parse_index, parse_head); //Yizhong: This ChildProcess() should be after the extractFeatures()
             pa.AddArc(parse_index, parse_head);
         }
 
