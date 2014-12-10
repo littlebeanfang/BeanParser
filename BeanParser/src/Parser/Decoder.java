@@ -40,6 +40,7 @@ public class Decoder {
 			//skip root node
 			int parseindex=ordermap.get(orderindex);
 			Object[] ret=this.FindHeadForOneWord(inst, parseindex, pa, set);
+			inst.deprels[parseindex]=(String)ret[3];
 			checkparamupdate=checkparamupdate.cat((FeatureVector)ret[2]);
 			int parsehead=(int) ret[0];
 //			System.out.println("parsehead in decodeinstace:"+parsehead+",rel:"+pipe.typeAlphabet.lookupIndex(parsehead));
@@ -48,7 +49,7 @@ public class Decoder {
 			fvforinst=fvforinst.cat((FeatureVector) ret[1]);
             inst.heads[parseindex]=parsehead;
 		}
-		System.out.println("=======DecodeInstance checkparamupdate size:"+checkparamupdate.size()+"fvforinst size:"+fvforinst.size());
+		//System.out.println("=======DecodeInstance checkparamupdate size:"+checkparamupdate.size()+"fvforinst size:"+fvforinst.size());
 		pa.AddArc(0, -1);//add root
 		//PrintScores(inst, pa);
 		instret[0]=pa;
@@ -58,21 +59,23 @@ public class Decoder {
 	}
 	
 	public Object[] FindHeadForOneWord(DependencyInstance inst,int childindex, ParseAgenda pa, int[] set){
-		Object[] ret=new Object[3];
+		Object[] ret=new Object[4];
 		boolean verbose=false;
 		int headindex=-1;
 		double score=Double.NEGATIVE_INFINITY;
 		FeatureVector actfv=new FeatureVector();
 		FeatureVector bestlabelfv=new FeatureVector();
+		String bestrelation="";
 		for(int head=0; head<inst.length();head++){
 			if ((head!=childindex) && (FindRoot(head, set) != childindex)) { //Jia: if the root of the head is not child
 				FeatureVector fv=new FeatureVector();
 				FeatureVector labelfv=new FeatureVector();
 				//pipe.AddNewFeature(inst, childindex, head, pa, fv);
+				Object[] retfv=new Object[2];
 				if(parsewithrelation){
-					FeatureVector[] retfv=pipe.extractParseFeatures(inst, childindex, head, pa, param);
-					labelfv=retfv[1];
-					fv=retfv[0];
+					retfv=pipe.extractParseFeatures(inst, childindex, head, pa, param);
+					labelfv=(FeatureVector)retfv[1];
+					fv=(FeatureVector)retfv[0];
 					//System.out.println("FindHeadForOneWord checkparamupdate size:"+checkparamupdate.size());
 					//System.out.println("relation out of addfeature:"+inst.deprels[childindex]);
 				}else{
@@ -85,6 +88,10 @@ public class Decoder {
 					//must store best fv in DependencyInstance
 					actfv=fv;
 					bestlabelfv=labelfv;
+					if(parsewithrelation){
+						//System.out.println((String)retfv[2]);
+						bestrelation=(String)retfv[2];
+					}
 				}
 			}
 		}
@@ -109,6 +116,8 @@ public class Decoder {
 		ret[0]=headindex;
 		ret[1]=actfv;
 		ret[2]=bestlabelfv;
+		ret[3]=bestrelation;
+		//System.out.println("child:"+childindex+",head:"+headindex+",relation:"+bestrelation);
 		return ret;
 	}
 

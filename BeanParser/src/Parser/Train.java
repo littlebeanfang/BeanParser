@@ -181,12 +181,12 @@ public class Train {
 //				System.out.println("trainingIter===================");
 //				System.out.println("fvforinst:"+fvforinst.toString());
 //				System.out.println("trainingIter END===================");
-				System.out.println("star:"+Arrays.toString(inst.deprels));
+				//System.out.println("star:"+Arrays.toString(inst.deprels));
 				d[0][0]=fvforinst;
-				System.out.println("fvforinst size:"+fvforinst.size());
+				//System.out.println("fvforinst size:"+fvforinst.size());
 				d[0][1]=parsewithrelation?parseAgenda.toActParseTree(inst):parseAgenda.toActParseTree();
-				System.out.println("d[0][1]="+d[0][1]);
-				System.out.println("actparse:"+inst.actParseTree);
+				//System.out.println("d[0][1]="+d[0][1]);
+				//System.out.println("actparse:"+inst.actParseTree);
 				//Bean: ignore labeled errors in inst
 			    /*
 			    if(options.decodeType.equals("proj")) {

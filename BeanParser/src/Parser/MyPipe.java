@@ -47,7 +47,7 @@ public class MyPipe extends DependencyPipe {
 		// fv);
 	}
 	
-	public FeatureVector[] extractParseFeatures(DependencyInstance instance, int childindex,
+	public Object[] extractParseFeatures(DependencyInstance instance, int childindex,
 			int parentindex, ParseAgenda pa, Parameters param) { // given an
 		// unparsed
 		// instance,extract
@@ -65,11 +65,13 @@ public class MyPipe extends DependencyPipe {
 		// addLabeledFeatures(instance, childindex, type, attR, childFeatures,
 		// fv);
 		//TODO add labeled feature here
-		FeatureVector labelfv=AddMyParseLabeledFeatures(instance, childindex, parentindex,  param);
+		Object[] featret=AddMyParseLabeledFeatures(instance, childindex, parentindex,  param);
+		FeatureVector labelfv=(FeatureVector)featret[0];
 		fv=fv.cat(labelfv);
-		FeatureVector[] ret=new FeatureVector[2];
+		Object[] ret=new Object[3];
 		ret[0]=fv;
 		ret[1]=labelfv;
+		ret[2]=featret[1];
 		return ret;
 	}
 	
@@ -100,7 +102,7 @@ public class MyPipe extends DependencyPipe {
 	}
 	
 	
-	public FeatureVector AddMyParseLabeledFeatures(DependencyInstance instance, int child, int parent, Parameters param){
+	public Object[] AddMyParseLabeledFeatures(DependencyInstance instance, int child, int parent, Parameters param){
 		/**
 		 * select the label with highest score
 		 */
@@ -119,7 +121,7 @@ public class MyPipe extends DependencyPipe {
 			String type=types[i];
 			//System.out.println("type["+i+"]:"+type);
 			boolean attR=child<parent?false:true;
-			//System.out.println("type:"+type);//for debugging
+//			System.out.println("type:"+type);//for debugging
 			this.addLabeledFeatures(instance, child, type, attR, true, fvtemp);
 			this.addLabeledFeatures(instance, parent, type, attR, false, fvtemp);
 			//System.out.println("fvtemp size:"+fvtemp.size());
@@ -144,16 +146,18 @@ public class MyPipe extends DependencyPipe {
 		//step 3: get the highest fv and change in param fv
 		//!!!no use: cannot change fv at all
 //		System.out.println("fv before cat:"+fv.size());
-//		System.out.println("bestfv:"+bestlabelfv.size()+",bestscore:"+bestlabelscore);
+		//System.out.println("bestfv:"+bestlabelfv.size()+",bestscore:"+bestlabelscore);
 //		System.out.println("fv after cat:"+fv.size());
 		
 		//step 4: fill label in instance 
-		instance.deprels[child]=besttypeString;
-//		System.out.println("Best relation:"+besttypeString);
+		//instance.deprels[child]=besttypeString;  //! need not assign here!!
+		//System.out.println("child:"+child+"parent:"+parent+",Best relation:"+besttypeString);
 		//System.out.println("instance in addmyparselabeledfeature:"+instance.deprels[child]+"child:"+child+",parent:"+parent);
 		//return fv;
-		
-		return bestlabelfv;
+		Object[] ret=new Object[2];
+		ret[0]=bestlabelfv;
+		ret[1]=besttypeString;
+		return ret;
 	}
 	public void PrintFVScore(FeatureVector fv, double[] parameters){
 		if (null != fv.subfv1) {

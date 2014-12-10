@@ -194,7 +194,7 @@ public class Parameters {
 		correct++;
 	    }
 	}		
-	System.out.println("Dep Error:"+((double)act_spans.length - correct));
+	//System.out.println("Dep Error:"+((double)act_spans.length - correct));
 	return ((double)act_spans.length - correct);
 		
     }
@@ -212,7 +212,7 @@ public class Parameters {
 		correct++;
 	    }
 	}		
-	System.out.println("Label Error:"+((double)act_spans.length - correct));
+	//System.out.println("Label Error:"+((double)act_spans.length - correct));
 	return ((double)act_spans.length - correct);
 		
     }

@@ -206,6 +206,7 @@ public class DependencyPipe {
 	    int small = i < heads[i] ? i : heads[i];
 	    int large = i > heads[i] ? i : heads[i];
 	    boolean attR = i < heads[i] ? false : true;
+	    //comment for labeled feature debugging
 	    addCoreFeatures(instance,small,large,attR,fv);
 	    if(labeled) {
 		addLabeledFeatures(instance,i,labs[i],attR,true,fv);
@@ -776,6 +777,7 @@ public class DependencyPipe {
 	}
 
 	if(labeled) {
+		System.out.println(types);
 	    for(int w1 = 0; w1 < instanceLength; w1++) {
 		for(int t = 0; t < types.length; t++) {
 		    String type = types[t];
@@ -789,8 +791,10 @@ public class DependencyPipe {
 			    FeatureVector prodFV = new FeatureVector();
 			    addLabeledFeatures(instance,w1,
 					       type,attR,child, prodFV);
-			    
+			   
 			    double nt_prob = params.getScore(prodFV);
+			    //Bean: for label debugging
+//			    System.out.println("score:"+nt_prob+",rel:"+types[t]+",w1:"+w1+"child:"+child);
 			    nt_fvs[w1][t][ph][ch] = prodFV;
 			    nt_probs[w1][t][ph][ch] = nt_prob;
 			    
