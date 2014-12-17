@@ -11,6 +11,8 @@ import java.io.ObjectInputStream;
 
 import java.util.Arrays;
 
+import javax.management.relation.Relation;
+
 import DataStructure.DependencyInstance;
 import DataStructure.FeatureVector;
 import DataStructure.Parameters;
@@ -21,6 +23,7 @@ import IO.CONLLReader;
 public class Train {
 	//TODO: change this to decide whether predict label
 		boolean parsewithrelation=true;
+		boolean relativeaddress=true;
 	public ParserOptions options;
 	public Parameters params;
 	public Train(ParserOptions options){
@@ -102,7 +105,12 @@ public class Train {
 
 			
 	        CONLLReader reader = new CONLLReader();
-	        reader.startReading(System.getenv("CODEDATA") + File.separator + trainfile);
+	        if(relativeaddress){
+	        	reader.startReading( trainfile);
+	        }else{
+	        	reader.startReading(System.getenv("CODEDATA") + File.separator + trainfile);
+	        }
+	        
 	        DependencyInstance inst;
 	        int currentInstance = 0;
 	        while((inst=reader.getNext())!=null){

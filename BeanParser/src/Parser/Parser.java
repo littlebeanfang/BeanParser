@@ -24,6 +24,8 @@ public class Parser {
     private Train trainer;
     public Parameters params;
     
+    boolean relativeaddress=true;
+    
 	//private 
     //constractor for decoder
     public Parser(DependencyPipe pipe, ParserOptions options) {
@@ -40,7 +42,14 @@ public class Parser {
     	this.params=params;
     }
 	public void loadModel(String file) throws Exception {
-		ObjectInputStream in = new ObjectInputStream(new BufferedInputStream(new FileInputStream(System.getenv("CODEDATA")+File.separator+file)));
+		//TODO: RELATIVE address
+		ObjectInputStream in;
+		if(relativeaddress){
+			in = new ObjectInputStream(new BufferedInputStream(new FileInputStream(file)));
+		}else{
+			in = new ObjectInputStream(new BufferedInputStream(new FileInputStream(System.getenv("CODEDATA")+File.separator+file)));
+		}
+		
 		params.parameters = (double[])in.readObject();
 		//System.out.println("Parameters loaded!");
 		pipe.dataAlphabet = (Alphabet)in.readObject();
@@ -52,7 +61,13 @@ public class Parser {
 		pipe.closeAlphabets();
 	}
 	public void saveModel(String file) throws IOException {
-		ObjectOutputStream out = new ObjectOutputStream(new FileOutputStream(System.getenv("CODEDATA")+File.separator+file));
+		//TODO: RELATIVE address
+		ObjectOutputStream out ;
+		if(relativeaddress){
+			out = new ObjectOutputStream(new FileOutputStream(file));
+		}else{
+			out = new ObjectOutputStream(new FileOutputStream(System.getenv("CODEDATA")+File.separator+file));
+		}
 		out.writeObject(params.parameters);
 		out.writeObject(pipe.dataAlphabet);
 		out.writeObject(pipe.typeAlphabet);
@@ -61,13 +76,24 @@ public class Parser {
 	public void Parse(String parsefile,String writefile) throws IOException{
 		 CONLLReader reader=new CONLLReader();
 		 //String filename="wsj_00_malt_processindex.txt";
-		reader.startReading(System.getenv("CODEDATA")+File.separator+parsefile);
-        File out=new File(System.getenv("CODEDATA")+File.separator+writefile);
+		//TODO: RELATIVE address
+		 File out;
+		 if(relativeaddress){
+			 reader.startReading(parsefile);
+			 out=new File(writefile);
+		 }else{
+			 reader.startReading(System.getenv("CODEDATA")+File.separator+parsefile);
+			 out=new File(System.getenv("CODEDATA")+File.separator+writefile);
+		 }
         if(!out.exists()){
             out.createNewFile();
         }
         CONLLWriter writer=new CONLLWriter(true);
-        writer.startWriting(System.getenv("CODEDATA")+File.separator+writefile);
+        if(relativeaddress){
+        	writer.startWriting(writefile);
+        }else{
+        	writer.startWriting(System.getenv("CODEDATA")+File.separator+writefile);
+        }
 
 		 DependencyInstance di;
 		 int instcount=0;

@@ -21,6 +21,7 @@ import javax.lang.model.type.TypeVisitor;
 public class MyPipe extends DependencyPipe {
 	//TODO: change this to decide whether predict label
 	boolean parsewithrelation=true;
+	boolean relativeaddress=true;
 
 	// -----------------------------Initialize---------------------------------------------
 	public MyPipe(ParserOptions options) throws IOException {
@@ -441,8 +442,13 @@ public class MyPipe extends DependencyPipe {
 
 		System.out.print("Creating Alphabet ... ");
 		CONLLReader reader = new CONLLReader();
-		labeled = reader.startReading(System.getenv("CODEDATA")
-				+ File.separator + file);//bean: here changed the label
+		//TODO: RELATIVE address
+		if(relativeaddress){
+			labeled = reader.startReading(file);//bean: here changed the label
+		}else{
+			labeled = reader.startReading(System.getenv("CODEDATA")
+					+ File.separator + file);//bean: here changed the label
+		}
 		int numInstances = 0;
 		DependencyInstance instance = reader.getNext();
 		while (instance != null) {
