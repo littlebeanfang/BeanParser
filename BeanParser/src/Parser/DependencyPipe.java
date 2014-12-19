@@ -6,10 +6,8 @@ import DataStructure.Parameters;
 import DataStructure.ParserOptions;
 import IO.DependencyReader;
 import IO.DependencyWriter;
-import gnu.trove.TIntArrayList;
 import mstparser.Alphabet;
 
-import java.io.File;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
@@ -59,6 +57,9 @@ public class DependencyPipe {
         return types[typeIndex];
     }
 
+
+    //Yizhong: This is not used
+/*
     protected final DependencyInstance nextInstance() throws IOException {
         DependencyInstance instance = depReader.getNext();
         if (instance == null || instance.forms == null) return null;
@@ -76,9 +77,11 @@ public class DependencyPipe {
 
         return instance;
     }
+*/
 
 
-    public int[] createInstances(String file,
+    //Yizhong: This is not used because we directly create alphabet.
+/*    public int[] createInstances(String file,
                                  File featFileName) throws IOException {
 
         createAlphabet(file);
@@ -88,11 +91,11 @@ public class DependencyPipe {
         labeled = depReader.startReading(file);
 
         TIntArrayList lengths = new TIntArrayList();
-/*
+*//*
     ObjectOutputStream out = options.createForest
 	    ? new ObjectOutputStream(new FileOutputStream(featFileName))
 	    : null;
-	*/
+	*//*
         DependencyInstance instance = depReader.getNext();
         int num1 = 0;
 
@@ -112,10 +115,10 @@ public class DependencyPipe {
             instance.actParseTree = spans.substring(0, spans.length() - 1);
 
             lengths.add(instance.length());
-        /*
+        *//*
         if(options.createForest)
 		writeInstance(instance,out);
-		*/
+		*//*
             instance = null;
 
             instance = depReader.getNext();
@@ -126,15 +129,17 @@ public class DependencyPipe {
         System.out.println();
 
         closeAlphabets();
-        /*
+        *//*
     if(options.createForest)
 	    out.close();
-*/
+*//*
         return lengths.toNativeArray();
 
-    }
+    }*/
 
-    public void createAlphabet(String file) throws IOException {
+
+    //Yizhong: this is not used because we rewrite it as createMyAlphabet in the Mypipe
+    /*public void createAlphabet(String file) throws IOException {
 
         System.out.print("Creating Alphabet ... ");
 
@@ -156,7 +161,7 @@ public class DependencyPipe {
         closeAlphabets();
 
         System.out.println("Done.");
-    }
+    }*/
 
     public void closeAlphabets() {
         dataAlphabet.stopGrowth();
@@ -187,6 +192,8 @@ public class DependencyPipe {
     }
 
 
+    //Yizhong: this is not used because for train we rewrite it as extractFeatureVector
+/*
     public FeatureVector createFeatureVector(DependencyInstance instance) {
 
         final int instanceLength = instance.length();
@@ -212,6 +219,7 @@ public class DependencyPipe {
 
         return fv;
     }
+*/
 
     protected void addExtendedFeatures(DependencyInstance instance,
                                        FeatureVector fv) {

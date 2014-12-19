@@ -65,7 +65,7 @@ public class Train {
             //System.out.println("Training iter took: " + (end-start));
             System.out.println("|Time:" + (end - start) + "]");
         }
-        
+
         params.averageParams(i * numInstances);
         long traintimeend = System.currentTimeMillis();
         System.out.println("==============================================");
@@ -79,7 +79,7 @@ public class Train {
 
     private void trainingIter(int numInstances, String trainfile, int iter, MyPipe pipe) throws IOException {
         /**
-         * TODO: Yizhong
+         * Author: Yizhong
          * create reader for trainfile, for instance reading later
          */
         int numUpd = 0;
@@ -122,7 +122,7 @@ public class Train {
             int K = 1;//let's only consider best parse now
             Object[][] d;
             /**
-             * TODO: Bean
+             * Author: Bean
              * Fill Object[][] d
              * Attention:
              * 1. d[k][0] is feature vector, and d[k][1] is actParseTree

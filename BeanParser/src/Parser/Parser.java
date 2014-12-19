@@ -68,7 +68,10 @@ public class Parser {
         System.out.println("Process index:");
         long parsestart = System.currentTimeMillis();
         while ((di = reader.getNext()) != null) {
-            System.out.print((++instcount) + "\t");
+            ++instcount;
+            if (instcount % 50 == 0) {
+                System.out.print(instcount + "\t");
+            }
             if (instcount % 30 == 0) System.out.print('\n');
             FeatureVector fv = new FeatureVector();//useless here, just align the param for DecodeInstance
             ParseAgenda pa = (ParseAgenda) decoder.DecodeInstance(di, di.orders)[0];

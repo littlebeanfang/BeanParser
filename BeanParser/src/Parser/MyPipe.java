@@ -48,7 +48,7 @@ public class MyPipe extends DependencyPipe {
             // feature
         }
 
-        //TODO: It still needs further discussion how to add this structure : the GHM or GMH or MGH or MHG and so on.
+        /*//TODO: It still needs further discussion how to add this structure : the GHM or GMH or MGH or MHG and so on.
         if (pa.tii.containsValue(childindex)) { // this shows that the child
             // candidate is already used as
             // another word's parent
@@ -66,7 +66,7 @@ public class MyPipe extends DependencyPipe {
                 }
             }
 
-            /*if (lsb != null && rsb != null) {
+            *//*if (lsb != null && rsb != null) {
                 grandchildren = (lsb.append("\t").append(rsb)).toString().split("\t");
             } else {
                 if (lsb == null && rsb != null) {
@@ -76,7 +76,7 @@ public class MyPipe extends DependencyPipe {
                         grandchildren = lsb.toString().split("\t");
                     }
                 }
-            }*/
+            }*//*
 
             for (String grandchild : grandchildren) {    // add parent-child-grandchild structure features
                 //System.out.print(grandchild);
@@ -84,7 +84,7 @@ public class MyPipe extends DependencyPipe {
                 addGHMFeatures(instance, parentindex, childindex, grandchild_index, fv);
             }
 
-        }
+        }*/
 
 
         if (pa.tii.containsValue(parentindex)) { // this shows that the parent
@@ -248,6 +248,11 @@ public class MyPipe extends DependencyPipe {
 
         int clc_index = modifier;
         StringBuffer lsb = pa.leftchilds.get(modifier);
+        for (int i = 0; i < forms.length; i++) {
+            System.out.print(forms[i] + " ");
+        }
+        System.out.println(modifier);
+        System.out.println(lsb);
         if (lsb != null) {
             String[] left_children = lsb.toString().split("\t");
             for (String child : left_children) {
@@ -259,6 +264,7 @@ public class MyPipe extends DependencyPipe {
 
         int crc_index = modifier;
         StringBuffer rsb = pa.rightchilds.get(modifier);
+        System.out.println(rsb);
         if (rsb != null) {
             String[] right_children = rsb.toString().split("\t");
             for (String child : right_children) {
@@ -283,9 +289,9 @@ public class MyPipe extends DependencyPipe {
 
 
         add("YZ_Ptla=" + H_pos + "_" + left_ch_num, 1.0, fv);
-        add("YZ_PtRa=" + H_pos + "_" + right_ch_num, 1.0, fv);
-        add("YZ_Pwtla=" + H_pos + "_" + H_word + "_" + left_ch_num, 1.0, fv);
-        add("YZ_Pwtra=" + H_pos + "_" + H_word + "_" + right_ch_num, 1.0, fv);
+        add("YZ_Ptra=" + H_pos + "_" + right_ch_num, 1.0, fv);
+        add("YZ_Pwtla=" + H_word + "_" + H_pos + "_" + left_ch_num, 1.0, fv);
+        add("YZ_Pwtra=" + H_word + "_" + H_pos + "_" + right_ch_num, 1.0, fv);
     }
 
 
