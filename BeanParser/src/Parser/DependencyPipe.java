@@ -21,8 +21,8 @@ public class DependencyPipe {
     public int[] typesInt;
     public boolean labeled = false;
     protected DependencyReader depReader;
+    protected ParserOptions options;
     private DependencyWriter depWriter;
-    private ParserOptions options;
 
     public DependencyPipe(ParserOptions options) throws IOException {
         this.options = options;
@@ -278,7 +278,7 @@ public class DependencyPipe {
                 instance.lemmas[childIndex], posA[childIndex],
                 attDist, fv);
 /*
-	    if (options.discourseMode) {
+        if (options.discourseMode) {
 		// Note: The features invoked here are designed for
 		// discourse parsing (as opposed to sentential
 		// parsing). It is conceivable that they could help for

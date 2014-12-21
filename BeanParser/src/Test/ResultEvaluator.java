@@ -49,5 +49,18 @@ public class ResultEvaluator {
         fi_gold.close();
     }
 }
-//0.8539988373058716
-//0.8487667137280956
+//0.8539988373058716 MST Original 2nd order features
+//0.8487667137280956 with Beam
+//0.8106469562328711 1st order
+//0.8157129806494477 only beam 2nd order
+
+
+//0.8488497633086953 in the bracket
+
+//Accuracy: 0.8559089776596628  only the lefmost and rightmost children
+
+//Accuracy: 0.8484345154056971 ptla ptra
+
+//Accuracy: 0.8494311103728927 num > 0
+
+//Accuracy: 0.8500955070176895 only two num > 0

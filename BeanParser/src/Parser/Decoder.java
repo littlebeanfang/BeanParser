@@ -33,8 +33,10 @@ public class Decoder {
             int parsehead = (Integer) ret[0];
 //			System.out.println("DecodeInstance fvforinst after call findhead:"+ret[1].toString().split(" ").length);
             pa.AddArc(parseindex, parsehead);
+            //System.out.println("Index: "+parseindex+"Head: "+parsehead);
             pa.ChildProcess(parseindex, parsehead);
             fvforinst = fvforinst.cat((FeatureVector) ret[1]);
+            //System.out.println("FV: \n"+fvforinst.toString());
             inst.heads[parseindex] = parsehead;
         }
 
@@ -56,6 +58,7 @@ public class Decoder {
                 FeatureVector fv = new FeatureVector();
                 //pipe.AddNewFeature(inst, childindex, head, pa, fv);
                 pipe.extractFeatures(inst, childindex, head, pa, fv);
+
                 double temp = fv.getScore(param.parameters);
                 if (temp > score) {
                     score = temp;

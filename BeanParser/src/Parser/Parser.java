@@ -72,10 +72,11 @@ public class Parser {
             if (instcount % 50 == 0) {
                 System.out.print(instcount + "\t");
             }
-            if (instcount % 30 == 0) System.out.print('\n');
+            //if (instcount % 30 == 0) System.out.print('\n');
             FeatureVector fv = new FeatureVector();//useless here, just align the param for DecodeInstance
+
             ParseAgenda pa = (ParseAgenda) decoder.DecodeInstance(di, di.orders)[0];
-            //System.out.println(pa);
+
             writer.write(new DependencyInstance(RemoveRoot(di.forms), RemoveRoot(di.postags), RemoveRoot(di.deprels), RemoveRoot(di.heads)));
         }
         long parseend = System.currentTimeMillis();
