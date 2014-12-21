@@ -14,16 +14,20 @@
 
 package mstparser;
 
-import java.util.ArrayList;
-import java.io.*;
-import java.util.Iterator;
+import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
+import java.io.Serializable;
 
 public class Alphabet implements Serializable
 {
+    private static final long serialVersionUID = 1;
+    private static final int CURRENT_SERIAL_VERSION = 0;
     gnu.trove.TObjectIntHashMap map;
     int numEntries;
     boolean growthStopped = false;
 
+	
     public Alphabet (int capacity)
     {
 	this.map = new gnu.trove.TObjectIntHashMap (capacity);
@@ -37,7 +41,6 @@ public class Alphabet implements Serializable
 	this (10000);
     }
 
-	
     /** Return -1 if entry isn't present. */
     public int lookupIndex (Object entry)
     {
@@ -52,7 +55,7 @@ public class Alphabet implements Serializable
 	    map.put (entry, ret);
 	    numEntries++;
 	}
-	
+
 	return ret;
     }
 
@@ -76,6 +79,9 @@ public class Alphabet implements Serializable
 	map.compact();
     }
 
+
+    // Serialization 
+		
     public void allowGrowth ()
     {
 	growthStopped = false;
@@ -86,12 +92,6 @@ public class Alphabet implements Serializable
 	return growthStopped;
     }
 
-
-    // Serialization 
-		
-    private static final long serialVersionUID = 1;
-    private static final int CURRENT_SERIAL_VERSION = 0;
-
     private void writeObject (ObjectOutputStream out) throws IOException {
 	out.writeInt (CURRENT_SERIAL_VERSION);
 	out.writeInt (numEntries);
@@ -100,7 +100,7 @@ public class Alphabet implements Serializable
     }
 
     private void readObject (ObjectInputStream in) throws IOException, ClassNotFoundException {
-	int version = in.readInt ();
+	int version = in.readInt();
 	numEntries = in.readInt();
 	map = (gnu.trove.TObjectIntHashMap)in.readObject();
 	growthStopped = in.readBoolean();

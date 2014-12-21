@@ -8,7 +8,7 @@ import java.io.IOException;
 /**
  * Created by wangyizhong on 2014/12/4.
  */
-public class ResultEvaluator {
+public class ResultEvaluator{
 
     public ResultEvaluator() {
     }
@@ -64,3 +64,13 @@ public class ResultEvaluator {
 //Accuracy: 0.8494311103728927 num > 0
 
 //Accuracy: 0.8500955070176895 only two num > 0
+
+//Accuracy: 0.8505938045012873 2nd nearest sibling
+
+//Num Feats: 1125682
+
+//Accuracy: 0.8568225230462586 three order sibling features
+
+//Accuracy: 0.8583174154970518 ghm features
+
+//Accuracy: 0.8572377709492567 ghm features without cross
