@@ -71,6 +71,14 @@ public class ResultEvaluator{
 
 //Accuracy: 0.8568225230462586 three order sibling features
 
-//Accuracy: 0.8583174154970518 ghm features
+//Accuracy: 0.8583174154970518 all ghm features
 
 //Accuracy: 0.8572377709492567 ghm features without cross
+
+//Accuracy: 0.8601445062702433 ghm features only postags HMG,HG,MG
+
+//Accuracy: 0.8618054978822357 ghm features only HMG postags
+
+//Accuracy: 0.8524208952744788 without correct third order sibling
+
+//Accuracy: 0.8571547213686571 without ghm

@@ -35,17 +35,175 @@ public class MyPipe extends DependencyPipe {
         this.options.secondOrder = true;
         if (this.options.secondOrder) {
             addTwoOrderSiblingFeatures(instance, parentindex, childindex, pa, fv);
-            addBeamFeatures(instance, parentindex, childindex, pa, fv);
+            //addBeamFeatures(instance, parentindex, childindex, pa, fv);
         }
-        addHMGfeatures(instance, parentindex, childindex, pa, fv);
-        addThreeOrderSiblingFeatures(instance,parentindex,childindex,pa,fv);
+        //addThreeOrderSiblingFeatures(instance,parentindex,childindex,pa,fv);
+        //addHMGfeatures(instance, parentindex, childindex, pa, fv);
+
+    }
+
+
+
+    private void addTwoOrderSiblingFeatures(DependencyInstance instance,
+                                           int parentindex, int childindex, ParseAgenda pa, FeatureVector fv) {
+        //System.out.println(childindex + "\t" + parentindex);
+
+        //if (pa.tii.containsKey(parentindex)) { // this shows that the parent
+            // candidate already has head,so we
+            // can add grandparent-parent-child
+            // feature
+        //}
+
+        if (pa.tii.containsValue(parentindex)) { // this shows that the parent
+//            // candidate has already been
+//            // another word's parent
+//            //System.out.print("\nMy: ");
+//
+//            //TODO: Yizhong---------------Nearest sibling-------------------------
+//            if(childindex < parentindex){
+//                StringBuffer lsb = pa.leftchilds.get(parentindex);
+//                if(lsb != null){
+//                    String[] left_childrens = lsb.toString().split("\t");
+//                    int right_nearest = parentindex;
+//                    for(String lch : left_childrens){
+//                        int current_ch = Integer.parseInt(lch);
+//                        if(current_ch > childindex && current_ch < right_nearest){
+//                            right_nearest = current_ch;          //Structure child-nearest_existing_child-parent
+//                        }
+//                    }
+//                    addTripFeatures(instance, childindex, right_nearest,
+//                            parentindex, fv); // parent can be in any place
+//                    addSiblingFeatures(instance, childindex, right_nearest,
+//                            false, fv);
+//                    addSiblingFeatures(instance, childindex, right_nearest,
+//                            true, fv);
+//                }
+//            }
+//
+//            if(childindex > parentindex){
+//                StringBuffer rsb = pa.rightchilds.get(parentindex);
+//                if(rsb != null){
+//                    String[] right_childrens = rsb.toString().split("\t");
+//                    int left_nearest = parentindex;
+//                    for(String rch : right_childrens){
+//                        int current_ch = Integer.parseInt(rch);
+//                        if(current_ch < childindex && current_ch > left_nearest){
+//                            left_nearest = current_ch;          //Structure child-nearest_existing_child-parent
+//                        }
+//                    }
+//                    addTripFeatures(instance, childindex, left_nearest,
+//                            parentindex, fv); // parent can be in any place
+//                    addSiblingFeatures(instance, childindex, left_nearest,
+//                            false, fv);
+//                    addSiblingFeatures(instance, childindex, left_nearest,
+//                            true, fv);
+//                }
+//            }
+            //----------------------------------------------------
+                StringBuffer lsb = pa.leftchilds.get(parentindex);
+                if (lsb != null) {
+                    String[] left_childrens = lsb.toString().split("\t");
+                    for (String existing_child : left_childrens) {     //MST 2nd order features
+                        int existing_child_index = Integer.parseInt(existing_child);
+                        int close = Math.max(childindex,existing_child_index);
+                        int far = Math.max(childindex, existing_child_index);
+                        addTripFeatures(instance, close, existing_child_index,
+                                parentindex, fv);
+                        addSiblingFeatures(instance, childindex, existing_child_index,
+                                false, fv);
+                        addSiblingFeatures(instance, childindex, existing_child_index,
+                                true, fv);
+                        /*addTripFeatures(instance, childindex, existing_child_index,
+                                parentindex, fv);
+                        addSiblingFeatures(instance, childindex, existing_child_index,
+                                false, fv);
+                        addSiblingFeatures(instance, childindex, existing_child_index,
+                                true, fv);*/
+                        //System.out.print(existing_child_index+"\t");
+                    }
+                }
+                StringBuffer rsb = pa.rightchilds.get(parentindex);
+                if (rsb != null) {
+                    String[] right_childrens = rsb.toString().split("\t");
+                    for (String existing_child : right_childrens) {    //MST 2nd order features
+                        int existing_child_index = Integer.parseInt(existing_child);
+                        addTripFeatures(instance, childindex, existing_child_index,
+                                parentindex, fv); // parent can be in any place
+                        addSiblingFeatures(instance, childindex, existing_child_index,
+                                false, fv);
+                        addSiblingFeatures(instance, childindex, existing_child_index,
+                                true, fv);
+                        //System.out.print(existing_child_index+"\t");
+                    }
+            }
+        }
+
+            //Since parseagenda is changed, this laborious work is unnecessary
+//            for (TIntIntIterator iter = pa.tii.iterator(); iter.hasNext(); ) {
+//                iter.advance();
+//                int existing_child = iter.key();
+//                int parent = iter.value();
+//                if (parent == parentindex) {
+//                    addTripFeatures(instance, childindex, existing_child,
+//                            parentindex, fv); // parent can be in any place
+//                    addSiblingFeatures(instance, childindex, existing_child,
+//                            false, fv);
+//                    addSiblingFeatures(instance, childindex, existing_child,
+//                            true, fv);
+//                    //System.out.print(existing_child+"\t");
+//                }
+//            }
+//        }
+    }
+
+    private void addThreeOrderSiblingFeatures(DependencyInstance instance,
+                                              int parentindex, int childindex, ParseAgenda pa, FeatureVector fv){
+        if (pa.tii.containsValue(parentindex)){
+            if (childindex < parentindex) {
+                StringBuffer lsb = pa.leftchilds.get(parentindex);
+                if (lsb != null) {
+                    String[] left_childrens = lsb.toString().split("\t");
+                    int right_nearest = parentindex;
+                    int left_nearest = -1;
+                    for (String lch : left_childrens) {
+                        int current_ch = Integer.parseInt(lch);
+                        if (current_ch > childindex && current_ch < right_nearest) {
+                            right_nearest = current_ch;
+                        }
+                        if (current_ch < childindex && current_ch > left_nearest) {
+                            left_nearest = current_ch;
+                        }
+                    }
+                    addRightLeftNearestFeatures(instance, parentindex, childindex, left_nearest, right_nearest, fv);
+                }
+            }
+
+            if (childindex > parentindex) {
+                StringBuffer rsb = pa.rightchilds.get(parentindex);
+                if (rsb != null) {
+                    String[] right_childrens = rsb.toString().split("\t");
+                    int left_nearest = parentindex;
+                    int right_nearest = instance.length()+1;
+                    //int left_second_nearest = parentindex;
+                    for (String rch : right_childrens) {
+                        int current_ch = Integer.parseInt(rch);
+                        if (current_ch < childindex && current_ch > left_nearest) {
+                            left_nearest = current_ch;
+                        }
+                        if (current_ch > childindex && current_ch < right_nearest) {
+                            right_nearest = current_ch;
+                        }
+                    }
+                    addRightLeftNearestFeatures(instance,parentindex,childindex,left_nearest,right_nearest,fv);
+                }
+            }
+        }
     }
 
     private void addHMGfeatures(DependencyInstance instance, int parentindex, int childindex, ParseAgenda pa, FeatureVector fv){
         //TODO: It still needs further discussion how to add this structure : the GHM or GMH or MGH or MHG and so on.
         if (pa.tii.containsValue(childindex)) { // this shows that the child
-            // candidate is already used as
-            // another word's parent
+            // candidate is already used as another word's parent
             StringBuffer lsb = pa.leftchilds.get(childindex);
             StringBuffer rsb = pa.rightchilds.get(childindex);
 
@@ -99,154 +257,6 @@ public class MyPipe extends DependencyPipe {
         }
     }
 
-    private void addThreeOrderSiblingFeatures(DependencyInstance instance,
-                                               int parentindex, int childindex, ParseAgenda pa, FeatureVector fv){
-        if (pa.tii.containsValue(parentindex)){
-            if (childindex < parentindex) {
-                StringBuffer lsb = pa.leftchilds.get(parentindex);
-                if (lsb != null) {
-                    String[] left_childrens = lsb.toString().split("\t");
-                    int right_nearest = parentindex;
-                    int left_nearest = -1;
-                    for (String lch : left_childrens) {
-                        int current_ch = Integer.parseInt(lch);
-                        if (current_ch > childindex && current_ch < right_nearest) {
-                            right_nearest = current_ch;
-                        }
-                        if (current_ch < childindex && current_ch > left_nearest) {
-                            left_nearest = current_ch;
-                        }
-                    }
-                    addRightLeftNearestFeatures(instance, parentindex, childindex, left_nearest, right_nearest, fv);
-                }
-            }
-
-            if (childindex > parentindex) {
-                StringBuffer rsb = pa.rightchilds.get(parentindex);
-                if (rsb != null) {
-                    String[] right_childrens = rsb.toString().split("\t");
-                    int left_nearest = parentindex;
-                    int right_nearest = instance.length()+1;
-                    for (String rch : right_childrens) {
-                        int current_ch = Integer.parseInt(rch);
-                        if (current_ch < childindex && current_ch > left_nearest) {
-                            left_nearest = current_ch;
-                        }
-                        if (current_ch > childindex && current_ch < right_nearest) {
-                            left_nearest = current_ch;
-                        }
-                    }
-                    addRightLeftNearestFeatures(instance,parentindex,childindex,left_nearest,right_nearest,fv);
-                }
-            }
-        }
-    }
-
-    private void addTwoOrderSiblingFeatures(DependencyInstance instance,
-                                           int parentindex, int childindex, ParseAgenda pa, FeatureVector fv) {
-        //System.out.println(childindex + "\t" + parentindex);
-
-        if (pa.tii.containsKey(parentindex)) { // this shows that the parent
-            // candidate already has head,so we
-            // can add grandparent-parent-child
-            // feature
-        }
-
-        if (pa.tii.containsValue(parentindex)) { // this shows that the parent
-            // candidate has already been
-            // another word's parent
-            //System.out.print("\nMy: ");
-
-            //TODO: Yizhong---------------Nearest sibling-------------------------
-            /*if(childindex < parentindex){
-                StringBuffer lsb = pa.leftchilds.get(parentindex);
-                if(lsb != null){
-                    String[] left_childrens = lsb.toString().split("\t");
-                    int right_nearest = parentindex;
-                    for(String lch : left_childrens){
-                        int current_ch = Integer.parseInt(lch);
-                        if(current_ch > childindex && current_ch < right_nearest){
-                            right_nearest = current_ch;          //Structure child-nearest_existing_child-parent
-                        }
-                    }
-                    addTripFeatures(instance, childindex, right_nearest,
-                            parentindex, fv); // parent can be in any place
-                    addSiblingFeatures(instance, childindex, right_nearest,
-                            false, fv);
-                    addSiblingFeatures(instance, childindex, right_nearest,
-                            true, fv);
-                }
-            }
-
-            if(childindex > parentindex){
-                StringBuffer rsb = pa.rightchilds.get(parentindex);
-                if(rsb != null){
-                    String[] right_childrens = rsb.toString().split("\t");
-                    int left_nearest = parentindex;
-                    for(String rch : right_childrens){
-                        int current_ch = Integer.parseInt(rch);
-                        if(current_ch < childindex && current_ch > left_nearest){
-                            left_nearest = current_ch;          //Structure child-nearest_existing_child-parent
-                        }
-                    }
-                    addTripFeatures(instance, childindex, left_nearest,
-                            parentindex, fv); // parent can be in any place
-                    addSiblingFeatures(instance, childindex, left_nearest,
-                            false, fv);
-                    addSiblingFeatures(instance, childindex, left_nearest,
-                            true, fv);
-                }
-            }*/
-            //----------------------------------------------------
-
-            StringBuffer lsb = pa.leftchilds.get(parentindex);
-            if (lsb != null) {
-                String[] left_childrens = lsb.toString().split("\t");
-                for (String existing_child : left_childrens) {     //MST 2nd order features
-                    int existing_child_index = Integer.parseInt(existing_child);
-                    addTripFeatures(instance, childindex, existing_child_index,
-                            parentindex, fv); // parent can be in any place
-                    addSiblingFeatures(instance, childindex, existing_child_index,
-                            false, fv);
-                    addSiblingFeatures(instance, childindex, existing_child_index,
-                            true, fv);
-                    //System.out.print(existing_child_index+"\t");
-                }
-            }
-            StringBuffer rsb = pa.rightchilds.get(parentindex);
-            if (rsb != null) {
-                String[] right_childrens = rsb.toString().split("\t");
-                for (String existing_child : right_childrens) {    //MST 2nd order features
-                    int existing_child_index = Integer.parseInt(existing_child);
-                    addTripFeatures(instance, childindex, existing_child_index,
-                            parentindex, fv); // parent can be in any place
-                    addSiblingFeatures(instance, childindex, existing_child_index,
-                            false, fv);
-                    addSiblingFeatures(instance, childindex, existing_child_index,
-                            true, fv);
-                    //System.out.print(existing_child_index+"\t");
-                }
-            }
-
-
-            //Since parseagenda is changed, this laborious work is unnecessary
-            /*for (TIntIntIterator iter = pa.tii.iterator(); iter.hasNext(); ) {
-                iter.advance();
-                int existing_child = iter.key();
-                int parent = iter.value();
-                if (parent == parentindex) {
-                    addTripFeatures(instance, childindex, existing_child,
-                            parentindex, fv); // parent can be in any place
-                    addSiblingFeatures(instance, childindex, existing_child,
-                            false, fv);
-                    addSiblingFeatures(instance, childindex, existing_child,
-                            true, fv);
-                    //System.out.print(existing_child+"\t");
-                }
-            }*/
-        }
-    }
-
     private void addRightLeftNearestFeatures(DependencyInstance instance,
                                              int head, int modifier, int left_nearest_index,
                                              int righ_nearest_index,FeatureVector fv){
@@ -272,14 +282,14 @@ public class MyPipe extends DependencyPipe {
         add("YZ_LRN_LMR_POS=" + left_nearest_pos + "_" + modifier_pos + "_" +right_nearest_pos, 1.0,
                 fv);
 
-        add("YZ_LRN_LMRH_POS=" + left_nearest_pos + "_" + modifier_pos + "_" +right_nearest_pos + "_" + head_pos, 1.0,
-                fv);
+        add("YZ_LRN_LMRH_POS=" + left_nearest_pos + "_" + modifier_pos + "_" +right_nearest_pos
+                + "_" + head_pos, 1.0, fv);
 
-        add("YZ_LRN_LMR_DIR_POS=" + left_nearest_pos + "_" + modifier_pos + "_" +right_nearest_pos + "_" +dir , 1.0,
-                fv);
+        add("YZ_LRN_LMR_DIR_POS=" + left_nearest_pos + "_" + modifier_pos + "_" +right_nearest_pos
+                + "_" +dir , 1.0, fv);
 
-        add("YZ_LRN_LMRH_DIR_POS=" + left_nearest_pos + "_" + modifier_pos + "_" +right_nearest_pos + "_" + head_pos + "_" + dir, 1.0,
-                fv);
+        add("YZ_LRN_LMRH_DIR_POS=" + left_nearest_pos + "_" + modifier_pos + "_" +right_nearest_pos
+                + "_" + head_pos + "_" + dir, 1.0, fv);
 
     }
 
@@ -332,9 +342,13 @@ public class MyPipe extends DependencyPipe {
                                        int ch1, int ch2, FeatureVector fv) {
 
         String[] pos = instance.postags;
-
         // ch1 is always the closest to par
-        String dir = par > ch2 ? "RA" : "LA";
+
+        String side = (ch2 - par)*(ch1 - par) < 0 ? "SA":"DI";
+
+        String p_c_dir = par < ch2 ? "RA" : "LA";
+
+        String dir = side + p_c_dir;
 
         String par_pos = pos[par];
         String ch1_pos = ch1 == par ? "STPOS" : pos[ch1];
@@ -343,7 +357,17 @@ public class MyPipe extends DependencyPipe {
         String pTrip = par_pos + "_" + ch1_pos + "_" + ch2_pos;
         add("POS_TRIP=" + pTrip + "_" + dir, 1.0, fv);
         add("APOS_TRIP=" + pTrip, 1.0, fv);
+/*        String[] pos = instance.postags;
+        // ch1 is always the closest to par
+        String dir = par < ch2 ? "RA" : "LA";
 
+        String par_pos = pos[par];
+        String ch1_pos = ch1 == par ? "STPOS" : pos[ch1];
+        String ch2_pos = pos[ch2];
+
+        String pTrip = par_pos + "_" + ch1_pos + "_" + ch2_pos;
+        add("POS_TRIP=" + pTrip + "_" + dir, 1.0, fv);
+        add("APOS_TRIP=" + pTrip, 1.0, fv);*/
     }
 
     //New features mentioned in Carreras's paper added to original MST parser for the structure of Grandparent-Head-Modifier
@@ -365,8 +389,8 @@ public class MyPipe extends DependencyPipe {
         String grandchild_word = forms[grandchild];
 
         add("YZ_PPCPGP=" + parent_child_dir + "_" + child_grandchild_dir + "_" + parent_pos + "_" + child_pos + "_" + grandchild_pos, 1.0, fv);
-        add("YZ_PPGP=" + parent_child_dir + "_" + child_grandchild_dir + "_" + parent_pos + "_" + grandchild_pos, 1.0, fv);
-        add("YZ_CPGP=" + parent_child_dir + "_" + child_grandchild_dir + "_" + child_pos + "_" + grandchild_pos, 1.0, fv);
+        //add("YZ_PPGP=" + parent_child_dir + "_" + child_grandchild_dir + "_" + parent_pos + "_" + grandchild_pos, 1.0, fv);
+        //add("YZ_CPGP=" + parent_child_dir + "_" + child_grandchild_dir + "_" + child_pos + "_" + grandchild_pos, 1.0, fv);
         //add("YZ_PWGW=" + parent_child_dir + "_" + child_grandchild_dir + "_" + parent_word + "_" + grandchild_word, 1.0, fv);
         //add("YZ_CWGW=" + parent_child_dir + "_" + child_grandchild_dir + "_" + child_word + "_" + grandchild_word, 1.0, fv);
         //add("YZ_PPGW=" + parent_child_dir + "_" + child_grandchild_dir + "_" + parent_pos + "_" + grandchild_word, 1.0, fv);
@@ -454,7 +478,6 @@ public class MyPipe extends DependencyPipe {
             //skip root node
             int parse_index = order_map.get(order_index);
             int parse_head = heads[parse_index];
-
             extractFeatures(instance, parse_index, parse_head, pa, fv);
             pa.ChildProcess(parse_index, parse_head); //Yizhong: This ChildProcess() should be after the extractFeatures()
             pa.AddArc(parse_index, parse_head);
