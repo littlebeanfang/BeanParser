@@ -12,6 +12,7 @@ import java.util.Map;
  *
  */
 public class ParseAgenda {
+	public StringBuffer sb_print = new StringBuffer(); //TODO Yizhong:For test
 	public TIntIntHashMap tii;
 	public TIntIntHashMap numofleftchild;
 	public TIntIntHashMap numofrightchild;
@@ -32,15 +33,16 @@ public class ParseAgenda {
 	}
 	public void AddArc(int child, int head){
 		this.tii.put(child, head);
+		sb_print.insert(0, child + "<--" + head + "\t");
 	}
 	public String toString(){
-		StringBuffer sb=new StringBuffer();
-		sb.append("Agenda Size:"+this.tii.size()+"\n");
+		/*StringBuffer sb=new StringBuffer();
+		//sb.append("Agenda Size:"+this.tii.size()+"\n");
 		for(int key:this.tii.keys()){
 			//sb.append("Child:"+key+", Head:"+this.tii.get(key)+"\n");
-			sb.append(this.tii.get(key)+"-->"+key+"\n");
-		}
-		return sb.toString();
+			sb.append(key+"<--"+this.tii.get(key)+"\t");
+		}*/
+		return sb_print.toString();
 	}
 	public String toActParseTree(){
 		StringBuffer sb=new StringBuffer();

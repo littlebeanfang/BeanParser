@@ -1,8 +1,11 @@
 package DataStructure;
 
-import gnu.trove.*;
-import java.io.*;
-import java.util.*;
+import gnu.trove.TIntIntHashMap;
+
+import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
+import java.io.Serializable;
 
 public class DependencyInstance implements Serializable {
 
@@ -122,15 +125,20 @@ public class DependencyInstance implements Serializable {
     }
 
     public String toString () {
-	StringBuffer sb = new StringBuffer();
-	sb.append(Arrays.toString(forms)).append("\n");
-	int[] keys=this.orders.keys();
-	for(int key:keys){
-		sb.append("order:"+key+", index:"+orders.get(key)+"\n");
+		StringBuffer sb = new StringBuffer();
+		int i = 0;
+		for (String form : forms) {
+			sb.append("(" + i + ")" + form + "[" + heads[i] + "]" + "\t\t");
+			i++;
+		}
+		/*sb.append(Arrays.toString(forms));
+		int[] keys=this.orders.keys();
+		for(int key:keys){
+			sb.append("order:"+key+", index:"+orders.get(key)+"\n");
+		}
+		sb.append(this.length()+"\n");*/
+		return sb.toString();
 	}
-	sb.append(this.length()+"\n");
-	return sb.toString();
-    }
 
 
     private void writeObject (ObjectOutputStream out) throws IOException {

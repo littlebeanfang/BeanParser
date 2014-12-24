@@ -12,7 +12,7 @@ public class TrainTest {
 		DependencyPipe pipe = new MyPipe(options);
 
 		Parser test = new Parser(pipe, options);
-		test.Train();
+		//test.Train();
 
 		test.loadModel(options.modelName);
 		test.Parse(options.testfile, options.outfile);

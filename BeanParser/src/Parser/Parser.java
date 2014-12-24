@@ -68,9 +68,11 @@ public class Parser {
         System.out.println("Process index:");
         long parsestart = System.currentTimeMillis();
         while ((di = reader.getNext()) != null) {
+            System.out.println("----------------------------------------------------------");
+            System.out.println(di.toString());
             ++instcount;
             if (instcount % 50 == 0) {
-                System.out.print(instcount + "\t");
+                System.out.println(instcount + "\t");
             }
             //if (instcount % 30 == 0) System.out.print('\n');
             FeatureVector fv = new FeatureVector();//useless here, just align the param for DecodeInstance

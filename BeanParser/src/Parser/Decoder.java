@@ -33,6 +33,11 @@ public class Decoder {
             int parsehead = (Integer) ret[0];
 //			System.out.println("DecodeInstance fvforinst after call findhead:"+ret[1].toString().split(" ").length);
             pa.AddArc(parseindex, parsehead);
+            if (parsehead == inst.heads[parseindex]) {
+                System.out.println(pa.toString());
+            } else {
+                System.err.println(pa.toString());
+            }
             //System.out.println("Index: "+parseindex+"Head: "+parsehead);
             pa.ChildProcess(parseindex, parsehead);
             fvforinst = fvforinst.cat((FeatureVector) ret[1]);
@@ -53,6 +58,7 @@ public class Decoder {
         int headindex = -1;
         double score = Double.NEGATIVE_INFINITY;
         FeatureVector actfv = new FeatureVector();
+        //System.out.println(pa.toString());
         for (int head = 0; head < inst.length(); head++) {
             if ((head != childindex) && (FindRoot(head, set) != childindex)) { //Jia: if the root of the head is not child
                 FeatureVector fv = new FeatureVector();
@@ -78,6 +84,7 @@ public class Decoder {
 
         //Update the disjoint-set
         set[childindex] = headindex;
+
 
         //inst.fv.cat(actfv);
         //Bean: store feature vector in fvforinst, for Object d[][]

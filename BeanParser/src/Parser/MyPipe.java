@@ -27,6 +27,7 @@ public class MyPipe extends DependencyPipe {
         // features
         // from it
         // boolean labeled;
+
         boolean leftToRight = (childindex > parentindex);
         int small = leftToRight ? parentindex : childindex;
         int large = leftToRight ? childindex : parentindex;
@@ -35,10 +36,10 @@ public class MyPipe extends DependencyPipe {
         this.options.secondOrder = true;
         if (this.options.secondOrder) {
             addTwoOrderSiblingFeatures(instance, parentindex, childindex, pa, fv);
-            //addBeamFeatures(instance, parentindex, childindex, pa, fv);
+            addBeamFeatures(instance, parentindex, childindex, pa, fv);
         }
-        //addThreeOrderSiblingFeatures(instance,parentindex,childindex,pa,fv);
-        //addHMGfeatures(instance, parentindex, childindex, pa, fv);
+        addThreeOrderSiblingFeatures(instance, parentindex, childindex, pa, fv);
+        addHMGfeatures(instance, parentindex, childindex, pa, fv);
 
     }
 
@@ -355,7 +356,11 @@ public class MyPipe extends DependencyPipe {
         String ch2_pos = pos[ch2];
 
         String pTrip = par_pos + "_" + ch1_pos + "_" + ch2_pos;
-        add("POS_TRIP=" + pTrip + "_" + dir, 1.0, fv);
+        //add("POS_TRIP=" + pTrip + "_" + dir, 1.0, fv);
+
+        add("POS_TRIP_side=" + pTrip + "_" + side, 1.0, fv);
+        add("POS_TRIP_dir=" + pTrip + "_" + p_c_dir, 1.0, fv);
+
         add("APOS_TRIP=" + pTrip, 1.0, fv);
 /*        String[] pos = instance.postags;
         // ch1 is always the closest to par
