@@ -34,27 +34,19 @@ public class MyPipe extends DependencyPipe {
         int large = leftToRight ? childindex : parentindex;
         addCoreFeatures(instance, small, large, leftToRight, fv);
         //System.out.println(this.options.secondOrder);
-        this.options.secondOrder = true;
+        //this.options.secondOrder = true;
         if (this.options.secondOrder) {
             addTwoOrderSiblingFeatures(instance, parentindex, childindex, pa, fv);
             //addBeamFeatures(instance, parentindex, childindex, pa, fv);
         }
-        //addThreeOrderSiblingFeatures(instance,parentindex,childindex,pa,fv);
-        //addHMGfeatures(instance, parentindex, childindex, pa, fv);
-
+        addThreeOrderSiblingFeatures(instance, parentindex, childindex, pa, fv);
+        addHMGfeatures(instance, parentindex, childindex, pa, fv);
     }
 
 
 
     private void addTwoOrderSiblingFeatures(DependencyInstance instance,
                                            int parentindex, int childindex, ParseAgenda pa, FeatureVector fv) {
-        //System.out.println(childindex + "\t" + parentindex);
-
-        //if (pa.tii.containsKey(parentindex)) { // this shows that the parent
-            // candidate already has head,so we
-            // can add grandparent-parent-child
-            // feature
-        //}
 
         if (pa.tii.containsValue(parentindex)) { // this shows that the parent
 //            // candidate has already been
@@ -107,21 +99,12 @@ public class MyPipe extends DependencyPipe {
                     String[] left_childrens = lsb.toString().split("\t");
                     for (String existing_child : left_childrens) {     //MST 2nd order features
                         int existing_child_index = Integer.parseInt(existing_child);
-                        int close = Math.max(childindex,existing_child_index);
-                        int far = Math.max(childindex, existing_child_index);
-                        addTripFeatures(instance, close, existing_child_index,
+                        addTripFeatures(instance, childindex, existing_child_index,
                                 parentindex, fv);
                         addSiblingFeatures(instance, childindex, existing_child_index,
                                 false, fv);
-                        addSiblingFeatures(instance, childindex, existing_child_index,
-                                true, fv);
-                        /*addTripFeatures(instance, childindex, existing_child_index,
-                                parentindex, fv);
-                        addSiblingFeatures(instance, childindex, existing_child_index,
-                                false, fv);
-                        addSiblingFeatures(instance, childindex, existing_child_index,
-                                true, fv);*/
-                        //System.out.print(existing_child_index+"\t");
+                        //addSiblingFeatures(instance, childindex, existing_child_index,
+                        //        true, fv);
                     }
                 }
                 StringBuffer rsb = pa.rightchilds.get(parentindex);
@@ -133,29 +116,11 @@ public class MyPipe extends DependencyPipe {
                                 parentindex, fv); // parent can be in any place
                         addSiblingFeatures(instance, childindex, existing_child_index,
                                 false, fv);
-                        addSiblingFeatures(instance, childindex, existing_child_index,
-                                true, fv);
-                        //System.out.print(existing_child_index+"\t");
+                        //addSiblingFeatures(instance, childindex, existing_child_index,
+                        //        true, fv);
                     }
             }
         }
-
-            //Since parseagenda is changed, this laborious work is unnecessary
-//            for (TIntIntIterator iter = pa.tii.iterator(); iter.hasNext(); ) {
-//                iter.advance();
-//                int existing_child = iter.key();
-//                int parent = iter.value();
-//                if (parent == parentindex) {
-//                    addTripFeatures(instance, childindex, existing_child,
-//                            parentindex, fv); // parent can be in any place
-//                    addSiblingFeatures(instance, childindex, existing_child,
-//                            false, fv);
-//                    addSiblingFeatures(instance, childindex, existing_child,
-//                            true, fv);
-//                    //System.out.print(existing_child+"\t");
-//                }
-//            }
-//        }
     }
 
     private void addThreeOrderSiblingFeatures(DependencyInstance instance,
@@ -176,7 +141,10 @@ public class MyPipe extends DependencyPipe {
                             left_nearest = current_ch;
                         }
                     }
-                    addRightLeftNearestFeatures(instance, parentindex, childindex, left_nearest, right_nearest, fv);
+
+                    if (right_nearest != parentindex && left_nearest != -1) {
+                        addRightLeftNearestFeatures(instance, parentindex, childindex, left_nearest, right_nearest, fv);
+                    }
                 }
             }
 
@@ -196,7 +164,9 @@ public class MyPipe extends DependencyPipe {
                             right_nearest = current_ch;
                         }
                     }
-                    addRightLeftNearestFeatures(instance,parentindex,childindex,left_nearest,right_nearest,fv);
+                    if (left_nearest != parentindex && right_nearest != instance.length() + 1) {
+                        addRightLeftNearestFeatures(instance, parentindex, childindex, left_nearest, right_nearest, fv);
+                    }
                 }
             }
         }
@@ -273,12 +243,12 @@ public class MyPipe extends DependencyPipe {
         String right_nearest_pos;
 
         if(head > modifier){
-            left_nearest_pos = left_nearest_index == -1?"NoLeftPos":pos[left_nearest_index];
-            right_nearest_pos = righ_nearest_index == head?"NoRightPos":pos[righ_nearest_index];
+            left_nearest_pos = pos[left_nearest_index];
+            right_nearest_pos = pos[righ_nearest_index];
         }
         else{
-            left_nearest_pos = left_nearest_index == head?"NoLeftPos":pos[left_nearest_index];
-            right_nearest_pos = righ_nearest_index == instance.length()+1?"NoRightPos":pos[righ_nearest_index];
+            left_nearest_pos = pos[left_nearest_index];
+            right_nearest_pos = pos[righ_nearest_index];
         }
 
         add("YZ_LRN_LMR_POS=" + left_nearest_pos + "_" + modifier_pos + "_" +right_nearest_pos, 1.0,
@@ -304,9 +274,11 @@ public class MyPipe extends DependencyPipe {
         // ch1 is always the closes to par
         String dir = ch1 > ch2 ? "RA" : "LA";
 
-        String ch1_pos = isST ? "STPOS" : pos[ch1];
+        //String ch1_pos = isST ? "STPOS" : pos[ch1];
+        String ch1_pos = pos[ch1];
         String ch2_pos = pos[ch2];
-        String ch1_word = isST ? "STWRD" : forms[ch1];
+        //String ch1_word = isST ? "STWRD" : forms[ch1];
+        String ch1_word = forms[ch1];
         String ch2_word = forms[ch2];
 
         add("CH_PAIR=" + ch1_pos + "_" + ch2_pos + "_" + dir, 1.0, fv);
@@ -346,30 +318,24 @@ public class MyPipe extends DependencyPipe {
         String[] pos = instance.postags;
         // ch1 is always the closest to par
 
-        String side = (ch2 - par)*(ch1 - par) < 0 ? "SA":"DI";
+        //String side = (ch2 - par)*(ch1 - par) < 0 ? "SA":"DI";
 
-        String p_c_dir = par < ch2 ? "RA" : "LA";
 
-        String dir = side + p_c_dir;
+        String p_c_dir = par < ch1 ? "RA" : "LA";
+        String p_s_dir = par < ch2 ? "RA" : "LA";
+        String c_s_dir = ch1 < ch2 ? "RA" : "LA";
+
 
         String par_pos = pos[par];
-        String ch1_pos = ch1 == par ? "STPOS" : pos[ch1];
+        String ch1_pos = pos[ch1];
         String ch2_pos = pos[ch2];
 
         String pTrip = par_pos + "_" + ch1_pos + "_" + ch2_pos;
-        add("POS_TRIP=" + pTrip + "_" + dir, 1.0, fv);
         add("APOS_TRIP=" + pTrip, 1.0, fv);
-/*        String[] pos = instance.postags;
-        // ch1 is always the closest to par
-        String dir = par < ch2 ? "RA" : "LA";
-
-        String par_pos = pos[par];
-        String ch1_pos = ch1 == par ? "STPOS" : pos[ch1];
-        String ch2_pos = pos[ch2];
-
-        String pTrip = par_pos + "_" + ch1_pos + "_" + ch2_pos;
-        add("POS_TRIP=" + pTrip + "_" + dir, 1.0, fv);
-        add("APOS_TRIP=" + pTrip, 1.0, fv);*/
+        add("YZ_PCD_POS_TRIP=" + p_c_dir + "_" + pTrip, 1.0, fv);
+        //add("YZ_PSD_POS_TRIP=" + p_s_dir + "_" + pTrip, 1.0, fv);
+        add("YZ_PCD_PSD_POS_TRIP=" + p_c_dir + "_" + p_s_dir + "_" + pTrip, 1.0, fv);
+        add("YZ_PCD_PSD_CSD_POS_TRIP=" + p_c_dir + "_" + p_s_dir + "_" + c_s_dir + "_" + pTrip, 1.0, fv);
     }
 
     //New features mentioned in Carreras's paper added to original MST parser for the structure of Grandparent-Head-Modifier
@@ -390,15 +356,21 @@ public class MyPipe extends DependencyPipe {
         String grandchild_pos = pos[grandchild];
         String grandchild_word = forms[grandchild];
 
-        add("YZ_PPCPGP=" + parent_child_dir + "_" + child_grandchild_dir + "_" + parent_pos + "_" + child_pos + "_" + grandchild_pos, 1.0, fv);
-        //add("YZ_PPGP=" + parent_child_dir + "_" + child_grandchild_dir + "_" + parent_pos + "_" + grandchild_pos, 1.0, fv);
-        //add("YZ_CPGP=" + parent_child_dir + "_" + child_grandchild_dir + "_" + child_pos + "_" + grandchild_pos, 1.0, fv);
-        //add("YZ_PWGW=" + parent_child_dir + "_" + child_grandchild_dir + "_" + parent_word + "_" + grandchild_word, 1.0, fv);
-        //add("YZ_CWGW=" + parent_child_dir + "_" + child_grandchild_dir + "_" + child_word + "_" + grandchild_word, 1.0, fv);
-        //add("YZ_PPGW=" + parent_child_dir + "_" + child_grandchild_dir + "_" + parent_pos + "_" + grandchild_word, 1.0, fv);
-        //add("YZ_CPGW=" + parent_child_dir + "_" + child_grandchild_dir + "_" + child_pos + "_" + grandchild_word, 1.0, fv);
-        //add("YZ_PWGP=" + parent_child_dir + "_" + child_grandchild_dir + "_" + parent_word + "_" + grandchild_pos, 1.0, fv);
-        //add("YZ_CWGP=" + parent_child_dir + "_" + child_grandchild_dir + "_" + child_word + "_" + grandchild_pos, 1.0, fv);
+        add("YZ_PPCPGP_DIR=" + parent_child_dir + "_" + child_grandchild_dir + "_" + parent_pos + "_" + child_pos + "_" + grandchild_pos, 1.0, fv);
+        add("YZ_PPGP_DIR=" + parent_child_dir + "_" + child_grandchild_dir + "_" + parent_pos + "_" + grandchild_pos, 1.0, fv);
+        add("YZ_PWGW_DIR=" + parent_child_dir + "_" + child_grandchild_dir + "_" + parent_word + "_" + grandchild_word, 1.0, fv);
+        add("YZ_PPGW_DIR=" + parent_child_dir + "_" + child_grandchild_dir + "_" + parent_pos + "_" + grandchild_word, 1.0, fv);
+        add("YZ_PWGP_DIR=" + parent_child_dir + "_" + child_grandchild_dir + "_" + parent_word + "_" + grandchild_pos, 1.0, fv);
+
+        add("YZ_PPCPGP=" + parent_pos + "_" + child_pos + "_" + grandchild_pos, 1.0, fv);
+        add("YZ_PPGP=" + parent_pos + "_" + grandchild_pos, 1.0, fv);
+        //add("YZ_CPGP=" + child_pos + "_" + grandchild_pos, 1.0, fv);
+        add("YZ_PWGW=" + parent_word + "_" + grandchild_word, 1.0, fv);
+        //add("YZ_CWGW=" + child_word + "_" + grandchild_word, 1.0, fv);
+        add("YZ_PPGW=" + parent_pos + "_" + grandchild_word, 1.0, fv);
+        //add("YZ_CPGW=" + child_pos + "_" + grandchild_word, 1.0, fv);
+        add("YZ_PWGP=" + parent_word + "_" + grandchild_pos, 1.0, fv);
+        //add("YZ_CWGP=" + child_word + "_" + grandchild_pos, 1.0, fv);
     }
 
 
@@ -518,6 +490,7 @@ public class MyPipe extends DependencyPipe {
         System.out.println("Creating Alphabet Done.");
         return numInstances;
     }
+<<<<<<< HEAD
     
     protected void writeInstance(DependencyInstance instance, ObjectOutputStream out) {
     	try {
@@ -527,4 +500,6 @@ public class MyPipe extends DependencyPipe {
     	}
     	catch (Exception e) {}
     }
+=======
+>>>>>>> FETCH_HEAD
 }
