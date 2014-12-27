@@ -32,14 +32,13 @@ public class MyPipe extends DependencyPipe {
         int large = leftToRight ? childindex : parentindex;
         addCoreFeatures(instance, small, large, leftToRight, fv);
         //System.out.println(this.options.secondOrder);
-        this.options.secondOrder = true;
+        //this.options.secondOrder = true;
         if (this.options.secondOrder) {
             addTwoOrderSiblingFeatures(instance, parentindex, childindex, pa, fv);
-            //addBeamFeatures(instance, parentindex, childindex, pa, fv);
+            addBeamFeatures(instance, parentindex, childindex, pa, fv);
         }
-        //addThreeOrderSiblingFeatures(instance,parentindex,childindex,pa,fv);
-        //addHMGfeatures(instance, parentindex, childindex, pa, fv);
-
+        addThreeOrderSiblingFeatures(instance, parentindex, childindex, pa, fv);
+        addHMGfeatures(instance, parentindex, childindex, pa, fv);
     }
 
 
@@ -107,7 +106,7 @@ public class MyPipe extends DependencyPipe {
                         int existing_child_index = Integer.parseInt(existing_child);
                         int close = Math.max(childindex,existing_child_index);
                         int far = Math.max(childindex, existing_child_index);
-                        addTripFeatures(instance, close, existing_child_index,
+                        addTripFeatures(instance, childindex, existing_child_index,
                                 parentindex, fv);
                         addSiblingFeatures(instance, childindex, existing_child_index,
                                 false, fv);
@@ -174,6 +173,8 @@ public class MyPipe extends DependencyPipe {
                             left_nearest = current_ch;
                         }
                     }
+
+                    //TODO REMOVE
                     addRightLeftNearestFeatures(instance, parentindex, childindex, left_nearest, right_nearest, fv);
                 }
             }
@@ -344,18 +345,18 @@ public class MyPipe extends DependencyPipe {
         String[] pos = instance.postags;
         // ch1 is always the closest to par
 
-        String side = (ch2 - par)*(ch1 - par) < 0 ? "SA":"DI";
+        //String side = (ch2 - par)*(ch1 - par) < 0 ? "SA":"DI";
 
         String p_c_dir = par < ch2 ? "RA" : "LA";
 
-        String dir = side + p_c_dir;
+        //String dir = side + p_c_dir;
 
         String par_pos = pos[par];
         String ch1_pos = ch1 == par ? "STPOS" : pos[ch1];
         String ch2_pos = pos[ch2];
 
         String pTrip = par_pos + "_" + ch1_pos + "_" + ch2_pos;
-        add("POS_TRIP=" + pTrip + "_" + dir, 1.0, fv);
+        add("POS_TRIP=" + pTrip + "_" + p_c_dir, 1.0, fv);
         add("APOS_TRIP=" + pTrip, 1.0, fv);
 /*        String[] pos = instance.postags;
         // ch1 is always the closest to par
@@ -508,6 +509,4 @@ public class MyPipe extends DependencyPipe {
         System.out.println("Creating Alphabet Done.");
         return numInstances;
     }
-
-
 }
