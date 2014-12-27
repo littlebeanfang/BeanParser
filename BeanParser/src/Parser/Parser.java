@@ -89,7 +89,7 @@ public class Parser {
         writer.finishWriting();
     }
 
-    public void Train() throws IOException {
+    public void Train() throws IOException, ClassNotFoundException {
         /**
          * Author: Bean
          * call Train class and organize the training process

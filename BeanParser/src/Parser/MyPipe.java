@@ -8,7 +8,9 @@ import IO.CONLLReader;
 import gnu.trove.TIntIntHashMap;
 
 import java.io.File;
+import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.ObjectOutputStream;
 
 public class MyPipe extends DependencyPipe {
 
@@ -493,6 +495,10 @@ public class MyPipe extends DependencyPipe {
 
         //System.out.println(System.getenv());
         labeled = reader.startReading(System.getenv("CODEDATA") + File.separator + file);
+        
+        ObjectOutputStream out = options.createForest ? new ObjectOutputStream(new FileOutputStream(
+            options.trainforest)) : null;
+        
         int numInstances = 0;
         DependencyInstance instance = reader.getNext();
         while (instance != null) {
@@ -501,13 +507,24 @@ public class MyPipe extends DependencyPipe {
             for (int i = 0; i < labs.length; i++) {
                 typeAlphabet.lookupIndex(labs[i]);
             }
-            extractFeatureVector(instance);
+            instance.setFeatureVector(extractFeatureVector(instance));
+         
+            if (options.createForest) writeInstance(instance, out);
             instance = reader.getNext();
         }
         closeAlphabets();
+        
+        if (options.createForest) out.close();
         System.out.println("Creating Alphabet Done.");
         return numInstances;
     }
-
-
+    
+    protected void writeInstance(DependencyInstance instance, ObjectOutputStream out) {
+    	try {
+    		out.writeObject(instance);
+    		out.writeObject(instance.fv.keys());
+    		out.writeObject(instance.orders);
+    	}
+    	catch (Exception e) {}
+    }
 }
