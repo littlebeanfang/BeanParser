@@ -35,7 +35,7 @@ public class MyPipe extends DependencyPipe {
         //this.options.secondOrder = true;
         if (this.options.secondOrder) {
             addTwoOrderSiblingFeatures(instance, parentindex, childindex, pa, fv);
-            //addBeamFeatures(instance, parentindex, childindex, pa, fv);
+            addBeamFeatures(instance, parentindex, childindex, pa, fv);
         }
         addThreeOrderSiblingFeatures(instance, parentindex, childindex, pa, fv);
         addHMGfeatures(instance, parentindex, childindex, pa, fv);
