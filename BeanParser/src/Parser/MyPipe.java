@@ -490,8 +490,7 @@ public class MyPipe extends DependencyPipe {
         System.out.println("Creating Alphabet Done.");
         return numInstances;
     }
-<<<<<<< HEAD
-    
+
     protected void writeInstance(DependencyInstance instance, ObjectOutputStream out) {
     	try {
     		out.writeObject(instance);
@@ -500,6 +499,5 @@ public class MyPipe extends DependencyPipe {
     	}
     	catch (Exception e) {}
     }
-=======
->>>>>>> FETCH_HEAD
+
 }
