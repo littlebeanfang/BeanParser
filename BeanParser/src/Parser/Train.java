@@ -2,9 +2,12 @@ package Parser;
 
 import DataStructure.*;
 import IO.CONLLReader;
+import gnu.trove.TIntIntHashMap;
 
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.IOException;
+import java.io.ObjectInputStream;
 
 public class Train {
     public ParserOptions options;
@@ -15,7 +18,7 @@ public class Train {
         //this.params=params;
     }
 
-    public void callTrain() throws IOException {
+    public void callTrain() throws IOException, ClassNotFoundException {
         MyPipe pipe = new MyPipe(options);
         /*Author: Yizhong
          *Rewrite createInstances function, call our feature extraction function, delete second param
@@ -43,7 +46,7 @@ public class Train {
     }
 
     public void train(int numInstances, String trainfile, MyPipe pipe)
-            throws IOException {
+            throws IOException, ClassNotFoundException {
 
         //System.out.print("About to train. ");
         //System.out.print("Num Feats: " + pipe.dataAlphabet.size());
@@ -77,7 +80,8 @@ public class Train {
         System.out.println("==============================================");
     }
 
-    private void trainingIter(int numInstances, String trainfile, int iter, MyPipe pipe) throws IOException {
+    private void trainingIter(int numInstances, String trainfile, int iter, MyPipe pipe)
+    		throws IOException, ClassNotFoundException {
         /**
          * Author: Yizhong
          * create reader for trainfile, for instance reading later
@@ -87,18 +91,30 @@ public class Train {
         boolean evaluateI = true;
 
         //int numInstances = instanceLengths.length;
-
-
         CONLLReader reader = new CONLLReader();
-        reader.startReading(System.getenv("CODEDATA") + File.separator + trainfile);
+        ObjectInputStream in = null;
+        if (!options.createForest)
+        	reader.startReading(System.getenv("CODEDATA") + File.separator + trainfile);
+        else 
+        	in = new ObjectInputStream(new FileInputStream(options.trainforest));
+        
         DependencyInstance inst;
         int currentInstance = 0;
-        while ((inst = reader.getNext()) != null) {
+        if (!options.createForest)
+        	inst = reader.getNext();
+        else {
+        	inst = (DependencyInstance) in.readObject();
+        	inst.fv = new FeatureVector((int[]) in.readObject());
+        	inst.orders = (TIntIntHashMap) in.readObject();
+        }
+        while (inst != null) {
             currentInstance++;
             if (currentInstance % 500 == 0) {
                 System.out.print(currentInstance + ",");
             }
-            inst.setFeatureVector(pipe.extractFeatureVector(inst));
+            
+            if (!options.createForest) inst.setFeatureVector(pipe.extractFeatureVector(inst));
+            
             String[] labs = inst.deprels;
             int[] heads = inst.heads;
 
@@ -163,11 +179,23 @@ public class Train {
 			    */
             params.updateParamsMIRA(inst, d, upd);
 
+            if (!options.createForest)
+            	inst = reader.getNext();
+            else {
+            	try {
+            		inst = (DependencyInstance) in.readObject();
+            		inst.fv = new FeatureVector((int[]) in.readObject());
+            		inst.orders = (TIntIntHashMap) in.readObject();
+            	}
+            	catch (Exception e) {
+            		inst = null;
+            	}
+            }
         }
 
         //System.out.println("");
         //System.out.println("  "+numInstances+" instances");
-
+        in.close();
         System.out.print(numInstances);
 
         //in.close();

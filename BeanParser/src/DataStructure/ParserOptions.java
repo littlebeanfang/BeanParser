@@ -29,7 +29,7 @@ public final class ParserOptions {
     
     public String trainfile = null;
     public String testfile = null;
-    //public File trainforest = null;
+    public File trainforest = null;
    // public File testforest = null;
     public boolean train = false;
     public boolean eval = false;
@@ -37,7 +37,7 @@ public final class ParserOptions {
     //public boolean rankEdgesByConfidence = false;
     public String modelName = "dep.model";
     //public String lossType = "punc";
-    //public boolean createForest = true;
+    public boolean createForest = true;
     //public String decodeType = "proj";
     //public String format = "CONLL";
     public int numIters = 10;
@@ -93,10 +93,11 @@ public final class ParserOptions {
 	    if (pair[0].equals("order") && pair[1].equals("2")) {
 		secondOrder = true;
 	    }			
-	    /*
+	    
 	    if (pair[0].equals("create-forest")) {
 		createForest = pair[1].equals("true") ? true : false;
-	    }			
+	    }		
+	    /*
 	    if (pair[0].equals("decode-type")) {
 		decodeType = pair[1];
 	    }			
@@ -118,24 +119,24 @@ public final class ParserOptions {
 	    */ 
 	}
 
-/*
+
 	try {
-	    File tmpDir = new File("/tmp");
+		File tmpDir = new File(System.getenv("CODEDATA") + "/tmp");
 	    if (null != trainfile) {
-		trainforest = File.createTempFile("train", ".forest");
+		trainforest = File.createTempFile("train", ".forest", tmpDir);
 		trainforest.deleteOnExit();
 	    }
-
+/*
 	    if (null != testfile) {
 		testforest = File.createTempFile("test", ".forest");
 		testforest.deleteOnExit();
 	    }
-
+*/
 	} catch (java.io.IOException e) {
 	    System.out.println("Unable to create tmp files for feature forests!");
 	    System.out.println(e);
 	    System.exit(0);
-	}*/
+	}
     }
 
 
@@ -168,7 +169,7 @@ public final class ParserOptions {
 	sb.append(" | ");
 	//sb.append("decode-type: " + decodeType);
 	sb.append(" | ");
-	//sb.append("create-forest: " + createForest);
+	sb.append("create-forest: " + createForest);
 	sb.append(" | ");
 	//sb.append("format: " + format);
 	sb.append(" | ");
