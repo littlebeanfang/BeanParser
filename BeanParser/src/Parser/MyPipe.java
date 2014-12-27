@@ -48,7 +48,7 @@ public class MyPipe extends DependencyPipe {
     private void addTwoOrderSiblingFeatures(DependencyInstance instance,
                                            int parentindex, int childindex, ParseAgenda pa, FeatureVector fv) {
 
-        if (pa.tii.containsValue(parentindex)) { // this shows that the parent
+//        if (pa.tii.containsValue(parentindex)) { // this shows that the parent
 //            // candidate has already been
 //            // another word's parent
 //            //System.out.print("\nMy: ");
@@ -94,8 +94,8 @@ public class MyPipe extends DependencyPipe {
 //                }
 //            }
             //----------------------------------------------------
-                StringBuffer lsb = pa.leftchilds.get(parentindex);
-                if (lsb != null) {
+                String lsb = pa.getLeftChilds(parentindex);
+                if (!lsb.isEmpty()) {
                     String[] left_childrens = lsb.toString().split("\t");
                     for (String existing_child : left_childrens) {     //MST 2nd order features
                         int existing_child_index = Integer.parseInt(existing_child);
@@ -107,8 +107,8 @@ public class MyPipe extends DependencyPipe {
                         //        true, fv);
                     }
                 }
-                StringBuffer rsb = pa.rightchilds.get(parentindex);
-                if (rsb != null) {
+                String rsb = pa.getRightChilds(parentindex);
+                if (!rsb.isEmpty()) {
                     String[] right_childrens = rsb.toString().split("\t");
                     for (String existing_child : right_childrens) {    //MST 2nd order features
                         int existing_child_index = Integer.parseInt(existing_child);
@@ -120,15 +120,14 @@ public class MyPipe extends DependencyPipe {
                         //        true, fv);
                     }
             }
-        }
+//        }
     }
 
     private void addThreeOrderSiblingFeatures(DependencyInstance instance,
                                               int parentindex, int childindex, ParseAgenda pa, FeatureVector fv){
-        if (pa.tii.containsValue(parentindex)){
             if (childindex < parentindex) {
-                StringBuffer lsb = pa.leftchilds.get(parentindex);
-                if (lsb != null) {
+                String lsb = pa.getLeftChilds(parentindex);
+                if (!lsb.isEmpty()) {
                     String[] left_childrens = lsb.toString().split("\t");
                     int right_nearest = parentindex;
                     int left_nearest = -1;
@@ -149,8 +148,8 @@ public class MyPipe extends DependencyPipe {
             }
 
             if (childindex > parentindex) {
-                StringBuffer rsb = pa.rightchilds.get(parentindex);
-                if (rsb != null) {
+                String rsb = pa.getRightChilds(parentindex);
+                if (!rsb.isEmpty()) {
                     String[] right_childrens = rsb.toString().split("\t");
                     int left_nearest = parentindex;
                     int right_nearest = instance.length()+1;
@@ -169,25 +168,29 @@ public class MyPipe extends DependencyPipe {
                     }
                 }
             }
-        }
     }
 
     private void addHMGfeatures(DependencyInstance instance, int parentindex, int childindex, ParseAgenda pa, FeatureVector fv){
         //TODO: It still needs further discussion how to add this structure : the GHM or GMH or MGH or MHG and so on.
-        if (pa.tii.containsValue(childindex)) { // this shows that the child
-            // candidate is already used as another word's parent
-            StringBuffer lsb = pa.leftchilds.get(childindex);
-            StringBuffer rsb = pa.rightchilds.get(childindex);
 
+    		String lsb = pa.getLeftChilds(childindex);
+            String rsb = pa.getRightChilds(childindex);
+
+            if (lsb.isEmpty() && rsb.isEmpty()) return;
             StringBuffer grandchildren_sb = new StringBuffer();
 
-            if(lsb != null){
+            if (!lsb.isEmpty()){
                 grandchildren_sb.append(lsb);
-                grandchildren_sb.append("\t");
             }
-            if(rsb != null) {
+            
+            if ((!lsb.isEmpty()) && (!rsb.isEmpty())) {
+            	grandchildren_sb.append("\t");
                 grandchildren_sb.append(rsb);
             }
+            else if (!rsb.isEmpty()) {
+            	grandchildren_sb.append(rsb);
+            }
+            
             //System.out.println("lsb: "+lsb);
             //System.out.println("rsb: "+rsb);
             //System.out.println("children: "+children.toString());
@@ -226,7 +229,6 @@ public class MyPipe extends DependencyPipe {
                 }*/
                 addGrandchildFeatures(instance, parentindex, childindex, grandchild_index, fv);
             }
-        }
     }
 
     private void addRightLeftNearestFeatures(DependencyInstance instance,
@@ -387,13 +389,13 @@ public class MyPipe extends DependencyPipe {
         String M_pos = pos[modifier];
 
         int clc_index = modifier;
-        StringBuffer lsb = pa.leftchilds.get(modifier);
+        String lsb = pa.getLeftChilds(modifier);
 //        for (int i = 0; i < forms.length; i++) {
 //            System.out.print(forms[i] + " ");
 //        }
 //        System.out.println(modifier);
 //        System.out.println(lsb);
-        if (lsb != null) {
+        if (!lsb.isEmpty()) {
             String[] left_children = lsb.toString().split("\t");
             for (String child : left_children) {
                 int child_index = Integer.parseInt(child);
@@ -405,9 +407,9 @@ public class MyPipe extends DependencyPipe {
         }
 
         int crc_index = modifier;
-        StringBuffer rsb = pa.rightchilds.get(modifier);
+        String rsb = pa.getRightChilds(modifier);
 //        System.out.println(rsb);
-        if (rsb != null) {
+        if (!rsb.isEmpty()) {
             String[] right_children = rsb.toString().split("\t");
             for (String child : right_children) {
                 int child_index = Integer.parseInt(child);
