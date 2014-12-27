@@ -691,7 +691,7 @@ public class DependencyPipe {
         }
 
 /*bean
-	// Test out relational features
+    // Test out relational features
 	if (options.useRelationalFeatures) {
 
 	    //for (int rf_index=0; rf_index<2; rf_index++) {

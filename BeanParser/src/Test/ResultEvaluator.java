@@ -8,7 +8,7 @@ import java.io.IOException;
 /**
  * Created by wangyizhong on 2014/12/4.
  */
-public class ResultEvaluator{
+public class ResultEvaluator {
 
     public ResultEvaluator() {
     }

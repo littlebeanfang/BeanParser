@@ -6,13 +6,13 @@ import Parser.MyPipe;
 import Parser.Parser;
 
 public class ParseTest {
-	public static void main(String args[]) throws Exception{
+	public static void main(String args[]) throws Exception {
 
 		ParserOptions options = new ParserOptions(args);
-		DependencyPipe dp=new MyPipe(options);
-		Parser test=new Parser(dp,options);
+		DependencyPipe dp = new MyPipe(options);
+		Parser test = new Parser(dp, options);
 		test.loadModel(options.modelName);
-		test.Parse(options.testfile,options.outfile);
+		test.Parse(options.testfile, options.outfile);
 		ResultEvaluator re = new ResultEvaluator();
 		re.evaluate(options.outfile, options.testfile);
 	}

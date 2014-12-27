@@ -44,9 +44,8 @@ public class MyPipe extends DependencyPipe {
     }
 
 
-
     private void addTwoOrderSiblingFeatures(DependencyInstance instance,
-                                           int parentindex, int childindex, ParseAgenda pa, FeatureVector fv) {
+                                            int parentindex, int childindex, ParseAgenda pa, FeatureVector fv) {
 
         if (pa.tii.containsValue(parentindex)) { // this shows that the parent
 //            // candidate has already been
@@ -94,38 +93,38 @@ public class MyPipe extends DependencyPipe {
 //                }
 //            }
             //----------------------------------------------------
-                StringBuffer lsb = pa.leftchilds.get(parentindex);
-                if (lsb != null) {
-                    String[] left_childrens = lsb.toString().split("\t");
-                    for (String existing_child : left_childrens) {     //MST 2nd order features
-                        int existing_child_index = Integer.parseInt(existing_child);
-                        addTripFeatures(instance, childindex, existing_child_index,
-                                parentindex, fv);
-                        addSiblingFeatures(instance, childindex, existing_child_index,
-                                false, fv);
-                        //addSiblingFeatures(instance, childindex, existing_child_index,
-                        //        true, fv);
-                    }
+            StringBuffer lsb = pa.leftchilds.get(parentindex);
+            if (lsb != null) {
+                String[] left_childrens = lsb.toString().split("\t");
+                for (String existing_child : left_childrens) {     //MST 2nd order features
+                    int existing_child_index = Integer.parseInt(existing_child);
+                    addTripFeatures(instance, childindex, existing_child_index,
+                            parentindex, fv);
+                    addSiblingFeatures(instance, childindex, existing_child_index,
+                            false, fv);
+                    //addSiblingFeatures(instance, childindex, existing_child_index,
+                    //        true, fv);
                 }
-                StringBuffer rsb = pa.rightchilds.get(parentindex);
-                if (rsb != null) {
-                    String[] right_childrens = rsb.toString().split("\t");
-                    for (String existing_child : right_childrens) {    //MST 2nd order features
-                        int existing_child_index = Integer.parseInt(existing_child);
-                        addTripFeatures(instance, childindex, existing_child_index,
-                                parentindex, fv); // parent can be in any place
-                        addSiblingFeatures(instance, childindex, existing_child_index,
-                                false, fv);
-                        //addSiblingFeatures(instance, childindex, existing_child_index,
-                        //        true, fv);
-                    }
+            }
+            StringBuffer rsb = pa.rightchilds.get(parentindex);
+            if (rsb != null) {
+                String[] right_childrens = rsb.toString().split("\t");
+                for (String existing_child : right_childrens) {    //MST 2nd order features
+                    int existing_child_index = Integer.parseInt(existing_child);
+                    addTripFeatures(instance, childindex, existing_child_index,
+                            parentindex, fv); // parent can be in any place
+                    addSiblingFeatures(instance, childindex, existing_child_index,
+                            false, fv);
+                    //addSiblingFeatures(instance, childindex, existing_child_index,
+                    //        true, fv);
+                }
             }
         }
     }
 
     private void addThreeOrderSiblingFeatures(DependencyInstance instance,
-                                              int parentindex, int childindex, ParseAgenda pa, FeatureVector fv){
-        if (pa.tii.containsValue(parentindex)){
+                                              int parentindex, int childindex, ParseAgenda pa, FeatureVector fv) {
+        if (pa.tii.containsValue(parentindex)) {
             if (childindex < parentindex) {
                 StringBuffer lsb = pa.leftchilds.get(parentindex);
                 if (lsb != null) {
@@ -153,7 +152,7 @@ public class MyPipe extends DependencyPipe {
                 if (rsb != null) {
                     String[] right_childrens = rsb.toString().split("\t");
                     int left_nearest = parentindex;
-                    int right_nearest = instance.length()+1;
+                    int right_nearest = instance.length() + 1;
                     //int left_second_nearest = parentindex;
                     for (String rch : right_childrens) {
                         int current_ch = Integer.parseInt(rch);
@@ -172,7 +171,7 @@ public class MyPipe extends DependencyPipe {
         }
     }
 
-    private void addHMGfeatures(DependencyInstance instance, int parentindex, int childindex, ParseAgenda pa, FeatureVector fv){
+    private void addHMGfeatures(DependencyInstance instance, int parentindex, int childindex, ParseAgenda pa, FeatureVector fv) {
         //TODO: It still needs further discussion how to add this structure : the GHM or GMH or MGH or MHG and so on.
         if (pa.tii.containsValue(childindex)) { // this shows that the child
             // candidate is already used as another word's parent
@@ -181,11 +180,11 @@ public class MyPipe extends DependencyPipe {
 
             StringBuffer grandchildren_sb = new StringBuffer();
 
-            if(lsb != null){
+            if (lsb != null) {
                 grandchildren_sb.append(lsb);
                 grandchildren_sb.append("\t");
             }
-            if(rsb != null) {
+            if (rsb != null) {
                 grandchildren_sb.append(rsb);
             }
             //System.out.println("lsb: "+lsb);
@@ -231,10 +230,10 @@ public class MyPipe extends DependencyPipe {
 
     private void addRightLeftNearestFeatures(DependencyInstance instance,
                                              int head, int modifier, int left_nearest_index,
-                                             int righ_nearest_index,FeatureVector fv){
+                                             int righ_nearest_index, FeatureVector fv) {
         String[] forms = instance.forms;
         String[] pos = instance.postags;
-        String dir = head > modifier? "LA":"RA";
+        String dir = head > modifier ? "LA" : "RA";
 
         String head_pos = pos[head];
         String modifier_pos = pos[modifier];
@@ -242,31 +241,30 @@ public class MyPipe extends DependencyPipe {
         String left_nearest_pos;
         String right_nearest_pos;
 
-        if(head > modifier){
+        if (head > modifier) {
             left_nearest_pos = pos[left_nearest_index];
             right_nearest_pos = pos[righ_nearest_index];
-        }
-        else{
+        } else {
             left_nearest_pos = pos[left_nearest_index];
             right_nearest_pos = pos[righ_nearest_index];
         }
 
-        add("YZ_LRN_LMR_POS=" + left_nearest_pos + "_" + modifier_pos + "_" +right_nearest_pos, 1.0,
+        add("YZ_LRN_LMR_POS=" + left_nearest_pos + "_" + modifier_pos + "_" + right_nearest_pos, 1.0,
                 fv);
 
-        add("YZ_LRN_LMRH_POS=" + left_nearest_pos + "_" + modifier_pos + "_" +right_nearest_pos
+        add("YZ_LRN_LMRH_POS=" + left_nearest_pos + "_" + modifier_pos + "_" + right_nearest_pos
                 + "_" + head_pos, 1.0, fv);
 
-        add("YZ_LRN_LMR_DIR_POS=" + left_nearest_pos + "_" + modifier_pos + "_" +right_nearest_pos
-                + "_" +dir , 1.0, fv);
+        add("YZ_LRN_LMR_DIR_POS=" + left_nearest_pos + "_" + modifier_pos + "_" + right_nearest_pos
+                + "_" + dir, 1.0, fv);
 
-        add("YZ_LRN_LMRH_DIR_POS=" + left_nearest_pos + "_" + modifier_pos + "_" +right_nearest_pos
+        add("YZ_LRN_LMRH_DIR_POS=" + left_nearest_pos + "_" + modifier_pos + "_" + right_nearest_pos
                 + "_" + head_pos + "_" + dir, 1.0, fv);
 
     }
 
     private void addSiblingFeatures(DependencyInstance instance, int ch1,
-                                          int ch2, boolean isST, FeatureVector fv) {
+                                    int ch2, boolean isST, FeatureVector fv) {
 
         String[] forms = instance.forms;
         String[] pos = instance.postags;
@@ -313,7 +311,7 @@ public class MyPipe extends DependencyPipe {
     }
 
     private void addTripFeatures(DependencyInstance instance, int par,
-                                       int ch1, int ch2, FeatureVector fv) {
+                                 int ch1, int ch2, FeatureVector fv) {
 
         String[] pos = instance.postags;
         // ch1 is always the closest to par
@@ -341,7 +339,7 @@ public class MyPipe extends DependencyPipe {
     //New features mentioned in Carreras's paper added to original MST parser for the structure of Grandparent-Head-Modifier
     //Written by Yizhong
     private void addGrandchildFeatures(DependencyInstance instance, int parent_index,
-                                      int child_index, int grandchild, FeatureVector fv) {
+                                       int child_index, int grandchild, FeatureVector fv) {
 
         String[] forms = instance.forms;
         String[] pos = instance.postags;
@@ -377,7 +375,7 @@ public class MyPipe extends DependencyPipe {
     //The new features Yue Zhang used in her beam search algorithm parser
     //written by yizhong
     private void addBeamFeatures(DependencyInstance instance, int head,
-                                       int modifier, ParseAgenda pa, FeatureVector fv) {
+                                 int modifier, ParseAgenda pa, FeatureVector fv) {
 
         String[] forms = instance.forms;
         String[] pos = instance.postags;
@@ -467,10 +465,10 @@ public class MyPipe extends DependencyPipe {
 
         //System.out.println(System.getenv());
         labeled = reader.startReading(System.getenv("CODEDATA") + File.separator + file);
-        
+
         ObjectOutputStream out = options.createForest ? new ObjectOutputStream(new FileOutputStream(
-            options.trainforest)) : null;
-        
+                options.trainforest)) : null;
+
         int numInstances = 0;
         DependencyInstance instance = reader.getNext();
         while (instance != null) {
@@ -480,24 +478,24 @@ public class MyPipe extends DependencyPipe {
                 typeAlphabet.lookupIndex(labs[i]);
             }
             instance.setFeatureVector(extractFeatureVector(instance));
-         
+
             if (options.createForest) writeInstance(instance, out);
             instance = reader.getNext();
         }
         closeAlphabets();
-        
+
         if (options.createForest) out.close();
         System.out.println("Creating Alphabet Done.");
         return numInstances;
     }
 
     protected void writeInstance(DependencyInstance instance, ObjectOutputStream out) {
-    	try {
-    		out.writeObject(instance);
-    		out.writeObject(instance.fv.keys());
-    		out.writeObject(instance.orders);
-    	}
-    	catch (Exception e) {}
+        try {
+            out.writeObject(instance);
+            out.writeObject(instance.fv.keys());
+            out.writeObject(instance.orders);
+        } catch (Exception e) {
+        }
     }
 
 }

@@ -1,8 +1,12 @@
 package DataStructure;
 
-import gnu.trove.*;
-import java.io.*;
-import java.util.*;
+import gnu.trove.TIntIntHashMap;
+
+import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
+import java.io.Serializable;
+import java.util.Arrays;
 
 public class DependencyInstance implements Serializable {
 
@@ -39,123 +43,124 @@ public class DependencyInstance implements Serializable {
 
     // RELATIONAL FEATURE: relational features that hold between items
     public RelationalFeature[] relFeats;
-	
+
     // Confidence scores per edge
     public double[] confidenceScores;
-    
+
     //Bean
     public TIntIntHashMap orders;
 
-    public DependencyInstance() {}
+    public DependencyInstance() {
+    }
 
     public DependencyInstance(DependencyInstance source) {
-	this.fv = source.fv;
-	this.actParseTree = source.actParseTree;
+        this.fv = source.fv;
+        this.actParseTree = source.actParseTree;
     }
-    
+
     public DependencyInstance(String[] forms, FeatureVector fv) {
-	this.forms = forms;
-	this.fv = fv;
+        this.forms = forms;
+        this.fv = fv;
     }
-    
+
     public DependencyInstance(String[] forms, String[] postags, FeatureVector fv) {
-	this(forms, fv);
-	this.postags = postags;
-    }
-    
-    public DependencyInstance(String[] forms, String[] postags, 
-			      String[] labs, FeatureVector fv) {
-	this(forms, postags, fv);
-	this.deprels = labs;
+        this(forms, fv);
+        this.postags = postags;
     }
 
-    public DependencyInstance(String[] forms, String[] postags, 
-			      String[] labs, int[] heads) {
-	this.forms = forms;
-	this.postags = postags;
-	this.deprels = labs;
-	this.heads = heads;
+    public DependencyInstance(String[] forms, String[] postags,
+                              String[] labs, FeatureVector fv) {
+        this(forms, postags, fv);
+        this.deprels = labs;
     }
-    
+
+    public DependencyInstance(String[] forms, String[] postags,
+                              String[] labs, int[] heads) {
+        this.forms = forms;
+        this.postags = postags;
+        this.deprels = labs;
+        this.heads = heads;
+    }
+
     public DependencyInstance(String[] forms, String[] lemmas, String[] cpostags,
-    		String[] postags, String[][] feats, String[] labs, int[] heads,
-    		TIntIntHashMap orders) {
-		this.forms = forms;
-		this.lemmas = lemmas;
-		this.cpostags = cpostags;
-		this.postags = postags;
-		this.feats = feats;
-		this.deprels = labs;
-		this.heads = heads;
-		this.orders=orders;
+                              String[] postags, String[][] feats, String[] labs, int[] heads,
+                              TIntIntHashMap orders) {
+        this.forms = forms;
+        this.lemmas = lemmas;
+        this.cpostags = cpostags;
+        this.postags = postags;
+        this.feats = feats;
+        this.deprels = labs;
+        this.heads = heads;
+        this.orders = orders;
     }
 
-    public DependencyInstance(String[] forms, String[] postags, 
-		      String[] labs, int[] heads, double[] confidenceScores) {
-	this(forms, postags, labs, heads);
-	this.confidenceScores = confidenceScores;
-	}
-    
-    public DependencyInstance(String[] forms, String[] lemmas, String[] cpostags, 
-			      String[] postags, String[][] feats, String[] labs, int[] heads) {
-	this(forms, postags, labs, heads);
-	this.lemmas = lemmas;
-	this.cpostags = cpostags;
-	this.feats = feats;
-    }
-    
-    public DependencyInstance(String[] forms, String[] lemmas, String[] cpostags, 
-		      String[] postags, String[][] feats, String[] labs, int[] heads,
-		      RelationalFeature[] relFeats, double[] confidenceScores) {
-    this(forms, lemmas, cpostags, postags, feats, labs, heads);
-    this.relFeats = relFeats;
-    this.confidenceScores = confidenceScores;
-    }    
-
-    public void setFeatureVector (FeatureVector fv) {
-	this.fv = fv;
+    public DependencyInstance(String[] forms, String[] postags,
+                              String[] labs, int[] heads, double[] confidenceScores) {
+        this(forms, postags, labs, heads);
+        this.confidenceScores = confidenceScores;
     }
 
-
-    public int length () {
-	return forms.length;
+    public DependencyInstance(String[] forms, String[] lemmas, String[] cpostags,
+                              String[] postags, String[][] feats, String[] labs, int[] heads) {
+        this(forms, postags, labs, heads);
+        this.lemmas = lemmas;
+        this.cpostags = cpostags;
+        this.feats = feats;
     }
 
-    public String toString () {
-	StringBuffer sb = new StringBuffer();
-	sb.append(Arrays.toString(forms)).append("\n");
-	int[] keys=this.orders.keys();
-	for(int key:keys){
-		sb.append("order:"+key+", index:"+orders.get(key)+"\n");
-	}
-	sb.append(this.length()+"\n");
-	return sb.toString();
+    public DependencyInstance(String[] forms, String[] lemmas, String[] cpostags,
+                              String[] postags, String[][] feats, String[] labs, int[] heads,
+                              RelationalFeature[] relFeats, double[] confidenceScores) {
+        this(forms, lemmas, cpostags, postags, feats, labs, heads);
+        this.relFeats = relFeats;
+        this.confidenceScores = confidenceScores;
+    }
+
+    public void setFeatureVector(FeatureVector fv) {
+        this.fv = fv;
     }
 
 
-    private void writeObject (ObjectOutputStream out) throws IOException {
-	out.writeObject(forms);
-	out.writeObject(lemmas);
-	out.writeObject(cpostags);
-	out.writeObject(postags);
-	out.writeObject(heads);
-	out.writeObject(deprels);
-	out.writeObject(actParseTree);
-	out.writeObject(feats);
-	out.writeObject(relFeats);
+    public int length() {
+        return forms.length;
+    }
+
+    public String toString() {
+        StringBuffer sb = new StringBuffer();
+        sb.append(Arrays.toString(forms)).append("\n");
+        int[] keys = this.orders.keys();
+        for (int key : keys) {
+            sb.append("order:" + key + ", index:" + orders.get(key) + "\n");
+        }
+        sb.append(this.length() + "\n");
+        return sb.toString();
     }
 
 
-    private void readObject (ObjectInputStream in) throws IOException, ClassNotFoundException {
-	forms = (String[])in.readObject();
-	lemmas = (String[])in.readObject();
-	cpostags = (String[])in.readObject();
-	postags = (String[])in.readObject();
-	heads = (int[])in.readObject();
-	deprels = (String[])in.readObject();
-	actParseTree = (String)in.readObject();
-	feats = (String[][])in.readObject();
-	relFeats = (RelationalFeature[])in.readObject();
+    private void writeObject(ObjectOutputStream out) throws IOException {
+        out.writeObject(forms);
+        out.writeObject(lemmas);
+        out.writeObject(cpostags);
+        out.writeObject(postags);
+        out.writeObject(heads);
+        out.writeObject(deprels);
+        out.writeObject(actParseTree);
+        out.writeObject(feats);
+        out.writeObject(relFeats);
+    }
+
+
+    private void readObject(ObjectInputStream in) throws IOException, ClassNotFoundException {
+        forms = (String[]) in.readObject();
+        lemmas = (String[]) in.readObject();
+        cpostags = (String[]) in.readObject();
+        postags = (String[]) in.readObject();
+        heads = (int[]) in.readObject();
+        deprels = (String[]) in.readObject();
+        actParseTree = (String) in.readObject();
+        feats = (String[][]) in.readObject();
+        relFeats = (RelationalFeature[]) in.readObject();
     }
 
 }

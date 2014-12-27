@@ -81,7 +81,7 @@ public class Train {
     }
 
     private void trainingIter(int numInstances, String trainfile, int iter, MyPipe pipe)
-    		throws IOException, ClassNotFoundException {
+            throws IOException, ClassNotFoundException {
         /**
          * Author: Yizhong
          * create reader for trainfile, for instance reading later
@@ -94,27 +94,27 @@ public class Train {
         CONLLReader reader = new CONLLReader();
         ObjectInputStream in = null;
         if (!options.createForest)
-        	reader.startReading(System.getenv("CODEDATA") + File.separator + trainfile);
-        else 
-        	in = new ObjectInputStream(new FileInputStream(options.trainforest));
-        
+            reader.startReading(System.getenv("CODEDATA") + File.separator + trainfile);
+        else
+            in = new ObjectInputStream(new FileInputStream(options.trainforest));
+
         DependencyInstance inst;
         int currentInstance = 0;
         if (!options.createForest)
-        	inst = reader.getNext();
+            inst = reader.getNext();
         else {
-        	inst = (DependencyInstance) in.readObject();
-        	inst.fv = new FeatureVector((int[]) in.readObject());
-        	inst.orders = (TIntIntHashMap) in.readObject();
+            inst = (DependencyInstance) in.readObject();
+            inst.fv = new FeatureVector((int[]) in.readObject());
+            inst.orders = (TIntIntHashMap) in.readObject();
         }
         while (inst != null) {
             currentInstance++;
             if (currentInstance % 500 == 0) {
                 System.out.print(currentInstance + ",");
             }
-            
+
             if (!options.createForest) inst.setFeatureVector(pipe.extractFeatureVector(inst));
-            
+
             String[] labs = inst.deprels;
             int[] heads = inst.heads;
 
@@ -180,16 +180,15 @@ public class Train {
             params.updateParamsMIRA(inst, d, upd);
 
             if (!options.createForest)
-            	inst = reader.getNext();
+                inst = reader.getNext();
             else {
-            	try {
-            		inst = (DependencyInstance) in.readObject();
-            		inst.fv = new FeatureVector((int[]) in.readObject());
-            		inst.orders = (TIntIntHashMap) in.readObject();
-            	}
-            	catch (Exception e) {
-            		inst = null;
-            	}
+                try {
+                    inst = (DependencyInstance) in.readObject();
+                    inst.fv = new FeatureVector((int[]) in.readObject());
+                    inst.orders = (TIntIntHashMap) in.readObject();
+                } catch (Exception e) {
+                    inst = null;
+                }
             }
         }
 
