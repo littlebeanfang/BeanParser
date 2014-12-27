@@ -84,7 +84,7 @@ public class Parser {
         System.out.println("Test File:" + options.testfile);
         System.out.println("Model Name:" + options.modelName);
         System.out.println("Sentence Number:" + instcount);
-        System.out.println("Train Time Total:" + (parseend - parsestart) / 1000.0);
+        System.out.println("Parse Time Total:" + (parseend - parsestart) / 1000.0);
         System.out.println("==============================================");
         writer.finishWriting();
     }

@@ -18,21 +18,27 @@ public class ParseAgenda {
 	public Map<Integer, StringBuffer> rightchilds = new HashMap<Integer, StringBuffer>();//split by \t
 	public Map<Integer, StringBuffer> leftchilds = new HashMap<Integer, StringBuffer>(); //StringBuffer is unordered
 	private Alphabet typealphabet;
+	private int[] set; // set: disjoint-set data structure, stores the parent of each node
 	
-	public ParseAgenda(){
+	public ParseAgenda(int length){
 		this.tii=new TIntIntHashMap();
 		this.numofleftchild=new TIntIntHashMap();
 		this.numofrightchild=new TIntIntHashMap();
+		set = new int[length];
+		for (int i = 0;i < length;i++) set[i] = i;
 	}
+	
 	public ParseAgenda(Alphabet alphabet){
 		this.tii=new TIntIntHashMap();
 		this.numofleftchild=new TIntIntHashMap();
 		this.numofrightchild=new TIntIntHashMap();
 		typealphabet=alphabet;
 	}
+	
 	public void AddArc(int child, int head){
 		this.tii.put(child, head);
 	}
+	
 	public String toString(){
 		StringBuffer sb=new StringBuffer();
 		sb.append("Agenda Size:"+this.tii.size()+"\n");
@@ -42,6 +48,7 @@ public class ParseAgenda {
 		}
 		return sb.toString();
 	}
+	
 	public String toActParseTree(){
 		StringBuffer sb=new StringBuffer();
 		for(int i = 1; i < tii.size(); i++) {
@@ -50,6 +57,7 @@ public class ParseAgenda {
 		}
 		return sb.substring(0,sb.length()-1);
 	}
+	
 	public String toActParseTree(DependencyInstance instance){
 		StringBuffer sb=new StringBuffer();
 		for(int i = 1; i < tii.size(); i++) {
@@ -57,6 +65,7 @@ public class ParseAgenda {
 		}
 		return sb.substring(0,sb.length()-1);
 	}
+	
 	public void ChildProcess(int childindex, int parentindex){
 //		System.out.println("Child:"+childindex+",Parent:"+parentindex);
 		if(childindex<parentindex){
@@ -95,6 +104,7 @@ public class ParseAgenda {
         	}
         }
 	}
+	
 	public void StoreOnePAInMap(Map<String, Integer> structurecount){
 		for(int i=0;i<tii.size();i++){
 			int leftchild=0,rightchild=0;
@@ -112,5 +122,14 @@ public class ParseAgenda {
 				structurecount.put(structureString, 1);
 			}
 		}
+	}
+	
+	public final int FindRoot(int node) {
+        if (set[node] != node) set[node] = this.FindRoot(set[node]);
+        return set[node];
+	}
+	
+	public final void UpdateSet(int child, int head) {
+		set[child] = head;
 	}
 }

@@ -447,7 +447,7 @@ public class MyPipe extends DependencyPipe {
         int[] heads = instance.heads;
         TIntIntHashMap order_map = instance.orders;
         FeatureVector fv = new FeatureVector();
-        ParseAgenda pa = new ParseAgenda();
+        ParseAgenda pa = new ParseAgenda(instance.length());
         for (int order_index = 1; order_index < instance.length(); order_index++) {
             //skip root node
             int parse_index = order_map.get(order_index);

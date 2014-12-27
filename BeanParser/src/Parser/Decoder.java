@@ -18,18 +18,14 @@ public class Decoder {
     }
 
     public Object[] DecodeInstance(DependencyInstance inst, TIntIntHashMap ordermap) throws IOException {
-        ParseAgenda pa = new ParseAgenda();
+        ParseAgenda pa = new ParseAgenda(inst.length());
         Object[] instret = new Object[2];
         FeatureVector fvforinst = new FeatureVector();
-
-        // set: disjoint-set data structure, stores the parent of each node
-        int[] set = new int[inst.length()];
-        for (int i = 0; i < inst.length(); i++) set[i] = i;
 
         for (int orderindex = 1; orderindex < inst.length(); orderindex++) {
             //skip root node
             int parseindex = ordermap.get(orderindex);
-            Object[] ret = this.FindHeadForOneWord(inst, parseindex, pa, set);
+            Object[] ret = this.FindHeadForOneWord(inst, parseindex, pa);
             int parsehead = (Integer) ret[0];
 //			System.out.println("DecodeInstance fvforinst after call findhead:"+ret[1].toString().split(" ").length);
             pa.AddArc(parseindex, parsehead);
@@ -47,14 +43,14 @@ public class Decoder {
         return instret;
     }
 
-    public Object[] FindHeadForOneWord(DependencyInstance inst, int childindex, ParseAgenda pa, int[] set) {
+    public Object[] FindHeadForOneWord(DependencyInstance inst, int childindex, ParseAgenda pa) {
         Object[] ret = new Object[2];
         boolean verbose = false;
         int headindex = -1;
         double score = Double.NEGATIVE_INFINITY;
         FeatureVector actfv = new FeatureVector();
         for (int head = 0; head < inst.length(); head++) {
-            if ((head != childindex) && (FindRoot(head, set) != childindex)) { //Jia: if the root of the head is not child
+            if ((head != childindex) && (pa.FindRoot(head) != childindex)) { //Jia: if the root of the head is not child
                 FeatureVector fv = new FeatureVector();
                 //pipe.AddNewFeature(inst, childindex, head, pa, fv);
                 pipe.extractFeatures(inst, childindex, head, pa, fv);
@@ -77,7 +73,7 @@ public class Decoder {
         }
 
         //Update the disjoint-set
-        set[childindex] = headindex;
+        pa.UpdateSet(childindex, headindex);
 
         //inst.fv.cat(actfv);
         //Bean: store feature vector in fvforinst, for Object d[][]
@@ -90,11 +86,6 @@ public class Decoder {
         ret[0] = headindex;
         ret[1] = actfv;
         return ret;
-    }
-
-    private int FindRoot(int node, int[] set) {
-        if (set[node] != node) set[node] = FindRoot(set[node], set);
-        return set[node];
     }
 
     public void PrintScores(DependencyInstance inst, ParseAgenda pa) throws IOException {
