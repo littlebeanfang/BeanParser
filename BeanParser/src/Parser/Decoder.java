@@ -4,6 +4,8 @@ import DataStructure.DependencyInstance;
 import DataStructure.FeatureVector;
 import DataStructure.Parameters;
 import DataStructure.ParseAgenda;
+import DataStructure.Beam;
+import DataStructure.ParserOptions;
 import gnu.trove.TIntIntHashMap;
 
 import java.io.*;
@@ -11,35 +13,45 @@ import java.io.*;
 public class Decoder {
     private MyPipe pipe;
     private Parameters param;
-
-    public Decoder(DependencyPipe pipe, Parameters param) {
+    private Beam beam;
+    
+    public Decoder(DependencyPipe pipe, Parameters param, ParserOptions options) {
         this.pipe = (MyPipe) pipe;
         this.param = param;
+        this.beam = new Beam(options.beamwidth);
     }
 
     public Object[] DecodeInstance(DependencyInstance inst, TIntIntHashMap ordermap) throws IOException {
-        ParseAgenda pa = new ParseAgenda(inst.length());
+    	beam.initialize(inst.length());
+        //ParseAgenda pa = new ParseAgenda(inst.length());
         Object[] instret = new Object[2];
-        FeatureVector fvforinst = new FeatureVector();
+        ParseAgenda pa;
+        //FeatureVector fvforinst = new FeatureVector();
 
         for (int orderindex = 1; orderindex < inst.length(); orderindex++) {
             //skip root node
-            int parseindex = ordermap.get(orderindex);
-            Object[] ret = this.FindHeadForOneWord(inst, parseindex, pa);
-            int parsehead = (Integer) ret[0];
-//			System.out.println("DecodeInstance fvforinst after call findhead:"+ret[1].toString().split(" ").length);
-            pa.AddArc(parseindex, parsehead);
-            //System.out.println("Index: "+parseindex+"Head: "+parsehead);
-            pa.ChildProcess(parseindex, parsehead);
-            fvforinst = fvforinst.cat((FeatureVector) ret[1]);
-            //System.out.println("FV: \n"+fvforinst.toString());
-            inst.heads[parseindex] = parsehead;
+            int childindex = ordermap.get(orderindex);
+            pa = beam.getNext();
+            while (pa != null) {
+            	for (int head = 0;head < inst.length();head++) {
+            		if ((head != childindex) && (pa.FindRoot(head) != childindex)) {
+            			FeatureVector fv = new FeatureVector();
+            			pipe.extractFeatures(inst, childindex, head, pa, fv);
+            			double temp = fv.getScore(param.parameters);
+            			beam.addAgenda(temp, childindex, head, fv);
+            		}
+            	}
+            	pa = beam.getNext();
+            }
+            beam.finishIteration();
+//            inst.heads[childindex] = parsehead;
         }
-
+        pa = beam.findBest();
         pa.AddArc(0, -1);//add root
+        inst.heads = pa.heads;
         //PrintScores(inst, pa);
         instret[0] = pa;
-        instret[1] = fvforinst;
+        instret[1] = pa.fv;
         return instret;
     }
 

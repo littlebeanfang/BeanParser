@@ -1,9 +1,7 @@
 package DataStructure;
 
 import mstparser.Alphabet;
-
 import java.util.Map;
-import java.util.HashSet;
 
 /**
  * used to store partial parse, child-head key-value pairs
@@ -11,36 +9,69 @@ import java.util.HashSet;
  *
  */
 public class ParseAgenda {
-	private int[] heads;
-	//public TIntIntHashMap numofleftchild;
+	public int[] heads;
 	private int[] numofleftchild;
-	//public TIntIntHashMap numofrightchild;
 	private int[] numofrightchild;
-	//public Map<Integer, StringBuffer> rightchilds = new HashMap<Integer, StringBuffer>();//split by \t
-	private StringBuffer[] rightchilds;
-	//public Map<Integer, StringBuffer> leftchilds = new HashMap<Integer, StringBuffer>(); //StringBuffer is unordered
-	private StringBuffer[] leftchilds;
+	private StringBuilder[] rightchilds;
+	private StringBuilder[] leftchilds;
 	private Alphabet typealphabet;
 	private int[] set; // set: disjoint-set data structure, stores the parent of each node
 	private int length;
+	public FeatureVector fv;
+	private double score;
 	
 	public ParseAgenda(int length){
 		heads = new int[length];
-		//this.numofleftchild=new TIntIntHashMap();
 		numofleftchild = new int[length];
-		//this.numofrightchild=new TIntIntHashMap();
 		numofrightchild = new int[length];
-		rightchilds = new StringBuffer[length];
-		leftchilds = new StringBuffer[length];
+		rightchilds = new StringBuilder[length];
+		leftchilds = new StringBuilder[length];
 		set = new int[length];
 		for (int i = 0;i < length;i++) {
 			set[i] = i;
-			rightchilds[i] = new StringBuffer();
-			leftchilds[i] = new StringBuffer();
+			rightchilds[i] = new StringBuilder();
+			leftchilds[i] = new StringBuilder();
 		}
 		this.length = length;
+		fv = new FeatureVector();
+		score = 0;
 	}
 	
+	public ParseAgenda(int length, int[] heads, int[] numofleftchild, int[] numofrightchild,
+			Alphabet typealphabet, int[] set, FeatureVector fv, double score) {
+		this.length = length;
+		this.heads = heads;
+		this.numofleftchild = numofleftchild;
+		this.numofrightchild = numofrightchild;
+		this.typealphabet = typealphabet;
+		this.set = set;
+		this.fv = fv;
+		this.score = score;
+	}
+	
+	public ParseAgenda clone() {
+		ParseAgenda pa = new ParseAgenda(length, heads.clone(), numofleftchild.clone(), numofrightchild.clone(),
+				typealphabet, set.clone(), fv, score);
+		pa.rightchilds = new StringBuilder[length];
+		pa.leftchilds = new StringBuilder[length];
+		for (int i = 0;i < length;i++) {
+			pa.leftchilds[i] = new StringBuilder(this.leftchilds[i].toString());
+			pa.rightchilds[i] = new StringBuilder(this.rightchilds[i].toString());
+		}
+		return pa;
+	}
+	
+	public void addFeatureVector(FeatureVector fv) {
+		this.fv.cat(fv);
+	}
+	
+	public void addScore(double score) {
+		this.score += score;
+	}
+	
+	public double getScore() {
+		return score;
+	}
 //	public ParseAgenda(Alphabet alphabet){
 //		this.tii=new TIntIntHashMap();
 //		this.numofleftchild=new TIntIntHashMap();
