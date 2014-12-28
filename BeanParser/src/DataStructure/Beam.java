@@ -27,6 +27,12 @@ public class Beam {
 			this.head = head;
 			this.fv = fv;
 		}
+		
+		@Override
+		public String toString() {
+			return "score=" + score + ", child=" + child
+					+ ", head=" + head + ", index=" + index + "]";
+		}
 	}
 	
 	private class partialResultComparator implements Comparator<partialResult> {
@@ -48,8 +54,8 @@ public class Beam {
 	}
 	
 	public void initialize(int length) {
-		for (int i = 0;i < width;i++)
-			curr[i] = new ParseAgenda(length);
+		curr[0] = new ParseAgenda(length);
+		for (int i = 1;i < width;i++) curr[i] = null;
 		queue.clear();
 		index = 0;
 	}
@@ -93,7 +99,7 @@ public class Beam {
 	}
 	
 	public ParseAgenda findBest() {
-		double max = -100000;
+		double max = Double.NEGATIVE_INFINITY;
 		ParseAgenda pa = null;
 		for (int i = 0;i < width;i++) {
 			if (curr[i].getScore() > max) {
@@ -102,5 +108,9 @@ public class Beam {
 			}
 		}
 		return pa;
+	}
+	
+	public ParseAgenda[] getQueue() {
+		return curr;
 	}
 }

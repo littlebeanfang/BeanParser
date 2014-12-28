@@ -148,14 +148,20 @@ public class Train {
             //FeatureVector fvforinst=new FeatureVector();
             Decoder decoder = new Decoder(pipe, params, options);
             Object[] decodeinstret = decoder.DecodeInstance(inst, inst.orders);
-            ParseAgenda parseAgenda = (ParseAgenda) decodeinstret[0];
-            FeatureVector fvforinst = (FeatureVector) decodeinstret[1];
-            d = new Object[1][2];//K=1, means best parse
+            //ParseAgenda parseAgenda = (ParseAgenda) decodeinstret[0];
+            //FeatureVector fvforinst = (FeatureVector) decodeinstret[1];
+            //d = new Object[1][2];//K=1, means best parse
 //				System.out.println("trainingIter===================");
 //				System.out.println("fvforinst:"+fvforinst.toString());
 //				System.out.println("trainingIter END===================");
-            d[0][0] = fvforinst;
-            d[0][1] = parseAgenda.toActParseTree();
+            ParseAgenda[] agendaArr = (ParseAgenda[]) decodeinstret[2];
+            d = new Object[options.beamwidth][2];
+            for (int i = 0;i < options.beamwidth;i++) {
+            	d[i][0] = agendaArr[i].fv;
+            	d[i][1] = agendaArr[i].toActParseTree();
+            }
+            //d[0][0] = fvforinst;
+            //d[0][1] = parseAgenda.toActParseTree();
             //Bean: ignore labeled errors in inst
                 /*
                 if(options.decodeType.equals("proj")) {

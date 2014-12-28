@@ -24,7 +24,7 @@ public class Decoder {
     public Object[] DecodeInstance(DependencyInstance inst, TIntIntHashMap ordermap) throws IOException {
     	beam.initialize(inst.length());
         //ParseAgenda pa = new ParseAgenda(inst.length());
-        Object[] instret = new Object[2];
+        Object[] instret = new Object[3];
         ParseAgenda pa;
         //FeatureVector fvforinst = new FeatureVector();
 
@@ -53,6 +53,7 @@ public class Decoder {
         //PrintScores(inst, pa);
         instret[0] = pa;
         instret[1] = pa.fv;
+        instret[2] = beam.getQueue();
         return instret;
     }
 
