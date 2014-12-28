@@ -1,11 +1,6 @@
 package Parser;
 
-import DataStructure.DependencyInstance;
-import DataStructure.FeatureVector;
-import DataStructure.Parameters;
-import DataStructure.ParseAgenda;
-import DataStructure.Beam;
-import DataStructure.ParserOptions;
+import DataStructure.*;
 import gnu.trove.TIntIntHashMap;
 
 import java.io.*;
@@ -47,7 +42,7 @@ public class Decoder {
 //            inst.heads[childindex] = parsehead;
         }
         pa = beam.findBest();
-        System.out.println(": " + pa.getScore());
+        //System.out.println(": " + pa.getScore());
         pa.AddArc(0, -1);//add root
         inst.heads = pa.heads;
         //PrintScores(inst, pa);

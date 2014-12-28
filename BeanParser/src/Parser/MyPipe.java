@@ -39,8 +39,8 @@ public class MyPipe extends DependencyPipe {
             addTwoOrderSiblingFeatures(instance, parentindex, childindex, pa, fv);
             //addBeamFeatures(instance, parentindex, childindex, pa, fv);
         }
-        addThreeOrderSiblingFeatures(instance, parentindex, childindex, pa, fv);
-        addHMGfeatures(instance, parentindex, childindex, pa, fv);
+        //addThreeOrderSiblingFeatures(instance, parentindex, childindex, pa, fv);
+        //addHMGfeatures(instance, parentindex, childindex, pa, fv);
     }
 
 
@@ -256,13 +256,13 @@ public class MyPipe extends DependencyPipe {
         add("YZ_LRN_LMR_POS=" + left_nearest_pos + "_" + modifier_pos + "_" +right_nearest_pos, 1.0,
                 fv);
 
-        add("YZ_LRN_LMRH_POS=" + left_nearest_pos + "_" + modifier_pos + "_" +right_nearest_pos
+        add("YZ_LRN_LMRH_POS=" + left_nearest_pos + "_" + modifier_pos + "_" + right_nearest_pos
                 + "_" + head_pos, 1.0, fv);
 
         add("YZ_LRN_LMR_DIR_POS=" + left_nearest_pos + "_" + modifier_pos + "_" +right_nearest_pos
                 + "_" +dir , 1.0, fv);
 
-        add("YZ_LRN_LMRH_DIR_POS=" + left_nearest_pos + "_" + modifier_pos + "_" +right_nearest_pos
+        add("YZ_LRN_LMRH_DIR_POS=" + left_nearest_pos + "_" + modifier_pos + "_" + right_nearest_pos
                 + "_" + head_pos + "_" + dir, 1.0, fv);
 
     }

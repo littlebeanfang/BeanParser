@@ -157,8 +157,10 @@ public class Train {
             ParseAgenda[] agendaArr = (ParseAgenda[]) decodeinstret[2];
             d = new Object[options.beamwidth][2];
             for (int i = 0;i < options.beamwidth;i++) {
-            	d[i][0] = agendaArr[i].fv;
-            	d[i][1] = agendaArr[i].toActParseTree();
+                if (agendaArr[i] != null) {
+                    d[i][0] = agendaArr[i].fv;
+                    d[i][1] = agendaArr[i].toActParseTree();
+                }
             }
             //d[0][0] = fvforinst;
             //d[0][1] = parseAgenda.toActParseTree();
