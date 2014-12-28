@@ -62,11 +62,11 @@ public class ParseAgenda {
 	}
 	
 	public void addFeatureVector(FeatureVector fv) {
-		this.fv.cat(fv);
+		this.fv = this.fv.cat(fv);
 	}
 	
-	public void addScore(double score) {
-		this.score += score;
+	public void setScore(double score) {
+		this.score = score;
 	}
 	
 	public double getScore() {

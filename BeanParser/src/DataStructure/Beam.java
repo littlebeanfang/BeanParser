@@ -32,7 +32,9 @@ public class Beam {
 	private class partialResultComparator implements Comparator<partialResult> {
 		@Override
 		public int compare(partialResult r1, partialResult r2) {
-			return (int) (r1.score - r2.score);
+			if (r1.score < r2.score) return -1;
+			if (r1.score > r2.score) return 1;
+			return 0;
 		}
 	}
 	
@@ -79,7 +81,7 @@ public class Beam {
 			next[i].AddArc(pr.child, pr.head);
 			next[i].ChildProcess(pr.child, pr.head);
 			next[i].addFeatureVector(pr.fv);
-			next[i].addScore(pr.score);
+			next[i].setScore(pr.score);
 			i++;
 		}
 		index = 0;

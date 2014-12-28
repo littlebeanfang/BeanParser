@@ -38,7 +38,7 @@ public class Decoder {
             			FeatureVector fv = new FeatureVector();
             			pipe.extractFeatures(inst, childindex, head, pa, fv);
             			double temp = fv.getScore(param.parameters);
-            			beam.addAgenda(temp, childindex, head, fv);
+            			beam.addAgenda(pa.getScore() + temp, childindex, head, fv);
             		}
             	}
             	pa = beam.getNext();
@@ -47,6 +47,7 @@ public class Decoder {
 //            inst.heads[childindex] = parsehead;
         }
         pa = beam.findBest();
+        System.out.println(": " + pa.getScore());
         pa.AddArc(0, -1);//add root
         inst.heads = pa.heads;
         //PrintScores(inst, pa);

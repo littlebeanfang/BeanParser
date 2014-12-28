@@ -98,8 +98,6 @@ public class Train {
         else 
         	in = new ObjectInputStream(new FileInputStream(options.trainforest));
         
-        Decoder decoder = new Decoder(pipe, params, options);
-        
         DependencyInstance inst;
         int currentInstance = 0;
         if (!options.createForest)
@@ -148,6 +146,7 @@ public class Train {
              * 3. send pipe in createInstance and param in train
              */
             //FeatureVector fvforinst=new FeatureVector();
+            Decoder decoder = new Decoder(pipe, params, options);
             Object[] decodeinstret = decoder.DecodeInstance(inst, inst.orders);
             ParseAgenda parseAgenda = (ParseAgenda) decodeinstret[0];
             FeatureVector fvforinst = (FeatureVector) decodeinstret[1];
@@ -198,8 +197,6 @@ public class Train {
         //System.out.println("  "+numInstances+" instances");
         in.close();
         System.out.print(numInstances);
-
-        //in.close();
 
     }
 }
