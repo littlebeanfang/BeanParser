@@ -102,7 +102,7 @@ public class Beam {
 		double max = Double.NEGATIVE_INFINITY;
 		ParseAgenda pa = null;
 		for (int i = 0;i < width;i++) {
-			if (curr[i].getScore() > max) {
+			if ((curr[i] != null) && (curr[i].getScore() > max)) {
 				pa = curr[i];
 				max = curr[i].getScore();
 			}
