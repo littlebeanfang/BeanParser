@@ -14,6 +14,9 @@ public class Parser {
     private Train trainer;
     private Parameters params;
 
+    public double[] GetParam(){
+    	return this.params.parameters;
+    }
     //private
     //constractor for decoder
     public Parser(DependencyPipe pipe, ParserOptions options) {
