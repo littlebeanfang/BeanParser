@@ -113,4 +113,8 @@ public class Beam {
 	public ParseAgenda[] getQueue() {
 		return curr;
 	}
+	
+	public String toString() {
+		return null;
+	}
 }
