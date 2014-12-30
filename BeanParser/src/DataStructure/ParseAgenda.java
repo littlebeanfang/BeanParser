@@ -1,6 +1,7 @@
 package DataStructure;
 
 import mstparser.Alphabet;
+
 import java.util.Map;
 
 /**
@@ -10,6 +11,7 @@ import java.util.Map;
  */
 public class ParseAgenda {
 	public int[] heads;
+	public FeatureVector fv;
 	private int[] numofleftchild;
 	private int[] numofrightchild;
 	private StringBuilder[] rightchilds;
@@ -17,7 +19,6 @@ public class ParseAgenda {
 	private Alphabet typealphabet;
 	private int[] set; // set: disjoint-set data structure, stores the parent of each node
 	private int length;
-	public FeatureVector fv;
 	private double score;
 	
 	public ParseAgenda(int length){
@@ -38,7 +39,7 @@ public class ParseAgenda {
 	}
 	
 	public ParseAgenda(int length, int[] heads, int[] numofleftchild, int[] numofrightchild,
-			Alphabet typealphabet, int[] set, double score) {
+					   Alphabet typealphabet, int[] set, double score) {
 		this.length = length;
 		this.heads = heads;
 		this.numofleftchild = numofleftchild;
@@ -64,13 +65,13 @@ public class ParseAgenda {
 	public void addFeatureVector(FeatureVector fv) {
 		this.fv = this.fv.cat(fv);
 	}
+
+	public double getScore() {
+		return score;
+	}
 	
 	public void setScore(double score) {
 		this.score = score;
-	}
-	
-	public double getScore() {
-		return score;
 	}
 //	public ParseAgenda(Alphabet alphabet){
 //		this.tii=new TIntIntHashMap();
