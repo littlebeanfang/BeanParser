@@ -69,7 +69,9 @@ public class Parser {
         long parsestart = System.currentTimeMillis();
         while ((di = reader.getNext()) != null) {
             ++instcount;
-            System.out.print(instcount);
+            System.out.print(instcount + " ");
+            //if (instcount == 596) 
+            //instcount = instcount;
             //if (instcount % 50 == 0) {
             //  System.out.print(instcount + "\t");
             //}

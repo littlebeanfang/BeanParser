@@ -56,6 +56,7 @@ public class Beam {
 	public void initialize(int length) {
 		curr[0] = new ParseAgenda(length);
 		for (int i = 1;i < width;i++) curr[i] = null;
+		for (int i = 0;i < width;i++) next[i] = null;
 		queue.clear();
 		index = 0;
 	}
