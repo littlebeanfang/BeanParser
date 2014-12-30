@@ -38,26 +38,26 @@ public class ParseAgenda {
 	}
 	
 	public ParseAgenda(int length, int[] heads, int[] numofleftchild, int[] numofrightchild,
-			Alphabet typealphabet, int[] set, FeatureVector fv, double score) {
+			Alphabet typealphabet, int[] set, double score) {
 		this.length = length;
 		this.heads = heads;
 		this.numofleftchild = numofleftchild;
 		this.numofrightchild = numofrightchild;
 		this.typealphabet = typealphabet;
 		this.set = set;
-		this.fv = fv;
 		this.score = score;
 	}
 	
 	public ParseAgenda clone() {
 		ParseAgenda pa = new ParseAgenda(length, heads.clone(), numofleftchild.clone(), numofrightchild.clone(),
-				typealphabet, set.clone(), fv, score);
+				typealphabet, set.clone(), score);
 		pa.rightchilds = new StringBuilder[length];
 		pa.leftchilds = new StringBuilder[length];
 		for (int i = 0;i < length;i++) {
 			pa.leftchilds[i] = new StringBuilder(this.leftchilds[i].toString());
 			pa.rightchilds[i] = new StringBuilder(this.rightchilds[i].toString());
 		}
+		pa.fv = new FeatureVector(fv.keys());
 		return pa;
 	}
 	
