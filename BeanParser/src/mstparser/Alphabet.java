@@ -99,19 +99,19 @@ public class Alphabet implements Serializable {
         growthStopped = in.readBoolean();
     }
 
-    public void refine(Parameters para){
+    public void refine(Parameters para) {
         this.allowGrowth();
         int remove_num = 0;
-        for(Object key : map.keys()){
+        for (Object key : map.keys()) {
             //System.out.println(para.parameters[map.get(key)]);
-            if(para.parameters[map.get(key)] == 0){
+            if (para.parameters[map.get(key)] == 0) {
                 map.remove(key);
                 //System.out.println("Remove: " + para.parameters[map.get(key)]);
                 numEntries--;
                 remove_num++;
             }
         }
-        System.out.println("remove: "+remove_num+"\tleft: "+numEntries);
+        System.out.println("Remove Features: " + remove_num + "\tLeft: " + numEntries);
         this.stopGrowth();
     }
 

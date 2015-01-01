@@ -691,7 +691,7 @@ public class DependencyPipe {
         }
 
 /*bean
-	// Test out relational features
+    // Test out relational features
 	if (options.useRelationalFeatures) {
 
 	    //for (int rf_index=0; rf_index<2; rf_index++) {
@@ -955,10 +955,9 @@ public class DependencyPipe {
      * lengths of the full lexical items are greater than 5 before
      * adding features.
      */
-    private final void
-    addOldMSTStemFeatures(String hLemma, String headP,
-                          String cLemma, String childP, String attDist,
-                          int hL, int cL, FeatureVector fv) {
+    private final void addOldMSTStemFeatures(String hLemma, String headP,
+                                             String cLemma, String childP, String attDist,
+                                             int hL, int cL, FeatureVector fv) {
 
         String all = hLemma + " " + headP + " " + cLemma + " " + childP;
         String hPos = headP + " " + cLemma + " " + childP;

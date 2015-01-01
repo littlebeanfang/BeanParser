@@ -9,7 +9,7 @@ public class Decoder {
     private MyPipe pipe;
     private Parameters param;
     private Beam beam;
-    
+
     public Decoder(DependencyPipe pipe, Parameters param, ParserOptions options) {
         this.pipe = (MyPipe) pipe;
         this.param = param;
@@ -17,7 +17,7 @@ public class Decoder {
     }
 
     public Object[] DecodeInstance(DependencyInstance inst, TIntIntHashMap ordermap) throws IOException {
-    	beam.initialize(inst.length());
+        beam.initialize(inst.length());
         //ParseAgenda pa = new ParseAgenda(inst.length());
         Object[] instret = new Object[3];
         ParseAgenda pa;
@@ -28,15 +28,15 @@ public class Decoder {
             int childindex = ordermap.get(orderindex);
             pa = beam.getNext();
             while (pa != null) {
-            	for (int head = 0;head < inst.length();head++) {
-            		if ((head != childindex) && (pa.FindRoot(head) != childindex)) {
-            			FeatureVector fv = new FeatureVector();
-            			pipe.extractFeatures(inst, childindex, head, pa, fv);
-            			double temp = fv.getScore(param.parameters);
-            			beam.addAgenda(pa.getScore() + temp, childindex, head, fv);
-            		}
-            	}
-            	pa = beam.getNext();
+                for (int head = 0; head < inst.length(); head++) {
+                    if ((head != childindex) && (pa.FindRoot(head) != childindex)) {
+                        FeatureVector fv = new FeatureVector();
+                        pipe.extractFeatures(inst, childindex, head, pa, fv);
+                        double temp = fv.getScore(param.parameters);
+                        beam.addAgenda(pa.getScore() + temp, childindex, head, fv);
+                    }
+                }
+                pa = beam.getNext();
             }
             beam.finishIteration();
 //            inst.heads[childindex] = parsehead;

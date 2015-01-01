@@ -1,6 +1,9 @@
 package Parser;
 
-import DataStructure.*;
+import DataStructure.DependencyInstance;
+import DataStructure.FeatureVector;
+import DataStructure.Parameters;
+import DataStructure.ParserOptions;
 import IO.CONLLReader;
 import IO.CONLLWriter;
 import mstparser.Alphabet;
@@ -34,11 +37,19 @@ public class Parser {
     public void loadModel(String file) throws Exception {
         ObjectInputStream in = new ObjectInputStream(new BufferedInputStream(new FileInputStream(System.getenv("CODEDATA") + File.separator + file)));
         params.parameters = (double[]) in.readObject();
-        //System.out.println("Parameters loaded!");
+
+        int total = 0;
+        int zero = 0;
+        for (int i = 0; i < params.parameters.length; i++) {
+            total++;
+            if (params.parameters[i] == 0) {
+                zero++;
+            }
+        }
+        System.out.println("Total: " + total + " Zero: " + zero);
         pipe.dataAlphabet = (Alphabet) in.readObject();
-        //System.out.println("dataAlphabet loaded!");
+        pipe.dataAlphabet.refine(params);
         pipe.typeAlphabet = (Alphabet) in.readObject();
-        //System.out.println("typeAlphabet loaded!");
         System.out.println("Model loaded!");
         in.close();
         pipe.closeAlphabets();

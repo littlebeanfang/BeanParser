@@ -12,14 +12,17 @@
 
 package IO;
 
-import java.io.*;
-
 import DataStructure.DependencyInstance;
+
+import java.io.BufferedReader;
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.io.InputStreamReader;
 
 /**
  * A class that defines common behavior and abstract methods for
  * readers for different formats.
- *
+ * <p/>
  * <p>
  * Created: Sat Nov 10 15:25:10 2001
  * </p>
@@ -34,46 +37,46 @@ public abstract class DependencyReader {
     protected boolean confScores = false;
     protected boolean ordered = true;
 
-    public static DependencyReader createDependencyReader (String format, 
-							   boolean discourseMode) 
-	throws IOException {
+    public static DependencyReader createDependencyReader(String format,
+                                                          boolean discourseMode)
+            throws IOException {
 
-	if (format.equals("MST")) {
-		/*Bean: no MST format
-	    return new MSTReader();
+        if (format.equals("MST")) {
+        /*Bean: no MST format
+        return new MSTReader();
 	    */
-		return null;
-	} else if (format.equals("CONLL")) {
-	    return new CONLLReader();
-	} else {
-	    System.out.println("!!!!!!!  Not a supported format: " + format);
-	    System.out.println("********* Assuming CONLL format. **********");
-	    return new CONLLReader();
-	}
+            return null;
+        } else if (format.equals("CONLL")) {
+            return new CONLLReader();
+        } else {
+            System.out.println("!!!!!!!  Not a supported format: " + format);
+            System.out.println("********* Assuming CONLL format. **********");
+            return new CONLLReader();
+        }
     }
 
-    public static DependencyReader createDependencyReader (String format)
-	throws IOException {
+    public static DependencyReader createDependencyReader(String format)
+            throws IOException {
 
-	return createDependencyReader(format, false);
+        return createDependencyReader(format, false);
     }
-    
-	public static DependencyReader createDependencyReaderWithConfidenceScores(
-			String format) throws IOException {
-	DependencyReader reader = createDependencyReader(format);
-	reader.confScores = true;
-	return reader;
-	}
+
+    public static DependencyReader createDependencyReaderWithConfidenceScores(
+            String format) throws IOException {
+        DependencyReader reader = createDependencyReader(format);
+        reader.confScores = true;
+        return reader;
+    }
 
 
-    public boolean startReading (String file) throws IOException {
-	labeled = fileContainsLabels(file);
-	inputReader = new BufferedReader(new InputStreamReader(new FileInputStream(file),"UTF8"));
-	return labeled;
+    public boolean startReading(String file) throws IOException {
+        labeled = fileContainsLabels(file);
+        inputReader = new BufferedReader(new InputStreamReader(new FileInputStream(file), "UTF8"));
+        return labeled;
     }
 
     public boolean isLabeled() {
-	return labeled;
+        return labeled;
     }
 
     public abstract DependencyInstance getNext() throws IOException;
@@ -81,10 +84,10 @@ public abstract class DependencyReader {
     protected abstract boolean fileContainsLabels(String filename) throws IOException;
 
 
-    protected String normalize (String s) {
-	if(s.matches("[0-9]+|[0-9]+\\.[0-9]+|[0-9]+[0-9,]+"))
-	    return "<num>";
+    protected String normalize(String s) {
+        if (s.matches("[0-9]+|[0-9]+\\.[0-9]+|[0-9]+[0-9,]+"))
+            return "<num>";
 
-	return s;
+        return s;
     }
 }

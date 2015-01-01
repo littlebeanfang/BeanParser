@@ -12,14 +12,17 @@
 
 package IO;
 
-import java.io.*;
-
 import DataStructure.DependencyInstance;
+
+import java.io.BufferedWriter;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.OutputStreamWriter;
 
 /**
  * A class that defines common behavior and abstract methods for
  * writers for different formats.
- *
+ * <p/>
  * <p>
  * Created: Sat Nov 10 15:25:10 2001
  * </p>
@@ -32,32 +35,32 @@ public abstract class DependencyWriter {
     protected BufferedWriter writer;
     protected boolean labeled = false;
 
-    public static DependencyWriter createDependencyWriter (String format, boolean labeled) throws IOException {
-	if (format.equals("MST")) {
-		/*Bean: no MST format
-	    return new MSTWriter(labeled);
+    public static DependencyWriter createDependencyWriter(String format, boolean labeled) throws IOException {
+        if (format.equals("MST")) {
+        /*Bean: no MST format
+        return new MSTWriter(labeled);
 	    */
-		return null;
-	} else if (format.equals("CONLL")) {
-	    return new CONLLWriter(labeled);
-	} else {
-	    System.out.println("!!!!!!!  Not a supported format: " + format);
-	    System.out.println("********* Assuming CONLL format. **********");
-	    return new CONLLWriter(labeled);
-	}
+            return null;
+        } else if (format.equals("CONLL")) {
+            return new CONLLWriter(labeled);
+        } else {
+            System.out.println("!!!!!!!  Not a supported format: " + format);
+            System.out.println("********* Assuming CONLL format. **********");
+            return new CONLLWriter(labeled);
+        }
     }
 
-    public void startWriting (String file) throws IOException {
-	writer = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(file),"UTF8"));
+    public void startWriting(String file) throws IOException {
+        writer = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(file), "UTF8"));
     }
 
-    public void finishWriting () throws IOException {
-	writer.flush();
-	writer.close();
+    public void finishWriting() throws IOException {
+        writer.flush();
+        writer.close();
     }
 
     public boolean isLabeled() {
-	return labeled;
+        return labeled;
     }
 
     public abstract void write(DependencyInstance instance) throws IOException;

@@ -12,7 +12,7 @@ import java.io.ObjectInputStream;
 public class Train {
     public ParserOptions options;
     public Parameters params;
-    
+
     public Train(ParserOptions options) {
         this.options = options;
         //this.params=params;
@@ -71,6 +71,7 @@ public class Train {
 
         params.averageParams(i * numInstances);
         long traintimeend = System.currentTimeMillis();
+
         System.out.println("==============================================");
         System.out.println("Train File:" + options.trainfile);
         System.out.println("Model Name:" + options.modelName);
@@ -81,7 +82,7 @@ public class Train {
     }
 
     private void trainingIter(int numInstances, String trainfile, int iter, MyPipe pipe, ParserOptions options)
-    		throws IOException, ClassNotFoundException {
+            throws IOException, ClassNotFoundException {
         /**
          * Author: Yizhong
          * create reader for trainfile, for instance reading later
@@ -94,27 +95,27 @@ public class Train {
         CONLLReader reader = new CONLLReader();
         ObjectInputStream in = null;
         if (!options.createForest)
-        	reader.startReading(System.getenv("CODEDATA") + File.separator + trainfile);
-        else 
-        	in = new ObjectInputStream(new FileInputStream(options.trainforest));
-        
+            reader.startReading(System.getenv("CODEDATA") + File.separator + trainfile);
+        else
+            in = new ObjectInputStream(new FileInputStream(options.trainforest));
+
         DependencyInstance inst;
         int currentInstance = 0;
         if (!options.createForest)
-        	inst = reader.getNext();
+            inst = reader.getNext();
         else {
-        	inst = (DependencyInstance) in.readObject();
-        	inst.fv = new FeatureVector((int[]) in.readObject());
-        	inst.orders = (TIntIntHashMap) in.readObject();
+            inst = (DependencyInstance) in.readObject();
+            inst.fv = new FeatureVector((int[]) in.readObject());
+            inst.orders = (TIntIntHashMap) in.readObject();
         }
         while (inst != null) {
             currentInstance++;
             if (currentInstance % 500 == 0) {
                 System.out.print(currentInstance + ",");
             }
-            
+
             if (!options.createForest) inst.setFeatureVector(pipe.extractFeatureVector(inst));
-            
+
             String[] labs = inst.deprels;
             int[] heads = inst.heads;
 
@@ -156,7 +157,7 @@ public class Train {
 //				System.out.println("trainingIter END===================");
             ParseAgenda[] agendaArr = (ParseAgenda[]) decodeinstret[2];
             d = new Object[options.beamwidth][2];
-            for (int i = 0;i < options.beamwidth;i++) {
+            for (int i = 0; i < options.beamwidth; i++) {
                 if (agendaArr[i] != null) {
                     d[i][0] = agendaArr[i].fv;
                     d[i][1] = agendaArr[i].toActParseTree();
@@ -188,16 +189,15 @@ public class Train {
             params.updateParamsMIRA(inst, d, upd);
 
             if (!options.createForest)
-            	inst = reader.getNext();
+                inst = reader.getNext();
             else {
-            	try {
-            		inst = (DependencyInstance) in.readObject();
-            		inst.fv = new FeatureVector((int[]) in.readObject());
-            		inst.orders = (TIntIntHashMap) in.readObject();
-            	}
-            	catch (Exception e) {
-            		inst = null;
-            	}
+                try {
+                    inst = (DependencyInstance) in.readObject();
+                    inst.fv = new FeatureVector((int[]) in.readObject());
+                    inst.orders = (TIntIntHashMap) in.readObject();
+                } catch (Exception e) {
+                    inst = null;
+                }
             }
         }
 
