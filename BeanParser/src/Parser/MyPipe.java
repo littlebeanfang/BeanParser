@@ -34,7 +34,7 @@ public class MyPipe extends DependencyPipe {
         int large = leftToRight ? childindex : parentindex;
         addCoreFeatures(instance, small, large, leftToRight, fv);
         //System.out.println(this.options.secondOrder);
-        //this.options.secondOrder = true;
+        this.options.secondOrder = true;
         if (this.options.secondOrder) {
             addTwoOrderSiblingFeatures(instance, parentindex, childindex, pa, fv);
             //addBeamFeatures(instance, parentindex, childindex, pa, fv);
@@ -329,6 +329,8 @@ public class MyPipe extends DependencyPipe {
 
 
         String par_pos = pos[par];
+        //System.out.println(":::"+pos.length+'\t'+ch1+"\t"+ch2);
+        //System.out.println("???????" + pos.toString());
         String ch1_pos = pos[ch1];
         String ch2_pos = pos[ch2];
 
