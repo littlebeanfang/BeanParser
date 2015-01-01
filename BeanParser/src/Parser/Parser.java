@@ -38,7 +38,7 @@ public class Parser {
         ObjectInputStream in = new ObjectInputStream(new BufferedInputStream(new FileInputStream(System.getenv("CODEDATA") + File.separator + file)));
         params.parameters = (double[]) in.readObject();
 
-        int total = 0;
+/*        int total = 0;
         int zero = 0;
         for (int i = 0; i < params.parameters.length; i++) {
             total++;
@@ -46,7 +46,7 @@ public class Parser {
                 zero++;
             }
         }
-        System.out.println("Total: " + total + " Zero: " + zero);
+        System.out.println("Total: " + total + " Zero: " + zero);*/
         pipe.dataAlphabet = (Alphabet) in.readObject();
         pipe.dataAlphabet.refine(params);
         pipe.typeAlphabet = (Alphabet) in.readObject();
