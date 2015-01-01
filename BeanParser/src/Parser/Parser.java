@@ -1,9 +1,6 @@
 package Parser;
 
-import DataStructure.DependencyInstance;
-import DataStructure.FeatureVector;
-import DataStructure.Parameters;
-import DataStructure.ParserOptions;
+import DataStructure.*;
 import IO.CONLLReader;
 import IO.CONLLWriter;
 import mstparser.Alphabet;
@@ -72,10 +69,12 @@ public class Parser {
         long parsestart = System.currentTimeMillis();
         while ((di = reader.getNext()) != null) {
             ++instcount;
-//            System.out.print(instcount);
-            if (instcount % 50 == 0) {
-                System.out.print(instcount + "\t");
-            }
+            System.out.print(instcount + " ");
+            //if (instcount == 596) 
+            //instcount = instcount;
+            //if (instcount % 50 == 0) {
+            //  System.out.print(instcount + "\t");
+            //}
             //if (instcount % 30 == 0) System.out.print('\n');
             FeatureVector fv = new FeatureVector();//useless here, just align the param for DecodeInstance
 
