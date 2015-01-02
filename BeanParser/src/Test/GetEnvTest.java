@@ -12,5 +12,6 @@ public class GetEnvTest {
 			System.out.println("Key:"+env.getKey()+", Value:"+env.getValue());
 		}
 		System.out.println(System.getenv("CODEDATA")+File.separator);
+		System.out.println(System.getenv("BeanTemp"));
 	}
 }

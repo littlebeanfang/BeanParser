@@ -1,6 +1,8 @@
 package Test;
 
+import java.io.File;
 import java.io.IOException;
+
 
 import DataStructure.DependencyInstance;
 import DataStructure.FeatureVector;
@@ -19,11 +21,12 @@ public class EasyFirstScoreCheck {
 		test.loadModel(options.modelName);
 		double params[]=test.GetParam();
 		CONLLReader reader=new CONLLReader();
-		reader.startReading(options.testfile);
+		reader.startReading(System.getenv("CODEDATA")+File.separator+options.testfile);
 		DependencyInstance di=reader.getNext();
 		int length=di.length();
 		int sentcount=1;
 		while(di!=null){
+			length=di.length();
 			System.out.println("sen:"+(sentcount++)+",length:"+length);
 			ParseAgenda pa=new ParseAgenda(length);
 			for(int head=0;head<length;head++){
@@ -32,15 +35,17 @@ public class EasyFirstScoreCheck {
 						FeatureVector fv=new FeatureVector();
 						dp.extractFeatures(di, child, head, pa, fv);
 						double score=fv.getScore(params);
-						System.out.print(head+"->"+child+":"+score+"\t");
+//						System.out.print(head+"->"+child+":"+score+"\t");
+						System.out.print(score+"\t");
 					}else{
-						System.out.println(head+"->"+child+":/\t");
+//						System.out.print(head+"->"+child+":/\t");
+						System.out.print("/\t");
 					}
 				}
 				System.out.println();
 			}
 			di=reader.getNext();
-			length=di.length();
+			
 		}
 	}
 	public static void main(String args[]) throws Exception{
