@@ -22,14 +22,25 @@ public class EasyFirstScoreCheck {
 		reader.startReading(options.testfile);
 		DependencyInstance di=reader.getNext();
 		int length=di.length();
-		ParseAgenda pa=new ParseAgenda(length);
-		for(int head=0;head<length;head++){
-			for(int child=0;child<length&&child!=head;child++){
-				FeatureVector fv=new FeatureVector();
-				dp.extractFeatures(di, child, head, pa, fv);
-				double score=fv.getScore(params);
-				System.out.println(head+"->"+child+":"+score);
+		int sentcount=1;
+		while(di!=null){
+			System.out.println("sen:"+(sentcount++)+",length:"+length);
+			ParseAgenda pa=new ParseAgenda(length);
+			for(int head=0;head<length;head++){
+				for(int child=0;child<length;child++){
+					if(child!=head){
+						FeatureVector fv=new FeatureVector();
+						dp.extractFeatures(di, child, head, pa, fv);
+						double score=fv.getScore(params);
+						System.out.print(head+"->"+child+":"+score+"\t");
+					}else{
+						System.out.println(head+"->"+child+":/\t");
+					}
+				}
+				System.out.println();
 			}
+			di=reader.getNext();
+			length=di.length();
 		}
 	}
 	public static void main(String args[]) throws Exception{
