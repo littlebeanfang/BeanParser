@@ -13,11 +13,12 @@ public class TrainTest {
 
 		Parser test = new Parser(pipe, options);
 		test.Train();
-
+/*
 		test.loadModel(options.modelName);
 		test.Parse(options.testfile, options.outfile);
 
 		ResultEvaluator re = new ResultEvaluator();
 		re.evaluate(options.outfile, options.testfile);
+		*/
 	}
 }

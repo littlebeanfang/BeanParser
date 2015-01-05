@@ -47,7 +47,7 @@ public class Decoder {
 //            inst.heads[childindex] = parsehead;
         }
         pa = beam.findBest();
-        System.out.println(": " + pa.getScore());
+        //System.out.println(": " + pa.getScore());
         pa.AddArc(0, -1);//add root
         inst.heads = pa.heads;
         //PrintScores(inst, pa);

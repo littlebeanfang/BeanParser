@@ -17,6 +17,9 @@ public class Parser {
     public double[] GetParam(){
     	return this.params.parameters;
     }
+    public void SetParam(double[] parameters){
+    	this.params=new Parameters(parameters);
+    }
     //private
     //constractor for decoder
     public Parser(DependencyPipe pipe, ParserOptions options) {
