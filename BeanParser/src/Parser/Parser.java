@@ -14,6 +14,9 @@ public class Parser {
     private Train trainer;
     private Parameters params;
 
+    public Parameters GetParameters(){
+    	return this.params;
+    }
     public double[] GetParam(){
     	return this.params.parameters;
     }

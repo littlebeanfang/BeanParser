@@ -1,5 +1,7 @@
 package Test;
 
+import gnu.trove.TIntIntHashMap;
+
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -13,8 +15,16 @@ import java.lang.reflect.Array;
 import java.util.ArrayList;
 
 
+
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.LinkedList;
+import java.util.Queue;
+import java.util.Stack;
+
 import DataStructure.DependencyInstance;
 import DataStructure.FeatureVector;
+import DataStructure.Parameters;
 import DataStructure.ParseAgenda;
 import DataStructure.ParserOptions;
 import IO.CONLLReader;
@@ -198,6 +208,109 @@ public class EasyFirstScoreCheck {
 		godreader.close();
 		sentWriter.close();
 	}
+
+	public TIntIntHashMap GenerateGodOrderByInstance(DependencyInstance di){
+		TIntIntHashMap order_child=new TIntIntHashMap();
+		Stack<String> ret=new Stack<String>();
+		HashMap<String,String> parent_childs=new HashMap<String,String>();
+		for(int i=1;i<di.length();i++){
+			String head=di.heads[i]+"";
+			if(parent_childs.containsKey(head)){
+				parent_childs.put(head, parent_childs.get(head)+"\t"+i);
+			}else{
+				parent_childs.put(head, i+"");
+			}
+		}
+		Queue<String> temp=new LinkedList<String>();//offer,poll
+		temp.offer("0");
+		while(temp.size()!=0){
+			String curString=temp.poll();
+			if(parent_childs.containsKey(curString)){
+				//subtree
+				//sb.append(curString+"\t");
+				ret.push(curString);
+				String childs[]=parent_childs.get(curString).split("\t");
+				for(int i=childs.length-1;i>=0;i--){
+					temp.offer(childs[i]);
+				}
+			}else{
+				//leaf node
+				//sb.append(curString+"\t");
+				ret.push(curString);
+			}
+		}
+		int order=1;
+		while(!ret.empty()){
+			String child=ret.pop();
+			if(child.equals("0")){
+				break;
+			}
+			order_child.put(order++, Integer.parseInt(child));
+		}
+		return order_child;
+	}
+	
+	public TIntIntHashMap GenerateEasyFirstOrderByInstance(DependencyInstance di,Parameters p) throws IOException{
+		int length=di.length();
+		ParseAgenda pa=new ParseAgenda(length);
+		MyPipe dp=new MyPipe(null);
+		double[][] matrix=new double[length-1][length-1];
+		for(int head=1;head<length;head++){
+			for(int child=1;child<length;child++){
+				if(child!=head){
+					FeatureVector fv=new FeatureVector();
+					dp.extractFeatures(di, child, head, pa, fv);
+					double score=fv.getScore(p.parameters);
+					matrix[head-1][child-1]=score;
+				}else{
+					matrix[head-1][child-1]=0;
+				}
+			}
+		}
+		BeanMatrixEasyFirst test=new BeanMatrixEasyFirst();
+		TIntIntHashMap map=new TIntIntHashMap();
+		test.GetEasyFirstOrder(matrix, map);
+		test.tranverseTIntIntHashMap(map);
+		return map;
+	}
+	
+	public void AddEasyFirstOrderProcessIndex(String modelfile, String conllfile, String writefile) throws Exception{
+		CONLLReader reader=new CONLLReader();
+		reader.startReading(conllfile);
+		File out=new File(writefile);
+		if(!out.exists()){
+			out.createNewFile();
+		}
+		FileWriter writer=new FileWriter(writefile);
+		DependencyInstance di=reader.getNext();
+		ParserOptions options = new ParserOptions(null);
+		MyPipe dp=new MyPipe(options);
+		Parser test=new Parser(dp,options);
+		test.loadModel(modelfile);
+		while(di!=null){
+			TIntIntHashMap map=this.GenerateEasyFirstOrderByInstance(di, test.GetParameters());
+			TIntIntHashMap transper=new TIntIntHashMap();
+			for(int i=1;i<=map.size();i++){
+				transper.put(map.get(i), i);
+			}
+			for(int i=1;i<di.length();i++){
+				writer.write(i+"\t"+di.forms[i]+"\t_\t"+di.postags[i]+"\t"+di.postags[i]+"\t_\t"+di.heads[i]+"\t"+di.deprels[i]+"\t_\t_\t"+transper.get(i)+"\n");
+			}
+			writer.write("\n");
+			di=reader.getNext();
+		}
+		writer.close();
+	}
+	
+	public void tranverseTIntIntHashMap(TIntIntHashMap map){
+		int len=map.size();
+		System.out.println("len"+len);
+		for(int i=1;i<=len;i++){
+			System.out.println(map.get(i));
+		}
+	}
+	
+
 	public void GenerateCombineBat(String batfilename) throws IOException{
 		int startindex=1;
 		int endindex=100;
@@ -211,6 +324,7 @@ public class EasyFirstScoreCheck {
 		}
 		writer.close();
 	}
+
 	public static void main(String args[]) throws Exception{
 		//args: Bean parse command, use modelname,test file and output file
 		//test file for sentence want to see score
@@ -219,7 +333,19 @@ public class EasyFirstScoreCheck {
 		EasyFirstScoreCheck test=new EasyFirstScoreCheck();
 //		test.PrintOutAll1orderArcScore(args);
 //		test.GenerateArcscorePairFiles("ArcScore_God_wsj2-21train_wsj00-01test_first100sent.score", "ArcScore_Increase_wsj2-21train_wsj00-01test_first100sent.score", "Arcscore100sen_GodIncrease");
+
+//		test.GenerateArcscoreSingleFile("ArcScore_God_wsj2-21train_wsj00-01test_first100sent.score", "Arcscore100sen_combinetest", "God");
+		/*
+		CONLLReader reader=new CONLLReader();
+		reader.startReading(System.getenv("CODEDATA")+File.separator+"1sen.txt");
+		DependencyInstance di=reader.getNext();
+		TIntIntHashMap ret=test.GenerateGodOrderByInstance(di);
+		test.tranverseTIntIntHashMap(ret);
+		*/
+		//test.AddEasyFirstOrderProcessIndex("", conllfile, writefile);
+
 //		test.GenerateArcscoreSingleFile("ArcScore_Increase_wsj2-21train_wsj00-01test_first100sent.score", "Arcscore100sen_combinetest", "Increase");
 		test.GenerateCombineBat("combile1-100.bat");
+
 	}
 }
