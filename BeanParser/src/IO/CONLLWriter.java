@@ -57,7 +57,7 @@ public class CONLLWriter extends DependencyWriter {
             writer.write('\t');
             writer.write(instance.deprels[i]);
             writer.write('\t');
-            writer.write("-\t-");
+            writer.write("_\t_");
             if (instance.confidenceScores != null) {
                 writer.write('\t');
                 writer.write(df.format(instance.confidenceScores[i]));

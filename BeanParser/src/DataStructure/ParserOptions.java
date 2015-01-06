@@ -48,8 +48,9 @@ public final class ParserOptions {
     //public boolean useRelationalFeatures = false;
     //public boolean discourseMode = false;
     //public String confidenceEstimator = null;
-    public boolean beam = false;
     public int beamwidth = 1;
+    public boolean easyfirst_parse = false;
+    public boolean easyfirst_train = false;
 
     public ParserOptions(String[] args) {
 
@@ -118,11 +119,14 @@ public final class ParserOptions {
 	    rankEdgesByConfidence = true;
 	    }	   
 	    */
-            if (pair[0].equals("beam")) {
-                beam = pair[1].equals("true") ? true : false;
-            }
             if (pair[0].equals("beam-width")) {
                 beamwidth = Integer.parseInt(pair[1]);
+            }
+            if (pair[0].equals("parse-order")) {
+            	if (pair[1].equals("easyfirst")) easyfirst_parse = true;
+            }
+            if (pair[0].equals("train-order")) {
+            	if (pair[1].equals("easyfirst")) easyfirst_train = true;
             }
         }
 

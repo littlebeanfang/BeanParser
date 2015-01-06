@@ -2,6 +2,7 @@ package Parser;
 
 import DataStructure.DependencyInstance;
 import DataStructure.FeatureVector;
+import DataStructure.Parameters;
 import DataStructure.ParseAgenda;
 import DataStructure.ParserOptions;
 import IO.CONLLReader;
@@ -11,6 +12,8 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.ObjectOutputStream;
+import java.util.Comparator;
+import java.util.PriorityQueue;
 
 public class MyPipe extends DependencyPipe {
 
@@ -500,5 +503,137 @@ public class MyPipe extends DependencyPipe {
         } catch (Exception e) {
         }
     }
+    
+    private final class arc {
+    	public final int child;
+    	public final int head;
+    	public final double score;
+    	
+    	public arc(int child, int head, double score) {
+    		this.child = child;
+    		this.head = head;
+    		this.score = score;
+    	}
+    	
+    	public boolean equals(arc a) {
+    		if ((this.child == a.child) && (this.head == a.head)) return true;
+    		return false;
+    	}
 
+		@Override
+		public String toString() {
+			return "arc [child=" + child + ", head=" + head + ", score="
+					+ score + "]";
+		}
+    }
+
+    private final class arcComparator implements Comparator<arc> {
+        @Override
+        public int compare(arc a1, arc a2) {
+        	// order all the arcs based on the reverse ordering of the natural numbers,
+        	// because the PriorityQueue returns the least element
+            if (a1.score < a2.score) return 1;
+            if (a1.score > a2.score) return -1;
+            return 0;
+        }
+    }
+
+    public TIntIntHashMap getEasyfirstOrder(DependencyInstance inst, Parameters params) {
+    	TIntIntHashMap order = new TIntIntHashMap();
+    	int length = inst.length(); // length is the number of nodes containing the root
+    	int[] next = new int[length + 1];
+    	int[] prev = new int[length + 1];
+    	arc[] forward = new arc[length + 1]; // contains the reference to the foward arc of the current node
+    	arc[] back = new arc[length + 1]; // contains the reference to the backward arc of the current node
+    	Comparator<arc> comparator = new arcComparator();
+    	PriorityQueue<arc> queue = new PriorityQueue<arc>(2*(length + 1), comparator);
+    	
+    	// initialize all the next and previous nodes to the neighbors
+    	for (int i = 0;i < length + 1;i++) {
+    		next[i] = i + 1;
+    		prev[i] = i - 1;
+    	}
+    	
+    	// initialize the forward and backward arcs to the neighbors and inserts them to the priority queue
+    	for (int i = 0;i < length;i++) {
+    		forward[i] = new arc(i+1, i, firstOrderScore(inst, params, i+1, i));
+    		back[i] = new arc(i, i+1, firstOrderScore(inst, params, i, i+1));
+    		queue.offer(forward[i]);
+    		queue.offer(back[i]);
+    	}
+    	
+    	// iteratively remove length - 2 nodes from the priority queue and update the arrays
+    	for (int i = 0;i < length - 2;i++) {
+    		arc top = queue.peek();
+    		// on iteration i+1 we do the child node
+    		order.put(i + 1, top.child);
+    		int small = top.child < top.head ? top.child : top.head;
+    		int large = top.child < top.head ? top.head : top.child;
+    		int prevNode = prev[small];
+    		int nextNode = next[large];
+    		
+    		// remove the arcs from the priority queue
+    		queue.remove(forward[top.child]);
+    		queue.remove(back[top.child]);
+    		if (top.head == small) {
+    			queue.remove(forward[top.head]);
+    			queue.remove(back[top.head]);
+    		}
+    		else {
+    			queue.remove(forward[prevNode]);
+    			queue.remove(back[prevNode]);
+    		}
+    		
+    		// update next and prev arrays
+    		next[top.child] = -1;
+    		prev[top.child] = -1;
+    		if (top.head == small) {
+    			next[top.head] = nextNode;
+    			prev[nextNode] = top.head;
+    		}
+    		else {
+    			next[prevNode] = top.head;
+    			prev[top.head] = prevNode;
+    		}
+    		
+    		// insert the new arcs to the priority queue and update forward and back arrays
+    		forward[top.child] = null;
+    		back[top.child] = null;
+    		if (top.head == small) {
+    			forward[top.head] = new arc(nextNode, top.head, firstOrderScore(inst, params, nextNode, top.head));
+    			back[top.head] = new arc(top.head, nextNode, firstOrderScore(inst, params, top.head, nextNode));
+    			queue.offer(forward[top.head]);
+    			queue.offer(back[top.head]);
+    		}
+    		else {
+    			forward[prevNode] = new arc(top.head, prevNode, firstOrderScore(inst, params, top.head, prevNode));
+    			back[prevNode] = new arc(prevNode, top.head, firstOrderScore(inst, params, prevNode, top.head));
+    			queue.offer(forward[prevNode]);
+    			queue.offer(back[prevNode]);
+    		}
+    	}
+    	// find the last node
+    	arc top = queue.poll();
+    	if ((top.child > 0) && (top.child < length)) order.put(length - 1, top.child);
+    	if ((top.head > 0) && (top.head < length)) order.put(length - 1, top.head);
+    	
+//    	System.out.println("MyPipe order: ");
+//    	for (int i = 1;i < length;i++)
+//    		System.out.print(order.get(i) + " ");
+//    	System.out.println();
+    	return order;
+    }
+    
+    private double firstOrderScore(DependencyInstance inst, Parameters params, int child, int head) {
+    	// return negative infinity if one of the nodes is virtual
+    	if ((child == 0) || (head == 0)) return Double.NEGATIVE_INFINITY;
+    	if ((child == inst.length()) || (head == inst.length())) return Double.NEGATIVE_INFINITY;
+    	FeatureVector fv = new FeatureVector();
+    	boolean leftToRight = (child > head);
+        int small = leftToRight ? head : child;
+        int large = leftToRight ? child : head;
+        addCoreFeatures(inst, small, large, leftToRight, fv);
+        // return a score based on first order features
+    	return fv.getScore(params.parameters);
+    }
 }

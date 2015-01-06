@@ -4,6 +4,11 @@ import java.util.Comparator;
 import java.util.Iterator;
 import java.util.PriorityQueue;
 
+/**
+ * a data structure that stores the current best results with number 'width'.
+ * 
+ * @author Tan Jia
+ */
 public class Beam {
     private ParseAgenda[] curr;
     private ParseAgenda[] next;
@@ -80,10 +85,6 @@ public class Beam {
 
     public ParseAgenda[] getQueue() {
         return curr;
-    }
-
-    public String toString() {
-        return null;
     }
 
     private class partialResult {

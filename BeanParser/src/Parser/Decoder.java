@@ -9,11 +9,13 @@ public class Decoder {
     private MyPipe pipe;
     private Parameters param;
     private Beam beam;
+    private ParserOptions options;
 
     public Decoder(DependencyPipe pipe, Parameters param, ParserOptions options) {
         this.pipe = (MyPipe) pipe;
         this.param = param;
         this.beam = new Beam(options.beamwidth);
+        this.options = options;
     }
 
     public Object[] DecodeInstance(DependencyInstance inst, TIntIntHashMap ordermap) throws IOException {
@@ -23,6 +25,10 @@ public class Decoder {
         ParseAgenda pa;
         //FeatureVector fvforinst = new FeatureVector();
 
+//        System.out.println("Decoder order: ");
+//        for (int i = 1;i < inst.length();i++)
+//        	System.out.print(ordermap.get(i) + " ");
+//        System.out.println();
         for (int orderindex = 1; orderindex < inst.length(); orderindex++) {
             //skip root node
             int childindex = ordermap.get(orderindex);

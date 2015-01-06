@@ -7,6 +7,7 @@ import DataStructure.ParserOptions;
 import IO.CONLLReader;
 import IO.CONLLWriter;
 import mstparser.Alphabet;
+import gnu.trove.TIntIntHashMap;
 
 import java.io.*;
 
@@ -80,7 +81,7 @@ public class Parser {
         long parsestart = System.currentTimeMillis();
         while ((di = reader.getNext()) != null) {
             ++instcount;
-            System.out.print(instcount + " ");
+            System.out.println("Sentence " + instcount);
             //if (instcount == 596) 
             //instcount = instcount;
             //if (instcount % 50 == 0) {
@@ -89,8 +90,18 @@ public class Parser {
             //if (instcount % 30 == 0) System.out.print('\n');
             FeatureVector fv = new FeatureVector();//useless here, just align the param for DecodeInstance
 
-            decoder.DecodeInstance(di, di.orders);
-
+            //Jia: decide which order to use
+            if (options.easyfirst_parse) {
+            	TIntIntHashMap map = ((MyPipe) pipe).getEasyfirstOrder(di, params);
+//            	System.out.println("Parser order: ");
+//            	for (int i = 1;i < di.length();i++)
+//            		System.out.print(map.get(i) + " ");
+//            	System.out.println();
+            	decoder.DecodeInstance(di, map);
+            }
+            else 
+            	decoder.DecodeInstance(di, di.orders);
+            
             writer.write(new DependencyInstance(RemoveRoot(di.forms), RemoveRoot(di.postags), RemoveRoot(di.deprels), RemoveRoot(di.heads)));
         }
         long parseend = System.currentTimeMillis();
