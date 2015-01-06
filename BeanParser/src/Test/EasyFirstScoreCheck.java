@@ -146,6 +146,58 @@ public class EasyFirstScoreCheck {
 		maltreader.close();
 		sentWriter.close();
 	}
+	/**
+	 * 
+	 * @param scorefileofallsents:the score file from PrintOutAll1orderArcScore output
+	 * @param folder:the folder to save all the splited small score files
+	 * @param prefix:give a prefix to score files, not only the sentnum to seperate different score
+	 * @throws IOException
+	 */
+	public void GenerateArcscoreSingleFile(String scorefileofallsents, String folder,String prefix) throws IOException{
+		BufferedReader godreader=new BufferedReader(new FileReader(scorefileofallsents));
+		File dir=new File(folder);
+		if(!dir.exists()){
+			dir.mkdir();
+		}
+		File sentFile=new File(dir+File.separator+"sentfile.txt");
+		if(!sentFile.exists()){
+			sentFile.createNewFile();
+		}
+		FileWriter sentWriter=new FileWriter(sentFile);
+		
+		String godString=godreader.readLine();
+		ArrayList<String> onegodsent=new ArrayList<String>();
+		int cursenlength=0;
+		int cursentnum=1;
+		while(godString!=null){
+			System.out.println(godString);
+			if(godString.equals("")){
+				System.out.println("writefile");
+				//write file, clear arraylist
+				File arc=new File(dir+File.separator+prefix+"_"+cursentnum+".score");
+				if(!arc.exists()){
+					arc.createNewFile();
+				}
+				FileWriter arcwriter=new FileWriter(arc);
+				for(String s:onegodsent){
+					arcwriter.write(s+"\n");
+				}
+				arcwriter.close();
+				onegodsent.clear();
+			}else if(godString.startsWith("length")){
+				cursenlength=Integer.parseInt(godString.split("\t")[1]);
+			}else if(godString.startsWith("<root>")){
+				sentWriter.write(godString+"\n");
+			}else if(godString.startsWith("sent")){
+				cursentnum=Integer.parseInt(godString.split("\t")[1]);
+			}else{
+				onegodsent.add(godString);
+			}
+			godString=godreader.readLine();
+		}
+		godreader.close();
+		sentWriter.close();
+	}
 	public static void main(String args[]) throws Exception{
 		//args: Bean parse command, use modelname,test file and output file
 		//test file for sentence want to see score
@@ -153,6 +205,7 @@ public class EasyFirstScoreCheck {
 		//output file for write arc score matrix
 		EasyFirstScoreCheck test=new EasyFirstScoreCheck();
 //		test.PrintOutAll1orderArcScore(args);
-		test.GenerateArcscorePairFiles("ArcScore_God_wsj2-21train_wsj00-01test_first100sent.score", "ArcScore_Increase_wsj2-21train_wsj00-01test_first100sent.score", "Arcscore100sen_GodIncrease");
+//		test.GenerateArcscorePairFiles("ArcScore_God_wsj2-21train_wsj00-01test_first100sent.score", "ArcScore_Increase_wsj2-21train_wsj00-01test_first100sent.score", "Arcscore100sen_GodIncrease");
+		test.GenerateArcscoreSingleFile("ArcScore_God_wsj2-21train_wsj00-01test_first100sent.score", "Arcscore100sen_combinetest", "God");
 	}
 }
