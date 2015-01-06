@@ -198,6 +198,19 @@ public class EasyFirstScoreCheck {
 		godreader.close();
 		sentWriter.close();
 	}
+	public void GenerateCombineBat(String batfilename) throws IOException{
+		int startindex=1;
+		int endindex=100;
+		File outFile=new File(batfilename);
+		if(!outFile.exists()){
+			outFile.createNewFile();
+		}
+		FileWriter writer=new FileWriter(outFile);
+		for(int i=startindex;i<=endindex;i++){
+			writer.write("copy *_"+i+".score "+i+".score\n");
+		}
+		writer.close();
+	}
 	public static void main(String args[]) throws Exception{
 		//args: Bean parse command, use modelname,test file and output file
 		//test file for sentence want to see score
@@ -206,6 +219,7 @@ public class EasyFirstScoreCheck {
 		EasyFirstScoreCheck test=new EasyFirstScoreCheck();
 //		test.PrintOutAll1orderArcScore(args);
 //		test.GenerateArcscorePairFiles("ArcScore_God_wsj2-21train_wsj00-01test_first100sent.score", "ArcScore_Increase_wsj2-21train_wsj00-01test_first100sent.score", "Arcscore100sen_GodIncrease");
-		test.GenerateArcscoreSingleFile("ArcScore_God_wsj2-21train_wsj00-01test_first100sent.score", "Arcscore100sen_combinetest", "God");
+//		test.GenerateArcscoreSingleFile("ArcScore_Increase_wsj2-21train_wsj00-01test_first100sent.score", "Arcscore100sen_combinetest", "Increase");
+		test.GenerateCombineBat("combile1-100.bat");
 	}
 }
