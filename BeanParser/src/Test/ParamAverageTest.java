@@ -27,7 +27,7 @@ public class ParamAverageTest {
 	public void AvergeModelParam(String[] args, String newmodelfile, int numofinstance) throws Exception{
 		//at least one model file name
 		ParserOptions options = new ParserOptions(args);
-		DependencyPipe dp=new MyPipe(options);
+		MyPipe dp=new MyPipe(options);
 		Parser test=new Parser(dp,options);
 		test.loadModel(args[0]);
 		total=new double[test.GetParam().length];

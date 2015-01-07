@@ -9,7 +9,7 @@ import java.io.*;
 
 public class Parser {
     public ParserOptions options;
-    private DependencyPipe pipe;
+    public MyPipe pipe;
     private Decoder decoder;
     private Train trainer;
     private Parameters params;
@@ -25,7 +25,7 @@ public class Parser {
     }
     //private
     //constractor for decoder
-    public Parser(DependencyPipe pipe, ParserOptions options) {
+    public Parser(MyPipe pipe, ParserOptions options) {
         this.pipe = pipe;
         this.options = options;
         // Set up arrays
@@ -34,7 +34,7 @@ public class Parser {
     }
 
     //constructor for trainer
-    public Parser(DependencyPipe pipe, ParserOptions options, Parameters params) {
+    public Parser(MyPipe pipe, ParserOptions options, Parameters params) {
         this.pipe = pipe;
         this.options = options;
         this.params = params;

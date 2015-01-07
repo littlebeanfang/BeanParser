@@ -42,6 +42,7 @@ public class BeanMatrixEasyFirst {
 		return ret;
 	}
 	public void GetEasyFirstOrder(double[][] arcscore,TIntIntHashMap map){
+		//arcscore must not containing root 
 		int length=arcscore.length;
 		//init node
 		int node[]=new int[length];
@@ -76,15 +77,15 @@ public class BeanMatrixEasyFirst {
 					child=index+1;
 				}
 			}
-			//node[left-1]->node[left]
+			//node[left-1]->node[left-2]
 //			System.out.println("left"+left);
-			double temp=arcscore[node[left-2]][node[left-1]];
+			double temp=arcscore[node[left-1]][node[left-2]];
 			
 //			System.out.println("arc:"+node[left-2]+"->"+node[left-1]);
 			if(temp>maxscore){
 				maxscore=temp;
 				head=left-1;
-				child=left;
+				child=left-2;
 			}
 			//if contain root score
 			//map.put(length-left+1, node[child]);
@@ -117,7 +118,7 @@ public class BeanMatrixEasyFirst {
 	public static void main(String args[]) throws IOException{
 		BeanMatrixEasyFirst test=new BeanMatrixEasyFirst();
 
-		double[][] matrix=test.DeleteRootInMatrix(test.ReadMatrixFromFile(System.getenv("CODEDATA")+File.separator+"God_1.score"));
+		double[][] matrix=test.DeleteRootInMatrix(test.ReadMatrixFromFile(System.getenv("CODEDATA")+File.separator+"God_2.score"));
 		test.PrintMatrix(matrix);
 		TIntIntHashMap map=new TIntIntHashMap();
 		test.GetEasyFirstOrder(matrix, map);

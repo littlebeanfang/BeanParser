@@ -9,7 +9,7 @@ public class TrainTest {
 	public static void main(String args[]) throws Exception{
 
 		ParserOptions options = new ParserOptions(args);
-		DependencyPipe pipe = new MyPipe(options);
+		MyPipe pipe = new MyPipe(options);
 
 		Parser test = new Parser(pipe, options);
 		test.Train();

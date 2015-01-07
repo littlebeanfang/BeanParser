@@ -250,26 +250,26 @@ public class EasyFirstScoreCheck {
 		return order_child;
 	}
 	
-	public TIntIntHashMap GenerateEasyFirstOrderByInstance(DependencyInstance di,Parameters p) throws IOException{
+	public TIntIntHashMap GenerateEasyFirstOrderByInstance(DependencyInstance di,Parser parser) throws IOException{
 		int length=di.length();
 		ParseAgenda pa=new ParseAgenda(length);
-		String args[]={"a","b"};
-		ParserOptions options=new ParserOptions(args);
-		MyPipe dp=new MyPipe(options);
+//		String args[]={"a","b"};
+//		ParserOptions options=new ParserOptions(args);
+//		MyPipe dp=new MyPipe(options);
 		double[][] matrix=new double[length-1][length-1];
 		for(int head=1;head<length;head++){
 			for(int child=1;child<length;child++){
 				if(child!=head){
 					FeatureVector fv=new FeatureVector();
-					dp.extractFeatures(di, child, head, pa, fv);
-					double score=fv.getScore(p.parameters);
+					parser.pipe.extractFeatures(di, child, head, pa, fv);
+					double score=fv.getScore(parser.GetParam());
 					matrix[head-1][child-1]=score;
 				}else{
 					matrix[head-1][child-1]=0;
 				}
 			}
 		}
-		this.PrintMatrix(matrix);
+//		this.PrintMatrix(matrix);
 		BeanMatrixEasyFirst test=new BeanMatrixEasyFirst();
 		TIntIntHashMap map=new TIntIntHashMap();
 		test.GetEasyFirstOrder(matrix, map);
@@ -301,7 +301,7 @@ public class EasyFirstScoreCheck {
 		Parser test=new Parser(dp,options);
 		test.loadModel(modelfile);
 		while(di!=null){
-			TIntIntHashMap map=this.GenerateEasyFirstOrderByInstance(di, test.GetParameters());
+			TIntIntHashMap map=this.GenerateEasyFirstOrderByInstance(di, test);
 			TIntIntHashMap transper=new TIntIntHashMap();
 			for(int i=1;i<=map.size();i++){
 				transper.put(map.get(i), i);
@@ -357,8 +357,8 @@ public class EasyFirstScoreCheck {
 		TIntIntHashMap ret=test.GenerateGodOrderByInstance(di);
 		test.tranverseTIntIntHashMap(ret);
 		*/
-//		test.AddEasyFirstOrderProcessIndex("wsj_2-21_godorder_features_MST2.model", System.getenv("CODEDATA")+File.separator+"1sen.txt", System.getenv("CODEDATA")+File.separator+"wsj_00-01_easyfirstorder_godmodel.txt");
-//		test.AddEasyFirstOrderProcessIndex("wsj_2-21_godorder_features_MST2.model", System.getenv("CODEDATA")+File.separator+"wsj_2-21_godorder_processindex.txt", System.getenv("CODEDATA")+File.separator+"wsj_2-21_easyfirstorder_godmodel.txt");
+//		test.AddEasyFirstOrderProcessIndex("wsj_2-21_godorder_features_MST2.model", System.getenv("CODEDATA")+File.separator+"wsj_00-01_godorder_processindex.txt", System.getenv("CODEDATA")+File.separator+"wsj_00-01_easyfirstorder_godmodel.txt");
+		test.AddEasyFirstOrderProcessIndex("wsj_2-21_godorder_features_MST2.model", System.getenv("CODEDATA")+File.separator+"wsj_2-21_godorder_processindex.txt", System.getenv("CODEDATA")+File.separator+"wsj_2-21_easyfirstorder_godmodel.txt");
 
 //		test.GenerateArcscoreSingleFile("ArcScore_Increase_wsj2-21train_wsj00-01test_first100sent.score", "Arcscore100sen_combinetest", "Increase");
 //		test.GenerateCombineBat("combile1-100.bat");
