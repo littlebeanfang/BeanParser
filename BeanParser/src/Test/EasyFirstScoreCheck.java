@@ -273,7 +273,7 @@ public class EasyFirstScoreCheck {
 		BeanMatrixEasyFirst test=new BeanMatrixEasyFirst();
 		TIntIntHashMap map=new TIntIntHashMap();
 		test.GetEasyFirstOrder(matrix, map);
-		test.tranverseTIntIntHashMap(map);
+//		test.tranverseTIntIntHashMap(map);
 		return map;
 	}
 	
@@ -306,8 +306,8 @@ public class EasyFirstScoreCheck {
 			for(int i=1;i<=map.size();i++){
 				transper.put(map.get(i), i);
 			}
-			System.out.println("transper============");
-			tranverseTIntIntHashMap(transper);
+//			System.out.println("transper============");
+//			tranverseTIntIntHashMap(transper);
 			for(int i=1;i<di.length();i++){
 				writer.write(i+"\t"+di.forms[i]+"\t_\t"+di.postags[i]+"\t"+di.postags[i]+"\t_\t"+di.heads[i]+"\t"+di.deprels[i]+"\t_\t_\t"+transper.get(i)+"\n");
 			}
@@ -358,7 +358,8 @@ public class EasyFirstScoreCheck {
 		test.tranverseTIntIntHashMap(ret);
 		*/
 //		test.AddEasyFirstOrderProcessIndex("wsj_2-21_godorder_features_MST2.model", System.getenv("CODEDATA")+File.separator+"wsj_00-01_godorder_processindex.txt", System.getenv("CODEDATA")+File.separator+"wsj_00-01_easyfirstorder_godmodel.txt");
-		test.AddEasyFirstOrderProcessIndex("wsj_2-21_godorder_features_MST2.model", System.getenv("CODEDATA")+File.separator+"wsj_2-21_godorder_processindex.txt", System.getenv("CODEDATA")+File.separator+"wsj_2-21_easyfirstorder_godmodel.txt");
+//		test.AddEasyFirstOrderProcessIndex("wsj_2-21_godorder_features_MST2.model", System.getenv("CODEDATA")+File.separator+"wsj_2-21_godorder_processindex.txt", System.getenv("CODEDATA")+File.separator+"wsj_2-21_easyfirstorder_godmodel.txt");
+		test.AddEasyFirstOrderProcessIndex("mst_wsj2-21_2order_10iter_proj_51.model", System.getenv("CODEDATA")+File.separator+"wsj_2-21_godorder_processindex.txt", System.getenv("CODEDATA")+File.separator+"wsj_2-21_easyfirstorder_mstmodel.txt");
 
 //		test.GenerateArcscoreSingleFile("ArcScore_Increase_wsj2-21train_wsj00-01test_first100sent.score", "Arcscore100sen_combinetest", "Increase");
 //		test.GenerateCombineBat("combile1-100.bat");

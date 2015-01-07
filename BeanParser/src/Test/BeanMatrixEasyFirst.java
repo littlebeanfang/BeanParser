@@ -81,7 +81,7 @@ public class BeanMatrixEasyFirst {
 //			System.out.println("left"+left);
 			double temp=arcscore[node[left-1]][node[left-2]];
 			
-//			System.out.println("arc:"+node[left-2]+"->"+node[left-1]);
+//			System.out.println("arc:"+node[left-1]+"->"+node[left-2]);
 			if(temp>maxscore){
 				maxscore=temp;
 				head=left-1;
