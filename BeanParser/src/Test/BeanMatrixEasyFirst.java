@@ -106,32 +106,41 @@ public class BeanMatrixEasyFirst {
 			System.out.println(map.get(i));
 		}
 	}
+	public void PrintMatrix(double[][] matrix){
+		for(int i=0;i<matrix.length;i++){
+			for(int j=0;j<matrix.length;j++){
+				System.out.print(matrix[i][j]+"\t");
+			}
+			System.out.println();
+		}
+	}
 	public static void main(String args[]) throws IOException{
 		BeanMatrixEasyFirst test=new BeanMatrixEasyFirst();
 
 		double[][] matrix=test.DeleteRootInMatrix(test.ReadMatrixFromFile(System.getenv("CODEDATA")+File.separator+"God_1.score"));
+		test.PrintMatrix(matrix);
 		TIntIntHashMap map=new TIntIntHashMap();
 		test.GetEasyFirstOrder(matrix, map);
 		test.tranverseTIntIntHashMap(map);
-		double[][] matrix2=test.DeleteRootInMatrix(test.ReadMatrixFromFile(System.getenv("CODEDATA")+File.separator+"God_3.score"));
-		TIntIntHashMap map2=new TIntIntHashMap();
-		test.GetEasyFirstOrder(matrix2, map2);
-		test.tranverseTIntIntHashMap(map2);
-		double[][] matrix3=test.DeleteRootInMatrix(test.ReadMatrixFromFile(System.getenv("CODEDATA")+File.separator+"God_5.score"));
-		TIntIntHashMap map3=new TIntIntHashMap();
-		test.GetEasyFirstOrder(matrix3, map3);
-		test.tranverseTIntIntHashMap(map3);
-		double[][] matrix4=test.DeleteRootInMatrix(test.ReadMatrixFromFile(System.getenv("CODEDATA")+File.separator+"MST_2.score"));
-		TIntIntHashMap map4=new TIntIntHashMap();
-		test.GetEasyFirstOrder(matrix4, map4);
-		test.tranverseTIntIntHashMap(map4);
-		double[][] matrix5=test.DeleteRootInMatrix(test.ReadMatrixFromFile(System.getenv("CODEDATA")+File.separator+"MST_4.score"));
-		TIntIntHashMap map5=new TIntIntHashMap();
-		test.GetEasyFirstOrder(matrix5, map5);
-		test.tranverseTIntIntHashMap(map5);
-		double[][] matrix6=test.DeleteRootInMatrix(test.ReadMatrixFromFile(System.getenv("CODEDATA")+File.separator+"MST_6.score"));
-		TIntIntHashMap map6=new TIntIntHashMap();
-		test.GetEasyFirstOrder(matrix6, map6);
-		test.tranverseTIntIntHashMap(map6);
+//		double[][] matrix2=test.DeleteRootInMatrix(test.ReadMatrixFromFile(System.getenv("CODEDATA")+File.separator+"God_3.score"));
+//		TIntIntHashMap map2=new TIntIntHashMap();
+//		test.GetEasyFirstOrder(matrix2, map2);
+//		test.tranverseTIntIntHashMap(map2);
+//		double[][] matrix3=test.DeleteRootInMatrix(test.ReadMatrixFromFile(System.getenv("CODEDATA")+File.separator+"God_5.score"));
+//		TIntIntHashMap map3=new TIntIntHashMap();
+//		test.GetEasyFirstOrder(matrix3, map3);
+//		test.tranverseTIntIntHashMap(map3);
+//		double[][] matrix4=test.DeleteRootInMatrix(test.ReadMatrixFromFile(System.getenv("CODEDATA")+File.separator+"MST_2.score"));
+//		TIntIntHashMap map4=new TIntIntHashMap();
+//		test.GetEasyFirstOrder(matrix4, map4);
+//		test.tranverseTIntIntHashMap(map4);
+//		double[][] matrix5=test.DeleteRootInMatrix(test.ReadMatrixFromFile(System.getenv("CODEDATA")+File.separator+"MST_4.score"));
+//		TIntIntHashMap map5=new TIntIntHashMap();
+//		test.GetEasyFirstOrder(matrix5, map5);
+//		test.tranverseTIntIntHashMap(map5);
+//		double[][] matrix6=test.DeleteRootInMatrix(test.ReadMatrixFromFile(System.getenv("CODEDATA")+File.separator+"MST_6.score"));
+//		TIntIntHashMap map6=new TIntIntHashMap();
+//		test.GetEasyFirstOrder(matrix6, map6);
+//		test.tranverseTIntIntHashMap(map6);
 	}
 }
