@@ -359,8 +359,10 @@ public class EasyFirstScoreCheck {
 		*/
 //		test.AddEasyFirstOrderProcessIndex("wsj_2-21_godorder_features_MST2.model", System.getenv("CODEDATA")+File.separator+"wsj_00-01_godorder_processindex.txt", System.getenv("CODEDATA")+File.separator+"wsj_00-01_easyfirstorder_godmodel.txt");
 //		test.AddEasyFirstOrderProcessIndex("wsj_2-21_godorder_features_MST2.model", System.getenv("CODEDATA")+File.separator+"wsj_2-21_godorder_processindex.txt", System.getenv("CODEDATA")+File.separator+"wsj_2-21_easyfirstorder_godmodel.txt");
-		test.AddEasyFirstOrderProcessIndex("mst_wsj2-21_2order_10iter_proj_51.model", System.getenv("CODEDATA")+File.separator+"wsj_2-21_godorder_processindex.txt", System.getenv("CODEDATA")+File.separator+"wsj_2-21_easyfirstorder_mstmodel.txt");
-
+//		test.AddEasyFirstOrderProcessIndex("mst_wsj2-21_2order_10iter_proj_51.model", System.getenv("CODEDATA")+File.separator+"wsj_2-21_godorder_processindex.txt", System.getenv("CODEDATA")+File.separator+"wsj_2-21_easyfirstorder_mstmodel.txt");
+//		test.AddEasyFirstOrderProcessIndex("mst_wsj2-21_2order_10iter_proj_51.model", System.getenv("CODEDATA")+File.separator+"wsj_00-01_godorder_processindex.txt", System.getenv("CODEDATA")+File.separator+"wsj_00-01_easyfirstorder_mstmodel.txt");
+//		test.AddEasyFirstOrderProcessIndex("wsj_2-21_malt_features_MST2_beam_1.model", System.getenv("CODEDATA")+File.separator+"wsj_00-01_godorder_processindex.txt", System.getenv("CODEDATA")+File.separator+"wsj_00-01_easyfirstorder_maltmodel.txt");
+		test.AddEasyFirstOrderProcessIndex("wsj_2-21_malt_features_MST2_beam_1.model", System.getenv("CODEDATA")+File.separator+"wsj_2-21_godorder_processindex.txt", System.getenv("CODEDATA")+File.separator+"wsj_2-21_easyfirstorder_maltmodel.txt");
 //		test.GenerateArcscoreSingleFile("ArcScore_Increase_wsj2-21train_wsj00-01test_first100sent.score", "Arcscore100sen_combinetest", "Increase");
 //		test.GenerateCombineBat("combile1-100.bat");
 
