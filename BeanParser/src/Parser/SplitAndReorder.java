@@ -3,10 +3,13 @@ package Parser;
 import java.io.File;
 import java.io.IOException;
 import java.util.Comparator;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
 import java.util.TreeMap;
+
+import com.sun.corba.se.impl.encoding.OSFCodeSetRegistry.Entry;
 
 import DataStructure.DependencyInstance;
 import IO.CONLLReader;
@@ -84,6 +87,8 @@ public class SplitAndReorder {
 					issplit[index]=true;
 			}
 		}
+		//fix bug, some fucking sentences have no punct as end !
+		issplit[issplit.length-1]=true;
 		return issplit;
 	}
 	public String CheckPos(String POS){
@@ -134,7 +139,7 @@ public class SplitAndReorder {
 		DependencyInstance di=reader.getNext();
 		while(di!=null){
 			boolean[] issplit=this.Split(di.postags);
-//			this.PrintSplit(issplit, di.forms);
+			this.PrintSplit(issplit, di.forms);
 			TIntIntHashMap neworder=this.Reorder(issplit, di.orders);
 			this.TranverseIntIntHashMapByValue(neworder);
 			di=reader.getNext();
@@ -151,16 +156,65 @@ public class SplitAndReorder {
 //			this.PrintSplit(issplit, di.forms);
 			TIntIntHashMap neworder=this.Reorder(issplit, di.orders);
 			di.orders=neworder;
-			this.TranverseIntIntHashMapByValue(di.orders);
+			//this.TranverseIntIntHashMapByValue(di.orders);
 			writer.write(di);
 			di=reader.getNext();
 		}
 		writer.finishWriting();
 	}
+	public int ReorderCheckForInstance(DependencyInstance di) throws IOException{
+		//check di.order[]
+		
+		int violationcount=0;
+		TIntIntHashMap child_order=new TIntIntHashMap();
+		for(int i=1;i<=di.orders.size();i++){
+			child_order.put(di.orders.get(i), i);
+		}
+		
+		HashMap<String,String> parent_childs=new HashMap<String,String>();
+		for(int i=1;i<di.length();i++){
+			String head=di.heads[i]+"";
+			if(parent_childs.containsKey(head)){
+				parent_childs.put(head, parent_childs.get(head)+"\t"+i);
+			}else{
+				parent_childs.put(head, i+"");
+			}
+		}
+		Iterator iterator=parent_childs.entrySet().iterator();
+		while(iterator.hasNext()){
+			Map.Entry<String, String> entry=(java.util.Map.Entry<String, String>) iterator.next();
+			int head=Integer.parseInt(entry.getKey());
+			String childs[]=entry.getValue().split("\t");
+			for(int i=0;i<childs.length;i++){
+				//check violation: di.order[head] < di.child[child]
+				int child=Integer.parseInt(childs[i]);
+				if(child_order.get(head)<child_order.get(child)){
+					violationcount++;
+				}
+			}
+		}
+		return violationcount;
+	}
+	public void ReorderViolationCheck(String conllfile) throws IOException{
+		CONLLReader reader=new CONLLReader();
+		reader.startReading(conllfile);
+		DependencyInstance di=reader.getNext();
+		int count=0;
+		while(di!=null){
+			count+=ReorderCheckForInstance(di);
+			di=reader.getNext();
+		}
+		System.out.println("reorder check file:"+conllfile);
+		System.out.println("Violation count:"+count);
+	}
 	public static void main(String args[]) throws IOException{
 		SplitAndReorder test=new SplitAndReorder();
 		//test.TestSplitter("1sen.txt");
 //		test.TestReorder("1sen.txt");
-		test.ReorderFile("1sen.txt", "1senreorder.txt");
+//		test.ReorderFile("wsj_2-21_godorder_processindex.txt", "wsj_2-21_godorder_processindex_reorder.txt");
+//		test.ReorderFile("wsj_00-01_godorder_processindex.txt", "wsj_00-01_godorder_processindex_reorder.txt");
+//		test.ReorderFile("wsj_2-21_easyfirstorder_maltmodel.txt", "wsj_2-21_easyfirstorder_maltmodel_reorder.txt");
+//		test.ReorderFile("wsj_00-01_easyfirstorder_maltmodel.txt", "wsj_00-01_easyfirstorder_maltmodel_reorder.txt");
+		test.ReorderViolationCheck(System.getenv("CODEDATA")+File.separator+"wsj_2-21_godorder_processindex_reorder.txt");
 	}
 }

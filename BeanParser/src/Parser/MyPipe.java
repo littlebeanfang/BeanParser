@@ -454,6 +454,7 @@ public class MyPipe extends DependencyPipe {
             //skip root node
             int parse_index = order_map.get(order_index);
             int parse_head = heads[parse_index];
+            System.out.println(parse_head+"->"+parse_index);
             extractFeatures(instance, parse_index, parse_head, pa, fv);
             pa.ChildProcess(parse_index, parse_head); //Yizhong: This ChildProcess() should be after the extractFeatures()
             pa.AddArc(parse_index, parse_head);
@@ -477,6 +478,7 @@ public class MyPipe extends DependencyPipe {
         DependencyInstance instance = reader.getNext();
         while (instance != null) {
             numInstances++;
+            System.out.print(numInstances+" ");
             String[] labs = instance.deprels;
             for (int i = 0; i < labs.length; i++) {
                 typeAlphabet.lookupIndex(labs[i]);
@@ -486,6 +488,7 @@ public class MyPipe extends DependencyPipe {
             if (options.createForest) writeInstance(instance, out);
             instance = reader.getNext();
         }
+        System.out.println();
         closeAlphabets();
         
         if (options.createForest) out.close();
