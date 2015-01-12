@@ -188,8 +188,9 @@ public class SplitAndReorder {
 			for(int i=0;i<childs.length;i++){
 				//check violation: di.order[head] < di.child[child]
 				int child=Integer.parseInt(childs[i]);
-				if(child_order.get(head)<child_order.get(child)){
+				if(child_order.get(head)<child_order.get(child)&&head!=0){
 					violationcount++;
+//					System.out.println("head:"+head+",child:"+child);
 				}
 			}
 		}
@@ -200,7 +201,10 @@ public class SplitAndReorder {
 		reader.startReading(conllfile);
 		DependencyInstance di=reader.getNext();
 		int count=0;
+		int instancecount=0;
 		while(di!=null){
+			instancecount++;
+//			System.out.println("sent:"+instancecount);
 			count+=ReorderCheckForInstance(di);
 			di=reader.getNext();
 		}
