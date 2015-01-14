@@ -66,11 +66,11 @@ public class Train {
 
             long end = System.currentTimeMillis();
             //System.out.println("Training iter took: " + (end-start));
-            System.out.println("|Time:" + (end - start) + "]");
-            Parser dp = new Parser(pipe, options, params);
-            System.out.print("Saving model for iteration "+i+" ...");
-            dp.saveModel(options.modelName+"_iter"+i);
-            System.out.println("done.");
+//            System.out.println("|Time:" + (end - start) + "]");
+//            Parser dp = new Parser(pipe, options, params);
+//            System.out.print("Saving model for iteration "+i+" ...");
+//            dp.saveModel(options.modelName+"_iter"+i);
+//            System.out.println("done.");
         }
 
         params.averageParams(i * numInstances);

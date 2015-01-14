@@ -15,6 +15,12 @@ import DataStructure.DependencyInstance;
 import IO.CONLLReader;
 import IO.WriteInstanceWithOrder;
 import gnu.trove.TIntIntHashMap;
+/**
+ * failed to improve easy first.
+ * But can reorder god and get close performance as malt
+ * @author Bean
+ *
+ */
 
 public class SplitAndReorder {
 	
@@ -218,7 +224,7 @@ public class SplitAndReorder {
 //		test.ReorderFile("wsj_2-21_godorder_processindex.txt", "wsj_2-21_godorder_processindex_reorder.txt");
 //		test.ReorderFile("wsj_00-01_godorder_processindex.txt", "wsj_00-01_godorder_processindex_reorder.txt");
 //		test.ReorderFile("wsj_2-21_easyfirstorder_maltmodel.txt", "wsj_2-21_easyfirstorder_maltmodel_reorder.txt");
-//		test.ReorderFile("wsj_00-01_easyfirstorder_maltmodel.txt", "wsj_00-01_easyfirstorder_maltmodel_reorder.txt");
-		test.ReorderViolationCheck(System.getenv("CODEDATA")+File.separator+"wsj_2-21_godorder_processindex_reorder.txt");
+		test.ReorderFile("wsj_00-01_easyfirstorder_godreorder.txt", "wsj_00-01_easyfirstorderfromgodreorder_reorder.txt");
+//		test.ReorderViolationCheck(System.getenv("CODEDATA")+File.separator+"wsj_2-21_malt_processindex.txt");
 	}
 }
