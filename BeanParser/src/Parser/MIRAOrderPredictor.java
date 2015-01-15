@@ -17,6 +17,7 @@ import DataStructure.Parameters;
 import DataStructure.ParseAgenda;
 import IO.CONLLReader;
 import IO.CONLLWriter;
+import IO.WriteInstanceWithOrder;
 import mstparser.Alphabet;
 
 /**
@@ -66,19 +67,21 @@ public class MIRAOrderPredictor {
 		FeatureVector fvforsent = new FeatureVector();
 		TIntIntHashMap order_child = new TIntIntHashMap();
 
-		int nodelength = di.length();// valid length
-		int node[] = new int[di.length() + 3];// in order to get position
+		int nodelength = di.length()-1;// valid length
+		int node[] = new int[di.length() + 2];// in order to get position
 												// i-1,i+1 and i+2
 		node[0] = -1;
-		node[di.length() + 1] = -1;
-		node[di.length() + 2] = -1;
+		node[nodelength + 1] = -1;
+		node[nodelength + 2] = -1;
 		for (int i = 1; i <= nodelength; i++) {
 			node[i] = i;
 		}
+		
 		while (nodelength > 0) {
 			// predict one node from node[1]~node[length]
 			FeatureVector fvmax = new FeatureVector();
 			int context[] = GetRelatedIndexs(node, 1);
+//			System.out.println("indexL:"+context[0]+",index:"+context[1]+"indexR:"+context[2]+"indexRR:"+context[3]);
 			ExtractFeature(di.postags, di.forms, context, fvmax, nodelength,1);
 			double scoremax = fvmax.getScore(this.param.parameters);
 			int selectindex = node[1];// index in sentence
@@ -98,8 +101,10 @@ public class MIRAOrderPredictor {
 			}
 
 			// store best fv and index in fvforsent and order_child
+//			System.out.println(fvmax.size());
 			fvforsent = fvforsent.cat(fvmax);
-			order_child.put(di.length() + 1 - nodelength, selectindex);
+//			System.out.println("order:"+(di.length() - nodelength)+",predict child:"+selectindex);
+			order_child.put(di.length() - nodelength, selectindex);
 			// delete the node in node[] and subtract node length
 			for (int i = selecti; i <= nodelength; i++) {
 				node[i] = node[i + 1];
@@ -108,6 +113,7 @@ public class MIRAOrderPredictor {
 		}
 
 		ret[0] = fvforsent;
+//		System.out.println(fvforsent.size());
 		ret[1] = order_child;
 		return ret;
 	}
@@ -122,26 +128,34 @@ public class MIRAOrderPredictor {
 		ret[3] = node[indexinnode + 2];
 		return ret;
 	}
-
+	public void tranverseTIntIntMap(TIntIntHashMap map){
+		System.out.println("len:"+map.size());
+		for(int i=1;i<=map.size();i++){
+			System.out.println("order:"+i+",child:"+map.get(i));
+		}
+	}
 	public void ExtractFeatureVectorByOrder(DependencyInstance di,
 			TIntIntHashMap order_child, FeatureVector fv) {
 		/*
 		 * according to the order loop: +get the feature vector for current
 		 * processing index +delete the process index
 		 */
-		int nodelength = di.length();// valid length
-		int node[] = new int[di.length() + 3];// in order to get position
+//		tranverseTIntIntMap(order_child);
+		int nodelength = di.length()-1;// valid length
+		int node[] = new int[nodelength + 3];// in order to get position
 												// i-1,i+1 and i+2
 		node[0] = -1;
-		node[di.length() + 1] = -1;
-		node[di.length() + 2] = -1;
+		node[nodelength + 1] = -1;
+		node[nodelength + 2] = -1;
 		for (int i = 1; i <= nodelength; i++) {
 			node[i] = i;
 		}
 		while (nodelength > 0) {
 			// extract feature of one node
-			int childindexinsentence = order_child.get(di.length() + 1
+			int childindexinsentence = order_child.get(di.length() 
 					- nodelength);
+//			System.out.println("child index:"+childindexinsentence+",order:"+(di.length()
+//					- nodelength));
 			int[] context = GetRelatedIndexByValue(node, childindexinsentence);
 			ExtractFeature(di.postags, di.forms, context, fv, nodelength,context[4]);
 			// delete the node in node[] and subtract node length
@@ -184,7 +198,7 @@ public class MIRAOrderPredictor {
 		int index = context[1];
 		int indexR = context[2];
 		int indexRR = context[3];
-		
+//		System.out.println("indexL:"+indexL+", index:"+index+", indexR:"+indexR+",indexRR:"+indexRR);
 		AddPositionFeature(positioninnode, fv);
 		// feat: i
 		if (index != -1) {
@@ -198,6 +212,7 @@ public class MIRAOrderPredictor {
 		}
 		//feat: i,i+1
 		if(index!=-1&&indexR!=-1){
+			
 			AddSRFeature(forms, poss, index, indexR, fv, nodelength);
 		}
 		if(index!=-1&&indexR!=-1&&indexRR!=-1){
@@ -265,14 +280,23 @@ public class MIRAOrderPredictor {
 	public int CountReverse(TIntIntHashMap hm1, TIntIntHashMap hm2) {
 		// reverse pair number as error function
 		// get mapping array
+//		System.out.println("hm1");
+//		tranverseTIntIntMap(hm1);
+//		System.out.println("hm2");
+//		tranverseTIntIntMap(hm2);
 		int array[] = new int[hm1.size()];
 		TIntIntHashMap hm2_child_order = new TIntIntHashMap();
-		for (int i = 0; i < hm2.size(); i++) {
+		for (int i = 1; i <= hm2.size(); i++) {
 			hm2_child_order.put(hm2.get(i), i);
 		}
-		for (int i = 1; i < hm2.size(); i++) {
+		for (int i = 1; i <= hm2.size(); i++) {
 			array[i - 1] = hm1.get(hm2_child_order.get(i));
 		}
+//		System.out.print("array:");
+//		for(int i=0;i<hm1.size();i++){
+//			System.out.print(array[i]+"\t");
+//		}
+//		System.out.println();
 		// count reverse
 		BinaryMergeSort sort = new BinaryMergeSort();
 		sort.mergesort(array, 0, array.length - 1);
@@ -285,6 +309,8 @@ public class MIRAOrderPredictor {
 		 * every instance from conll 2.extract feature vector of instance
 		 * 3.close alphabet, stop growth 4.init param
 		 */
+		System.out.println("Creating alphabet start...");
+		long start=System.currentTimeMillis();
 		int numofinstance = 0;
 		CONLLReader reader = new CONLLReader();
 		reader.startReading(orderedconll);
@@ -294,6 +320,9 @@ public class MIRAOrderPredictor {
 			ExtractFeatureVectorByOrder(di, di.orders, new FeatureVector());
 			di = reader.getNext();
 		}
+		long end=System.currentTimeMillis();
+		System.out.println("Done. num of feat:"+orderfeat.size()+". Time:"+(end-start)/1000+" seconds.");
+		param = new Parameters(orderfeat.size());
 		orderfeat.stopGrowth();
 		return numofinstance;
 	}
@@ -304,8 +333,8 @@ public class MIRAOrderPredictor {
 		 * 1. creating alphabet and init param 2. as setting iter nummber, call
 		 * train iter
 		 */
+		this.orderfeat=new Alphabet();
 		int numofinst = CreatingAlphabet(orderedconll);
-		param = new Parameters(numofinst);
 		for (int i = 1; i <= iter; i++) {
 			TrainIter(numofinst, orderedconll, i, iter);
 		}
@@ -315,29 +344,43 @@ public class MIRAOrderPredictor {
 
 	public void Predict(String orderconll, String modelfile, String writefile)
 			throws ClassNotFoundException, IOException {
+		long start=System.currentTimeMillis();
 		MIRAOrderPredictor predictor = new MIRAOrderPredictor();
 		predictor.loadmodel(modelfile);
 		CONLLReader reader = new CONLLReader();
 		reader.startReading(orderconll);
-		CONLLWriter writer = new CONLLWriter(true);
+		WriteInstanceWithOrder writer = new WriteInstanceWithOrder();
 		writer.startWriting(writefile);
 		DependencyInstance di = reader.getNext();
 		int instcount = 0;
+		int reversecount=0;
 		while (di != null) {
 			instcount++;
 			TIntIntHashMap predictorder = (TIntIntHashMap) predictor
 					.PredictOrderByCurrentParam(di)[1];
+			reversecount+=this.CountReverse(di.orders, predictorder);
+			/*
 			System.out.println("sent " + instcount + ":"
 					+ this.CountReverse(di.orders, predictorder)
 					+ " reverse orders.");
+					*/
 			// write childs !
+			/*
 			writer.write(new DependencyInstance(RemoveRoot(di.forms),
 					RemoveRoot(di.lemmas), RemoveRoot(di.cpostags),
 					RemoveRoot(di.postags), di.feats, RemoveRoot(di.deprels),
 					RemoveRoot(di.heads), predictorder));
+					*/
+//			System.out.println("predict order");
+//			tranverseTIntIntMap(predictorder);
+//			System.out.println("===========");
+			di.orders=predictorder;
+			writer.write(di);
 			di = reader.getNext();
 		}
 		writer.finishWriting();
+		long end=System.currentTimeMillis();
+		System.out.println("Predict Done.\nTime:"+(end-start)/1000+".\nReversecount:"+reversecount);
 	}
 
 	private String[] RemoveRoot(String[] form) {
@@ -361,6 +404,8 @@ public class MIRAOrderPredictor {
 		/*
 		 * 1. process every instance 2. call hildreth 3. fv.update param
 		 */
+		System.out.println("Iter: "+curiter);
+		long start=System.currentTimeMillis();
 		int numUpd = 0;
 		CONLLReader reader = new CONLLReader();
 		reader.startReading(trainfile);
@@ -396,6 +441,8 @@ public class MIRAOrderPredictor {
 			}
 			inst = reader.getNext();
 		}
+		long end=System.currentTimeMillis();
+		System.out.println("=========================Time:"+(end-start)/1000);
 	}
 
 	private double[] hildreth(FeatureVector[] a, double[] b) {
@@ -479,4 +526,13 @@ public class MIRAOrderPredictor {
 
 		return alpha;
 	}
+	
+	public static void main(String args[]) throws IOException, ClassNotFoundException{
+		MIRAOrderPredictor test=new MIRAOrderPredictor();
+//		test.Train("1sen.txt", 20, "1senorderpredict.model");
+//		test.Predict("1sen.txt", "1senorderpredict.model", "1senorderpredict.order");
+		test.Train("wsj_2-21_malt_processindex.txt", 10, "wsj_2-21_malt_orderpredictor.model");
+		test.Predict("wsj_00-01_malt_processindex.txt", "wsj_2-21_malt_orderpredictor.model", "wsj_00-01_malt_orderpredictor.order");
+	}
+	
 }

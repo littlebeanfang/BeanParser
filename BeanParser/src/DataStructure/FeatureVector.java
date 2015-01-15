@@ -220,7 +220,17 @@ public final class FeatureVector extends TLinkedList {
 	}
     }
 
-
+    public int size(){
+    	int count=0;
+    	if(subfv1!=null){
+    		count+=subfv1.size();
+    	}
+    	if(subfv2!=null){
+    		count+=subfv2.size();
+    	}
+    	count+=super.size();
+    	return count;
+    }
     public final String toString() {
 	StringBuilder sb = new StringBuilder();
 	toString(sb);
