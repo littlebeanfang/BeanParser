@@ -1,6 +1,7 @@
 package Parser;
 
 import java.io.BufferedInputStream;
+import java.io.BufferedOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
@@ -8,7 +9,9 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
+import java.util.HashMap;
 import java.util.Iterator;
+import java.util.Map;
 
 import gnu.trove.TIntIntHashMap;
 import DataStructure.DependencyInstance;
@@ -50,8 +53,8 @@ public class MIRAOrderPredictor {
 	}
 
 	public void savemodel(String modelfile) throws IOException {
-		ObjectOutputStream out = new ObjectOutputStream(new FileOutputStream(
-				modelfile));
+		ObjectOutputStream out = new ObjectOutputStream(new BufferedOutputStream(new FileOutputStream(
+				modelfile)));
 		out.writeObject(param.parameters);
 		out.writeObject(orderfeat);
 		System.out.println("Model saved!");
@@ -199,7 +202,8 @@ public class MIRAOrderPredictor {
 		int indexR = context[2];
 		int indexRR = context[3];
 //		System.out.println("indexL:"+indexL+", index:"+index+", indexR:"+indexR+",indexRR:"+indexRR);
-		AddPositionFeature(positioninnode, fv);
+//		System.out.println("index:"+index+",form:"+forms[index]+",positioninnode:"+positioninnode);
+		AddPositionFeature(positioninnode, fv,forms.length-1);
 		// feat: i
 		if (index != -1) {
 			AddSelfFeature(forms, poss, index, fv, nodelength);
@@ -220,7 +224,7 @@ public class MIRAOrderPredictor {
 		}
 	}
 	
-	private void AddPositionFeature(int positioninnode,FeatureVector fv){
+	private void AddPositionFeature(int positioninnode,FeatureVector fv,int sentlength){
 		//position is important, so set value as 1.0
 		add("Order_Position_"+positioninnode, fv, 1.0);
 	}
@@ -270,7 +274,7 @@ public class MIRAOrderPredictor {
 		String formfeat = prefix.append("_form1_").append(forms[index])
 				.append("_form2_").append(forms[indexR]).append("_form3_")
 				.append(forms[indexRR]).toString();
-		add(formfeat, fv, value);
+//		add(formfeat, fv, value);
 		String posfeat = prefix.append("_pos1_").append(forms[index])
 				.append("_pos2_").append(forms[indexR]).append("_pos3_")
 				.append(forms[indexRR]).toString();
@@ -301,6 +305,64 @@ public class MIRAOrderPredictor {
 		BinaryMergeSort sort = new BinaryMergeSort();
 		sort.mergesort(array, 0, array.length - 1);
 		return sort.nixuNum;
+	}
+	public int CountOrderSquareDist(TIntIntHashMap hm1, TIntIntHashMap hm2) {
+		// reverse pair number as error function
+		// get mapping array
+//		System.out.println("hm1");
+//		tranverseTIntIntMap(hm1);
+//		System.out.println("hm2");
+//		tranverseTIntIntMap(hm2);
+		int count=0;
+		TIntIntHashMap hm1_child_order = new TIntIntHashMap();
+		for (int i = 1; i <= hm1.size(); i++) {
+			hm1_child_order.put(hm1.get(i), i);
+		}
+		TIntIntHashMap hm2_child_order = new TIntIntHashMap();
+		for (int i = 1; i <= hm2.size(); i++) {
+			hm2_child_order.put(hm2.get(i), i);
+		}
+		for(int i=1;i<=hm1.size();i++){
+			int dist=hm2_child_order.get(i)-hm1_child_order.get(i);
+			count+=dist*dist;
+		}
+		return count;
+	}
+	
+	public int ViolationCount(DependencyInstance di,TIntIntHashMap order_child) throws IOException{
+		//check di.order[]
+		
+		int violationcount=0;
+		
+		TIntIntHashMap child_order=new TIntIntHashMap();
+		for(int i=1;i<=order_child.size();i++){
+			child_order.put(order_child.get(i), i);
+		}
+		
+		HashMap<String,String> parent_childs=new HashMap<String,String>();
+		for(int i=1;i<di.length();i++){
+			String head=di.heads[i]+"";
+			if(parent_childs.containsKey(head)){
+				parent_childs.put(head, parent_childs.get(head)+"\t"+i);
+			}else{
+				parent_childs.put(head, i+"");
+			}
+		}
+		Iterator iterator=parent_childs.entrySet().iterator();
+		while(iterator.hasNext()){
+			Map.Entry<String, String> entry=(java.util.Map.Entry<String, String>) iterator.next();
+			int head=Integer.parseInt(entry.getKey());
+			String childs[]=entry.getValue().split("\t");
+			for(int i=0;i<childs.length;i++){
+				//check violation: di.order[head] < di.child[child]
+				int child=Integer.parseInt(childs[i]);
+				if(child_order.get(head)<child_order.get(child)&&head!=0){
+					violationcount++;
+//					System.out.println("head:"+head+",child:"+child);
+				}
+			}
+		}
+		return violationcount;
 	}
 
 	public int CreatingAlphabet(String orderedconll) throws IOException {
@@ -333,6 +395,7 @@ public class MIRAOrderPredictor {
 		 * 1. creating alphabet and init param 2. as setting iter nummber, call
 		 * train iter
 		 */
+		System.out.println("Train iter:"+iter);
 		this.orderfeat=new Alphabet();
 		int numofinst = CreatingAlphabet(orderedconll);
 		for (int i = 1; i <= iter; i++) {
@@ -354,11 +417,17 @@ public class MIRAOrderPredictor {
 		DependencyInstance di = reader.getNext();
 		int instcount = 0;
 		int reversecount=0;
+		int CN2count=0;//for normalization
+		double percentageaccumulatation=0.0;
 		while (di != null) {
 			instcount++;
 			TIntIntHashMap predictorder = (TIntIntHashMap) predictor
 					.PredictOrderByCurrentParam(di)[1];
-			reversecount+=this.CountReverse(di.orders, predictorder);
+			int reversetemp=this.CountReverse(di.orders, predictorder);
+			reversecount+=reversetemp;
+			int CN2temp=(di.length()-1)*(di.length()-2)/2;
+			CN2count+=CN2temp;
+			percentageaccumulatation+=(double)reversetemp/CN2temp;
 			/*
 			System.out.println("sent " + instcount + ":"
 					+ this.CountReverse(di.orders, predictorder)
@@ -380,7 +449,7 @@ public class MIRAOrderPredictor {
 		}
 		writer.finishWriting();
 		long end=System.currentTimeMillis();
-		System.out.println("Predict Done.\nTime:"+(end-start)/1000+".\nReversecount:"+reversecount);
+		System.out.println("Predict Done.\nTime:"+(end-start)/1000+".\nReversecount:"+reversecount+".\nCN2count:"+CN2count+"\npercentage:"+percentageaccumulatation/instcount);
 	}
 
 	private String[] RemoveRoot(String[] form) {
@@ -418,26 +487,33 @@ public class MIRAOrderPredictor {
 			if (currentInstance % 500 == 0) {
 				System.out.print(currentInstance + ",");
 			}
-			FeatureVector fv = new FeatureVector();
-			ExtractFeatureVectorByOrder(inst, inst.orders, fv);
-			inst.setFeatureVector(fv);
-
-			double upd = (double) (iter * numInstances
-					- (numInstances * (curiter - 1) + currentInstance) + 1);
-
-			Object[] ret = PredictOrderByCurrentParam(inst);
-			FeatureVector fvpredict = (FeatureVector) ret[0];
-			TIntIntHashMap order_predict = (TIntIntHashMap) ret[1];
-			int K = 1;
-			FeatureVector[] dist = new FeatureVector[K];
-			dist[0] = fv.getDistVector(fvpredict);
-			double[] b = new double[K];
-			b[0] = (double) CountReverse(order_predict, inst.orders)
-					- (fv.getScore(param.parameters) - fvpredict
-							.getScore(param.parameters));
-			double[] alpha = hildreth(dist, b);
-			for (int k = 0; k < K; k++) {
-				dist[k].update(param.parameters, param.total, alpha[k], upd);
+			int lastpunish=1;
+			int punish=2;
+			while(punish>0&&punish!=lastpunish){
+//				System.out.println("punish="+punish);
+				FeatureVector fv = new FeatureVector();
+				ExtractFeatureVectorByOrder(inst, inst.orders, fv);
+				inst.setFeatureVector(fv);
+	
+				double upd = (double) (iter * numInstances
+						- (numInstances * (curiter - 1) + currentInstance) + 1);
+	
+				Object[] ret = PredictOrderByCurrentParam(inst);
+				FeatureVector fvpredict = (FeatureVector) ret[0];
+				TIntIntHashMap order_predict = (TIntIntHashMap) ret[1];
+				int K = 1;
+				FeatureVector[] dist = new FeatureVector[K];
+				dist[0] = fv.getDistVector(fvpredict);
+				double[] b = new double[K];
+				lastpunish=punish;
+				punish=CountReverse(order_predict, inst.orders)+ViolationCount(inst, order_predict)+CountOrderSquareDist(order_predict, inst.orders);
+				b[0] = (double) punish/inst.length()
+						- (fv.getScore(param.parameters) - fvpredict
+								.getScore(param.parameters));
+				double[] alpha = hildreth(dist, b);
+				for (int k = 0; k < K; k++) {
+					dist[k].update(param.parameters, param.total, alpha[k], upd);
+				}
 			}
 			inst = reader.getNext();
 		}
@@ -527,12 +603,36 @@ public class MIRAOrderPredictor {
 		return alpha;
 	}
 	
+	public void BatRun(String args[]) throws ClassNotFoundException, IOException{
+		//args: train-file, iter-num, model-name, test-file, order-file
+		System.out.println("train-file:"+args[0]);
+		System.out.println("iter-num:"+args[1]);
+		System.out.println("model-name£º"+args[2]);
+		System.out.println("test-file:"+args[3]);
+		System.out.println("order-file:"+args[4]);
+		MIRAOrderPredictor test=new MIRAOrderPredictor();
+		test.Train(args[0], Integer.parseInt(args[1]), args[2]);
+		test.Predict(args[3], args[2], args[4]);
+	}
+	public void BatTest(String args[]) throws ClassNotFoundException, IOException{
+		System.out.println("model-name£º"+args[0]);
+		System.out.println("test-file:"+args[1]);
+		System.out.println("order-file:"+args[2]);
+		MIRAOrderPredictor test=new MIRAOrderPredictor();
+		test.Predict(args[1], args[0], args[2]);
+		
+	}
 	public static void main(String args[]) throws IOException, ClassNotFoundException{
 		MIRAOrderPredictor test=new MIRAOrderPredictor();
-//		test.Train("1sen.txt", 20, "1senorderpredict.model");
+//		test.Train("1sen.txt", 1, "1senorderpredict.model");
 //		test.Predict("1sen.txt", "1senorderpredict.model", "1senorderpredict.order");
-		test.Train("wsj_2-21_malt_processindex.txt", 10, "wsj_2-21_malt_orderpredictor.model");
-		test.Predict("wsj_00-01_malt_processindex.txt", "wsj_2-21_malt_orderpredictor.model", "wsj_00-01_malt_orderpredictor.order");
+		
+		System.out.println("change punish function");
+		test.Train("wsj_2-21_malt_processindex.txt", 4, "wsj_2-21_malt_orderpredictor_chgcost4.model");
+		test.Predict("wsj_00-01_malt_processindex.txt", "wsj_2-21_malt_orderpredictor_chgcost4.model", "wsj_00-01_malt_orderpredictor_chgcost4.order");
+		
+//		test.BatRun(args);
+//		test.BatTest(args);
 	}
 	
 }
