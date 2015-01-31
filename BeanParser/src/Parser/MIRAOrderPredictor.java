@@ -631,9 +631,9 @@ public class MIRAOrderPredictor {
 //		test.Train("1sen.txt", 1, "1senorderpredict.model");
 //		test.Predict("1sen.txt", "1senorderpredict.model", "1senorderpredict.order");
 		
-		System.out.println("change punish function");
-		test.Train("wsj_2-21_malt_processindex.txt", 4, "wsj_2-21_malt_orderpredictor_chgcost4.model");
-		test.Predict("wsj_00-01_malt_processindex.txt", "wsj_2-21_malt_orderpredictor_chgcost4.model", "wsj_00-01_malt_orderpredictor_chgcost4.order");
+		System.out.println("debug 2015-1-31, and all punish.");
+		test.Train("wsj_2-21_malt_processindex.txt", 4, "wsj_2-21_malt_orderpredictor_debug.model");
+		test.Predict("wsj_00-01_malt_processindex.txt", "wsj_2-21_malt_orderpredictor_debug.model", "wsj_00-01_malt_orderpredictor_debug.order");
 		
 //		test.BatRun(args);
 //		test.BatTest(args);
