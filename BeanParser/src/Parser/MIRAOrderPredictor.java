@@ -105,7 +105,9 @@ public class MIRAOrderPredictor {
 
 			// store best fv and index in fvforsent and order_child
 //			System.out.println(fvmax.size());
+			/*Debug2015-1-31
 			fvforsent = fvforsent.cat(fvmax);
+			*/
 //			System.out.println("order:"+(di.length() - nodelength)+",predict child:"+selectindex);
 			order_child.put(di.length() - nodelength, selectindex);
 			// delete the node in node[] and subtract node length
@@ -114,7 +116,9 @@ public class MIRAOrderPredictor {
 			}
 			nodelength--;
 		}
-
+		//Debug2015-1-31: the feature vector here should not cat the feature above !!
+		//should just extract by function extractFeatureByOrder, to assign value to features
+		ExtractFeatureVectorByOrder(di, order_child, fvforsent);
 		ret[0] = fvforsent;
 //		System.out.println(fvforsent.size());
 		ret[1] = order_child;
