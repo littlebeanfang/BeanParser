@@ -12,6 +12,8 @@
 
 package IO;
 
+import gnu.trove.TIntIntHashMap;
+
 import java.io.*;
 import java.text.DecimalFormat;
 
@@ -60,6 +62,38 @@ public class CONLLWriter extends DependencyWriter {
 	writer.newLine();
 
     }
+    
+    public void write(DependencyInstance instance, TIntIntHashMap order_child) throws IOException {
+    	TIntIntHashMap child_order=new TIntIntHashMap();
+    	for(int i=1;i<=order_child.size();i++){
+    		child_order.put(order_child.get(i), i);
+    	}
+        DecimalFormat df = null;
+        if (instance.confidenceScores != null){
+    		df = new DecimalFormat();
+    		df.setMaximumFractionDigits(3);
+    	}
+    	for (int i=0; i<instance.length(); i++) {
+    	    writer.write(Integer.toString(i+1));                writer.write('\t');
+    	    writer.write(instance.forms[i]);                    writer.write('\t');
+    	    writer.write(instance.forms[i]);                    writer.write('\t');
+    	    //writer.write(instance.cpostags[i]);                 writer.write('\t');
+    	    writer.write(instance.postags[i]);                  writer.write('\t');
+    	    writer.write(instance.postags[i]);                  writer.write('\t');
+    	    writer.write("-");                                  writer.write('\t');
+    	    writer.write(Integer.toString(instance.heads[i]));  writer.write('\t');
+    	    writer.write(instance.deprels[i]);                  writer.write('\t');
+    	    writer.write("-\t-");
+    	    writer.write("\t"+child_order.get(i+1));
+    	    if (instance.confidenceScores != null){
+    	    	writer.write('\t');
+    	    	writer.write(df.format(instance.confidenceScores[i]));
+    	    }
+    	    writer.newLine();
+    	}
+    	writer.newLine();
+
+        }
 
 
 }
