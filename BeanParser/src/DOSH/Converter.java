@@ -5,13 +5,11 @@ import java.io.IOException;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
-import java.util.Queue;
 import java.util.Stack;
 
 import DataStructure.DependencyInstance;
 import IO.CONLLReader;
 import IO.CONLLWriter;
-import gnu.trove.TFloatArrayList;
 import gnu.trove.TIntIntHashMap;
 
 /**
@@ -60,13 +58,17 @@ public class Converter {
 					//end of sentence but cannot shift any more
 					//Swap is needed, pop until one node can be done
 					Stack<Integer> temp=new Stack<Integer>();
+					int depthofswap=0;
+					
 					while(true){
 						temp.push(buf.pop());
+						depthofswap++;
 						int swaptop=buf.peek();
 						if(!refcount.contains(swaptop)){
 							//DO and recover the buf stack
 							ret.put(ordercount++, swaptop);
 							System.out.println("DO+"+swaptop+" ");
+							System.out.println("swapdepth:"+depthofswap);
 							int headref=di.heads[swaptop];
 							int headrefcount=refcount.get(headref);
 							if(headrefcount==1){
@@ -125,7 +127,6 @@ public class Converter {
 			sencount++;
 		}
 		writer.finishWriting();
-		
 	}
 	private String[] RemoveRoot(String[] form) {
         String[] ret = new String[form.length - 1];
@@ -248,13 +249,4 @@ public class Converter {
 		System.out.println("=======================================");
 	}
 	
-	public static void main(String args[]) throws IOException{
-		Converter testConverter=new Converter();
-//		testConverter.GenerateDOSHOrder("WSJ//wsj_00-01.conll", "wsj_00-01.dosh");
-//		testConverter.GenerateDOSHOrder("WSJ//wsj_2-21.conll", "wsj_2-21.dosh");
-		testConverter.GenerateDOSHOrder("dutch_alpino_train.conll", "dutch_train.dosh");
-//		testConverter.OrderCompare("WSJ//wsj_2-21_malt_processindex_new.txt", "wsj_2-21.dosh");
-//		testConverter.OrderCompare("WSJ//wsj_2-21_malt_processindex.txt", "wsj_2-21.dosh");
-		testConverter.OrderCompare("dutch_train_processindex.txt", "dutch_train.dosh");
-	}
 }
