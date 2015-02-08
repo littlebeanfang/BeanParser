@@ -14,6 +14,8 @@ public class ParseAgenda {
 	private int[] numofrightchild;
 	private StringBuilder[] rightchilds;
 	private StringBuilder[] leftchilds;
+	public int[] leftmostchilds;
+	public int[] rightmostchilds;
 	private Alphabet typealphabet;
 	private int[] set; // set: disjoint-set data structure, stores the parent of each node
 	private int length;
@@ -26,11 +28,15 @@ public class ParseAgenda {
 		numofrightchild = new int[length];
 		rightchilds = new StringBuilder[length];
 		leftchilds = new StringBuilder[length];
+		leftmostchilds = new int[length];
+		rightmostchilds = new int[length];
 		set = new int[length];
 		for (int i = 0;i < length;i++) {
 			set[i] = i;
 			rightchilds[i] = new StringBuilder();
 			leftchilds[i] = new StringBuilder();
+			leftmostchilds[i]=-1;
+			rightmostchilds[i]=-1;
 		}
 		this.length = length;
 		fv = new FeatureVector();
@@ -157,7 +163,11 @@ public class ParseAgenda {
 //        }
 		if(childindex<parentindex){
         	//LA
+			
 			numofleftchild[parentindex]++;
+			if(leftmostchilds[parentindex]>childindex||leftmostchilds[parentindex]==-1){
+				leftmostchilds[parentindex]=childindex;
+			}
         	
 			if (leftchilds[parentindex].length() == 0)
 				leftchilds[parentindex].append(childindex);
@@ -166,6 +176,9 @@ public class ParseAgenda {
         }else{
         	//RA
 			numofrightchild[parentindex]++;
+			if(rightmostchilds[parentindex]<childindex){
+				rightmostchilds[parentindex]=childindex;
+			}
         	
 			if (rightchilds[parentindex].length() == 0)
 				rightchilds[parentindex].append(childindex);
