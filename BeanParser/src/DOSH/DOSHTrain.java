@@ -3,13 +3,19 @@ package DOSH;
 import gnu.trove.TIntIntHashMap;
 
 import java.io.File;
+import java.io.FileOutputStream;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.io.ObjectOutputStream;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Stack;
 
+import de.bwaldvogel.liblinear.InvalidInputDataException;
+import de.bwaldvogel.liblinear.Parameter;
+import de.bwaldvogel.liblinear.Problem;
+import de.bwaldvogel.liblinear.Train;
 import mstparser.Alphabet;
 import DataStructure.DependencyInstance;
 import DataStructure.FeatureVector;
@@ -409,7 +415,7 @@ public class DOSHTrain {
     	return rightmostchild;
     	*/
     }
-    public void GenerateLiblinearAndOrderFile(String conllfile,String liblinearfile, String orderfile) throws IOException{
+    public void GenerateLiblinearAndOrderFile(String conllfile,String liblinearfile, String orderfile,String alphabetfile) throws IOException{
     	CONLLReader reader=new CONLLReader();
     	reader.ordered=false;
     	System.out.println(conllfile);
@@ -438,6 +444,13 @@ public class DOSHTrain {
     		sentcount++;
     	}
     	doshAlphabet.stopGrowth();
+    	File alphabetout=new File(alphabetfile);
+    	if(!alphabetout.exists()){
+    		alphabetout.createNewFile();
+    	}
+        ObjectOutputStream out = new ObjectOutputStream(new FileOutputStream( alphabetfile));
+        out.writeObject(doshAlphabet);
+        out.close();
     	System.out.println("Number of Doshfeature:"+(doshAlphabet.size()-1));
     	writer.finishWriting();
     	libwriter.close();
@@ -456,4 +469,12 @@ public class DOSHTrain {
         }
         return ret;
     }
+	
+	public void TrainLiblinear(String libinstfilestring, String modelname) throws IOException, InvalidInputDataException{
+		Train train=new Train();
+//		File libinstfile=new File(libinstfilestring);
+//        train.readProblem(libinstfile,-1.0);
+        //train.main(new String[] {"-v", "10", "-c", "10", "-w1", "1.234", "-s","4",libinstfilestring,modelname});
+		train.main(new String[] { "-v", "10","-c", "1", "-e", "0.1", "-s","4",libinstfilestring,modelname});
+	}
 }
