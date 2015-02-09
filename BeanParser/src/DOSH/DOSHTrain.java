@@ -2,10 +2,14 @@ package DOSH;
 
 import gnu.trove.TIntIntHashMap;
 
+import java.io.BufferedInputStream;
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -36,6 +40,13 @@ public class DOSHTrain {
 	public DOSHTrain(){
 		doshAlphabet=new Alphabet();
 		doshAlphabet.lookupIndex("beanbeanjiangO(กษ_กษ)O");
+	}
+	public DOSHTrain(String alphabetfile) throws  IOException, ClassNotFoundException{
+		//for extract feature
+		ObjectInputStream in = new ObjectInputStream(new BufferedInputStream(new FileInputStream(alphabetfile)));
+        doshAlphabet=(Alphabet) in.readObject();
+        in.close();
+        doshAlphabet.stopGrowth();
 	}
 	/**
 	 * take dependency instance as input, according to the parse tree to generate:
