@@ -486,6 +486,6 @@ public class DOSHTrain {
 //		File libinstfile=new File(libinstfilestring);
 //        train.readProblem(libinstfile,-1.0);
         //train.main(new String[] {"-v", "10", "-c", "10", "-w1", "1.234", "-s","4",libinstfilestring,modelname});
-		train.main(new String[] { "-v", "10","-c", "1", "-e", "0.1", "-s","4",libinstfilestring,modelname});
+		train.main(new String[] { "-c", "1", "-e", "0.1", "-s","4",libinstfilestring,modelname});
 	}
 }
