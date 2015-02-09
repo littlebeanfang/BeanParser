@@ -112,7 +112,7 @@ public class DOSHParse {
     	Model libModel=Model.load(new File(libmodelfile));
     	DOSHTrain featextract=new DOSHTrain(alphagetfile);
     	FeatureVector fv=new FeatureVector();
-    	int node[]={0,1,2,3,4,5,6,7,8,9,10,11,12,-1};
+    	int node[]={0,1,2,3,4,5,6,7,8,9,10,11,12,13,-1};
     	featextract.ExtractDoshFeature(di, new HashSet(), new ParseAgenda(di.length()), node, 1, fv);
     	LiblinearInstance test=new LiblinearInstance(fv);
     	double predict=Linear.predict(libModel, test.TransformXfeat());
