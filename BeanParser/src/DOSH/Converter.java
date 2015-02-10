@@ -241,7 +241,7 @@ public class Converter {
 			if(di2==null){
 				System.out.println("Error: The sentence is not the same.");
 			}
-			reversecount+=ViolationCount(di1, di2.orders);
+			reversecount+=CountReverse(di1.orders, di2.orders);
 			di1=reader1.getNext();
 			di2=reader2.getNext();
 		}

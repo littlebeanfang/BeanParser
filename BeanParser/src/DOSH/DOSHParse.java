@@ -10,7 +10,12 @@ import mstparser.Alphabet;
 import DataStructure.DependencyInstance;
 import DataStructure.FeatureVector;
 import DataStructure.ParseAgenda;
+import DataStructure.ParserOptions;
 import IO.CONLLReader;
+import IO.CONLLWriter;
+import Parser.Decoder;
+import Parser.MyPipe;
+import Parser.Parser;
 
 /**
  * This class parsing while predicting order.
@@ -20,90 +25,192 @@ import IO.CONLLReader;
  *
  */
 public class DOSHParse {
-	private Alphabet doshalphabeAlphabet;
-	private final int DO=1;
-	private final int UNDO=2;
+	private Model libModel;
+	public Parser beanParser;//store pipe 
+	private Decoder decoder;
+	private DOSHTrain featextractor;//init with doshalphabet,only used to extract features
+	private static final int DO=1;
+	private static final int UNDO=2;
 	
-	public DOSHParse(String doshalphabetfile,  String liblinearmodel, String beanmodel){
+	public DOSHParse(String doshalphabetfile,  String liblinearmodel, String[] beanargs) throws Exception{
 		//load model and init params
+		ParserOptions options = new ParserOptions(beanargs);
+		MyPipe dp=new MyPipe(options);
+		beanParser=new Parser(dp,options);
+		beanParser.loadModel(options.modelName);
+		decoder=new Decoder(beanParser.pipe, beanParser.GetParameters(), options);
+		libModel=Model.load(new File(System.getenv("CODEDATA")+File.separator+liblinearmodel));
+		featextractor=new DOSHTrain(System.getenv("CODEDATA")+File.separator+doshalphabetfile);
 	}
+	/*
 	public DOSHParse(){
-		
+		//!only for test libpredict
 	}
-	public void DecodeOneInstance(DependencyInstance di){
+	*/
+	public ParseAgenda DecodeOneInstance(DependencyInstance di){
+		//params that need not update
+		int senlength=di.length()-1;
+		//params that need update
 		boolean toright=true; //flag for the direction of indexpointer
-		boolean reachend=false; //flag for no more shift is allowed
+		boolean backtracefailed=false;
+		int indexpointer=0;
+		int[] node=new int[senlength+2];
+		ParseAgenda pa=new ParseAgenda(di.length());
+		HashSet donechild=new HashSet();//store the nodes that has been done
+		//store the max predict value of DO action of backtrace nodes
+		int backtracemaxindex=-1;
+		double backtracemaxvalue=Double.MIN_VALUE;
+		//init node
+		for(int i=0;i<senlength+1;i++){
+			node[i]=i;
+		}
+		node[senlength+1]=-1;
 		
+		//legend is begining, fighting bean!
+		while(donechild.size()>senlength-1){//last element must do
+			int endindexinnode=senlength-donechild.size();//0-endindex
+			FeatureVector fv=new FeatureVector();
+			featextractor.ExtractDoshFeature(di, donechild, pa, node, indexpointer, fv);
+			double[] predict=PredictAction(fv);
+			int action=(int) predict[0];
+			if(backtracefailed==true){
+				//read backtrace,to get index to do
+				if(backtracemaxindex!=-1){
+					action=DOSHParse.DO;
+					indexpointer=backtracemaxindex;
+					backtracemaxindex=-1;
+					backtracemaxvalue=Double.MIN_VALUE;
+				}else{
+					System.out.println("=====How come backtracemaxindex is -1 ?");
+				}
+			}
+			if(action==DOSHParse.DO){
+				//no need to know the fv, and the predicted relation is stored in di
+				int head=(int) decoder.FindHeadForOneWord(di, indexpointer, pa)[0];
+				pa.ChildProcess(indexpointer, head);
+				donechild.add(indexpointer);
+				
+			}else if(action==DOSHParse.UNDO&&toright==false){
+				double predictvalue=predict[1];
+				if(predictvalue>backtracemaxvalue){
+					backtracemaxindex=indexpointer;
+					backtracemaxvalue=predictvalue;
+				}
+			}else{
+				System.out.println("=====Are you kidding?");
+			}
+			Object[] ret=UpdateNodeAndPointerAndFlag(node, endindexinnode, toright, indexpointer, action);
+			indexpointer=(int) ret[0];
+			toright=(boolean) ret[1];
+			backtracefailed=(boolean) ret[2];
+		}
+		//do last node
+		int head=(int) decoder.FindHeadForOneWord(di, node[1], pa)[0];
+		pa.ChildProcess(node[1], head);
+		return pa;
 	}
-	public void PredictAction(){
-		//pseudo predictor
+	public Object[] UpdateNodeAndPointerAndFlag(int[] node, int endindex, boolean toright,int pointer, int action){
+		//return:1.the new pointer 2.new flag
+		int newpointer=pointer;
+		boolean newtoright=toright;
+		boolean backtracefailed=false;
+		Object[] ret=new Object[3];
+		if(toright){//normal action
+			if(action==DOSHParse.DO){
+				for(int i=pointer;i<=endindex;i++){
+					node[i]=node[i+1];
+				}
+			}else{//UNDO
+				if(pointer<endindex){//SH
+					newpointer++;
+				}else{//pointer=endindex
+					newtoright=false;
+					newpointer--;
+				}
+			}
+		}else{//backtrace action
+			if(action==DOSHParse.DO){//backtrace DO or DO after backtracefailed
+				for(int i=pointer;i<=endindex;i++){
+					node[i]=node[i+1];
+				}
+				newpointer=endindex-1;
+			}else{//SH
+				if(pointer==1){//backtrace fail
+					backtracefailed=true;
+				}else{
+					newpointer--;
+				}
+			}
+		}
+		ret[0]=newpointer;
+		ret[1]=newtoright;
+		ret[2]=backtracefailed;
+		return ret;
 	}
-	public void ExtractDoshFeature(DependencyInstance di, HashSet donechild,ParseAgenda pa, int[] node, int indexinnode, FeatureVector fv){
-		//TODO not finish yet, just test the index
-		int stack0=node[indexinnode];
-		int stack1=indexinnode-1>=0?node[indexinnode-1]:-1;
-		int stack2=indexinnode-2>=0?node[indexinnode-2]:-1;
-		int input0=node[indexinnode+1];
-		int input1=indexinnode+2<node.length-1?node[indexinnode+2]:-1;
-		int input2=indexinnode+3<node.length-1?node[indexinnode+3]:-1;
-		int stack0ldep=leftmostdep(pa, stack0);
-		int stack0rdep=rightmostdep(pa, stack0);
-		int stack1ldep=stack1==-1?-1:leftmostdep(pa, stack1);
-		int stack1rdep=stack1==-1?-1:rightmostdep(pa, stack1);
-		System.out.println("\t*"+stack0+"\t"+stack0ldep+"\t"+stack0rdep+"\t*"+stack1+"\t"+stack1ldep+"\t"+stack1rdep+"\t*"+stack2+"\t*"+input0+"\t*"+input1+"\t*"+input2);
-		
+	public double[] PredictAction(FeatureVector doshfv){
+		int doindexinliblabel=1;//get by TestlibPredict()
+		LiblinearInstance test=new LiblinearInstance(doshfv);
+    	double predict=Linear.predict(libModel, test.TransformXfeat());
+    	double[] estimates = new double[libModel.getNrClass()];
+        double label = Linear.predictValues(libModel, test.TransformXfeat(), estimates);
+        double dovalue=estimates[1];
+        double[] ret=new double[2];
+        ret[0]=label;
+        ret[1]=dovalue;
+        return ret;
 	}
-	public int leftmostdep(ParseAgenda pa, int index){
-    	//boolean print=true;
-    	if(index==0||index==-1){
-    		return -1;
-    	}
-    	return pa.leftmostchilds[index];
-    	/*
-//    	System.out.println("index:"+index);
-    	String leftchilds[]=pa.getLeftChilds(index).split(" ");
-    	if(leftchilds.length==1){
-    		//empty: length==1
-    		return -1;//not exsist
-    	}
-//    	System.out.println("=="+pa.getLeftChilds(index)+"=="+leftchilds.length);
-    	int leftmostchild=Integer.parseInt(leftchilds[0]);
-    	for(int i=1;i<leftchilds.length;i++){
-    		int lchild=Integer.parseInt(leftchilds[i]);
-    		if(lchild<leftmostchild){
-    			leftmostchild=lchild;
-    		}
-    	}
-    	if(print){
-    		System.out.println("index:"+index+", leftmost:"+leftmostchild);
-    	}
-    	return leftmostchild;
-    	*/
+	public void Parse(String parsefile, String writefile) throws IOException{
+		CONLLReader reader = new CONLLReader();
+		reader.ordered=false;
+        reader.startReading(System.getenv("CODEDATA") + File.separator + parsefile);
+        File out = new File(System.getenv("CODEDATA") + File.separator + writefile);
+        if (!out.exists()) {
+            out.createNewFile();
+        }
+        CONLLWriter writer = new CONLLWriter(true);
+        writer.startWriting(System.getenv("CODEDATA") + File.separator + writefile);
+
+        DependencyInstance di;
+        int instcount = 0;
+        System.out.println("Process index:");
+        long parsestart = System.currentTimeMillis();
+        while ((di = reader.getNext()) != null) {
+            ++instcount;
+            System.out.print(instcount+" ");
+            //if (instcount % 50 == 0) {
+            //  System.out.print(instcount + "\t");
+            //}
+            //if (instcount % 30 == 0) System.out.print('\n');
+            FeatureVector fv = new FeatureVector();//useless here, just align the param for DecodeInstance
+
+            DecodeOneInstance(di);
+
+            writer.write(new DependencyInstance(RemoveRoot(di.forms), RemoveRoot(di.postags), RemoveRoot(di.deprels), RemoveRoot(di.heads)));
+        }
+        long parseend = System.currentTimeMillis();
+        System.out.println("\n==============================================");
+        System.out.println("Test File:" + beanParser.options.testfile);
+        System.out.println("Model Name:" + beanParser.options.modelName);
+        System.out.println("Sentence Number:" + instcount);
+        System.out.println("Parse Time Total:" + (parseend - parsestart) / 1000.0);
+        System.out.println("==============================================");
+        writer.finishWriting();
+	}
+	private String[] RemoveRoot(String[] form) {
+        String[] ret = new String[form.length - 1];
+        for (int i = 0; i < ret.length; i++) {
+            ret[i] = form[i + 1];
+        }
+        return ret;
     }
-    public int rightmostdep(ParseAgenda pa, int index){
-    	boolean print=true;
-    	if(index==0||index==-1){
-    		return -1;
-    	}
-    	return pa.rightmostchilds[index];
-    	/*
-    	String rightchilds[]=pa.getRightChilds(index).split(" ");
-    	if(rightchilds.length==1){
-    		return -1;//not exsist
-    	}
-    	int rightmostchild=Integer.parseInt(rightchilds[0]);
-    	for(int i=1;i<rightchilds.length;i++){
-    		int rchild=Integer.parseInt(rightchilds[i]);
-    		if(rchild<rightmostchild){
-    			rightmostchild=rchild;
-    		}
-    	}
-    	if(print){
-    		System.out.println("index:"+index+", rightmost:"+rightmostchild);
-    	}
-    	return rightmostchild;
-    	*/
+	private int[] RemoveRoot(int[] form) {
+        int[] ret = new int[form.length - 1];
+        for (int i = 0; i < ret.length; i++) {
+            ret[i] = form[i + 1];
+        }
+        return ret;
     }
+	/*
     public void TestLibPredict(String libmodelfile,String alphagetfile,String conllfile) throws IOException, ClassNotFoundException{
     	//try on 10136 on dutch train data
     	CONLLReader reader=new CONLLReader();
@@ -113,9 +220,18 @@ public class DOSHParse {
     	DOSHTrain featextract=new DOSHTrain(alphagetfile);
     	FeatureVector fv=new FeatureVector();
     	int node[]={0,1,2,3,4,5,6,7,8,9,10,11,12,13,-1};
-    	featextract.ExtractDoshFeature(di, new HashSet(), new ParseAgenda(di.length()), node, 1, fv);
+    	featextract.ExtractDoshFeature(di, new HashSet(), new ParseAgenda(di.length()), node, 4, fv);
     	LiblinearInstance test=new LiblinearInstance(fv);
     	double predict=Linear.predict(libModel, test.TransformXfeat());
+    	double[] estimates = new double[libModel.getNrClass()];
+        double probabilityPrediction = Linear.predictValues(libModel, test.TransformXfeat(), estimates);
     	System.out.println("prediction:"+predict);
+    	for(double temp:estimates){
+    		System.out.println(" "+temp);
+    	}
+    	System.out.println("prediction:"+probabilityPrediction);
+    	System.out.println("model.label[0]="+libModel.getLabels()[0]);
+    	System.out.println("model.label[1]="+libModel.getLabels()[1]);
     }
+    */
 }
