@@ -73,13 +73,13 @@ public class DOSHParse {
 			featextractor.ExtractDoshFeature(di, donechild, pa, node, indexpointer, fv);
 			double[] predict=PredictAction(fv);
 			int action=(int) predict[0];
-			System.out.println("Actionpredict:"+action);
+//			System.out.println("Actionpredict:"+action);
 			if(backtracefailed==true){
 				//read backtrace,to get index to do
 				if(backtracemaxindex!=-1){
 					action=DOSHParse.DO;
 					indexpointer=backtracemaxindex;
-					System.out.println("backtracemaxindex:"+indexpointer);
+//					System.out.println("backtracemaxindex:"+indexpointer);
 					backtracemaxindex=-1;
 					backtracemaxvalue=Double.NEGATIVE_INFINITY;
 				}else{
@@ -101,11 +101,11 @@ public class DOSHParse {
 			}else if(action==DOSHParse.UNDO){
 				if(toright==false){
 					double predictvalue=predict[1];
-					System.out.println("predict value="+predictvalue+",backtracemaxvalue="+backtracemaxvalue);
+//					System.out.println("predict value="+predictvalue+",backtracemaxvalue="+backtracemaxvalue);
 					if(predictvalue>backtracemaxvalue){
 						backtracemaxindex=indexpointer;
 						backtracemaxvalue=predictvalue;
-						System.out.println("update backtracemaxvalue:"+backtracemaxvalue+",backindex:"+backtracemaxindex);
+//						System.out.println("update backtracemaxvalue:"+backtracemaxvalue+",backindex:"+backtracemaxindex);
 					}
 					System.out.println("SH+end\t");
 				}else{
@@ -116,19 +116,19 @@ public class DOSHParse {
 				System.out.println("=====Are you kidding?");
 			}
 			Object[] ret=UpdateNodeAndPointerAndFlag(node, endindexinnode, toright, indexpointer, action);
-			System.out.println("Update:");
-			System.out.print("Node:");
-			for(int elem:node){
-				System.out.print("\t"+elem);
-			}
-			System.out.println();
+//			System.out.println("Update:");
+//			System.out.print("Node:");
+//			for(int elem:node){
+//				System.out.print("\t"+elem);
+//			}
+//			System.out.println();
 			
 			indexpointer=(int) ret[0];
-			System.out.println("indexpointer:"+indexpointer);
+//			System.out.println("indexpointer:"+indexpointer);
 			toright=(boolean) ret[1];
-			System.out.println("toright:"+toright);
+//			System.out.println("toright:"+toright);
 			backtracefailed=(boolean) ret[2];
-			System.out.println("backtracefailed:"+backtracefailed);
+//			System.out.println("backtracefailed:"+backtracefailed);
 		}
 		//do last node
 		int head=(int) decoder.FindHeadForOneWord(di, node[1], pa)[0];

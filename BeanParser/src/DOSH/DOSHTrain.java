@@ -3,10 +3,12 @@ package DOSH;
 import gnu.trove.TIntIntHashMap;
 
 import java.io.BufferedInputStream;
+import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
+import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.ObjectInputStream;
@@ -16,7 +18,10 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Stack;
 
+import de.bwaldvogel.liblinear.FeatureNode;
 import de.bwaldvogel.liblinear.InvalidInputDataException;
+import de.bwaldvogel.liblinear.Linear;
+import de.bwaldvogel.liblinear.Model;
 import de.bwaldvogel.liblinear.Parameter;
 import de.bwaldvogel.liblinear.Problem;
 import de.bwaldvogel.liblinear.Train;
@@ -488,5 +493,31 @@ public class DOSHTrain {
 //        train.readProblem(libinstfile,-1.0);
         //train.main(new String[] {"-v", "10", "-c", "10", "-w1", "1.234", "-s","4",libinstfilestring,modelname});
 		train.main(new String[] { "-c", "1", "-e", "0.1", "-s","4",libinstfilestring,modelname});
+	}
+	
+	public void TestModelAccuracyOnInstanceFile(String liblinearmodel,String instfile) throws IOException, ClassNotFoundException{
+    	Model libModel=Model.load(new File(liblinearmodel));
+    	BufferedReader reader=new BufferedReader(new FileReader(instfile));
+    	String line=reader.readLine();
+    	int rightcount=0;
+    	int totalcount=0;
+    	while(line!=null){
+    		totalcount++;
+    		String columns[]=line.split(" ");
+    		double[] estimates = new double[libModel.getNrClass()];
+    		FeatureNode fn[]=new FeatureNode[columns.length-1];
+    		for(int i=1;i<columns.length;i++){
+    			String feat_value[]=columns[i].split(":");
+    			fn[i-1]=new FeatureNode(Integer.parseInt(feat_value[0]), Double.parseDouble(feat_value[1]));
+    		}
+            double probabilityPrediction = Linear.predictValues(libModel, fn, estimates);
+        	//System.out.println("prediction:"+probabilityPrediction);
+        	if(Integer.parseInt(columns[0])==(int)probabilityPrediction){
+        		rightcount++;
+        	}
+    		line=reader.readLine();
+    	}
+    	
+    	System.out.println("Lib ActionAccuracy:"+(double)rightcount/totalcount);
 	}
 }
