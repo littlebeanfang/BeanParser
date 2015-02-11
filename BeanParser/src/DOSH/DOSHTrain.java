@@ -240,30 +240,42 @@ public class DOSHTrain {
 		int stack0=node[indexinnode];
 		int stack1=indexinnode-1>=0?node[indexinnode-1]:-1;
 		int stack2=indexinnode-2>=0?node[indexinnode-2]:-1;
+		int stack3=indexinnode-3>=0?node[indexinnode-3]:-1;
 		int input0=node[indexinnode+1];
 		int input1=indexinnode+2<node.length-1?node[indexinnode+2]:-1;
 		int input2=indexinnode+3<node.length-1?node[indexinnode+3]:-1;
+		int input3=indexinnode+4<node.length-1?node[indexinnode+4]:-1;
 		int stack0ldep=leftmostdep(pa, stack0);
 		int stack0rdep=rightmostdep(pa, stack0);
 		int stack1ldep=stack1==-1?-1:leftmostdep(pa, stack1);
 		int stack1rdep=stack1==-1?-1:rightmostdep(pa, stack1);
-		//Form:
-		String input0formString=input0==-1?"NULL":di.forms[input0];
+		//Form: 7
 		String stack0formString=stack0==-1?"NULL":di.forms[stack0];
 		String stack1formString=stack1==-1?"NULL":di.forms[stack1];
-		//POS:
+		String stack2formString=stack2==-1?"NULL":di.forms[stack2];
+		String input0formString=input0==-1?"NULL":di.forms[input0];
+		String input1formString=input1==-1?"NULL":di.forms[input1];
+		String stack0ldepformString=stack0ldep==-1?"NULL":di.forms[stack0ldep];
+		String stack1rdepformString=stack1rdep==-1?"NULL":di.forms[stack1rdep];
+		//POS:11
 		String stack0posString=stack0==-1?"NULL":di.postags[stack0];
 		String stack1posString=stack1==-1?"NULL":di.postags[stack1];
 		String stack2posString=stack2==-1?"NULL":di.postags[stack2];
+		String stack3posString=stack3==-1?"NULL":di.postags[stack3];
 		String input0posString=input0==-1?"NULL":di.postags[input0];
 		String input1posString=input1==-1?"NULL":di.postags[input1];
 		String input2posString=input2==-1?"NULL":di.postags[input2];
-		
+		String input3posString=input3==-1?"NULL":di.postags[input3];
+		String stack0ldepposString=stack0ldep==-1?"NULL":di.postags[stack0ldep];
+		String stack0rdepposString=stack0rdep==-1?"NULL":di.postags[stack0rdep];
+		String stack1ldepposString=stack1ldep==-1?"NULL":di.postags[stack1ldep];
+		String stack1rdepposString=stack1rdep==-1?"NULL":di.postags[stack1rdep];
+		//DEPREL:4
 		String stack0ldep_rel=donechild.contains(stack0ldep)?di.deprels[stack0ldep]:"NULL";
 		String stack0rdep_rel=donechild.contains(stack0rdep)?di.deprels[stack0rdep]:"NULL";
 		String stack1ldep_rel=donechild.contains(stack1ldep)?di.deprels[stack1ldep]:"NULL";
 		String stack1rdep_rel=donechild.contains(stack1rdep)?di.deprels[stack1rdep]:"NULL";
-		
+	/*	
 //		DOSHFEAT1:InputColumn(FORM,Lookahead[0])
 		String feature1="DOSHFEAT1input0formString:"+input0formString;
 		add(feature1, fv);
@@ -325,10 +337,114 @@ public class DOSHTrain {
 //		DOSHFEAT20:OutputColumn(DEPREL,rdep(Stack[1]))
 		String feature20=stack1rdep==-1?"DOSHFEAT20:NULL":"DOSHFEAT20:"+stack1rdep_rel;
 		add(feature20, fv);
+		*/
+		///////////////////////POS FEAT//////////////////////////
+		//FEAT1
+		String feature1="DOSHFEAT1:"+stack0posString;
+		add(feature1, fv);
+		//FEAT2
+		String feature2="DOSHFEAT2:"+stack1posString;
+		add(feature2, fv);
+		//FEAT3
+		String feature3="DOSHFEAT3:"+stack2posString;
+		add(feature3, fv);
+		//FEAT4
+		String feature4="DOSHFEAT4:"+stack3posString;
+		add(feature4, fv);
+		//FEAT5
+		String feature5="DOSHFEAT5:"+input0posString;
+		add(feature5, fv);
+		//FEAT6
+		String feature6="DOSHFEAT6:"+input1posString;
+		add(feature6, fv);
+		//FEAT7
+		String feature7="DOSHFEAT7:"+input2posString;
+		add(feature7, fv);
+		//FEAT8
+		String feature8="DOSHFEAT8:"+stack0ldepposString;
+		add(feature8, fv);
+		//FEAT9
+		String feature9="DOSHFEAT9:"+stack0rdepposString;
+		add(feature9, fv);
+		//FEAT10
+		String feature10="DOSHFEAT10:"+stack1ldepposString;
+		add(feature10, fv);
+		//FEAT11
+		String feature11="DOSHFEAT11:"+stack1rdepposString;
+		add(feature11, fv);
+		///////////////////////REL FEAT//////////////////////////
+		//FEAT12
+		String feature12="DOSHFEAT12:"+stack0ldep_rel;
+		add(feature12, fv);
+		//FEAT13
+		String feature13="DOSHFEAT13:"+stack1rdep_rel;
+		add(feature13, fv);
+		///////////////////////FORM FEAT//////////////////////////
+		//FEAT14
+		String feature14="DOSHFEAT14:"+stack0formString;
+		add(feature14, fv);
+		//FEAT15
+		String feature15="DOSHFEAT15:"+stack1formString;
+		add(feature15, fv);
+		//FEAT16
+		String feature16="DOSHFEAT16:"+stack2formString;
+		add(feature16, fv);
+		//FEAT17
+		String feature17="DOSHFEAT17:"+input0formString;
+		add(feature17, fv);
+		//FEAT18
+		String feature18="DOSHFEAT18:"+input1formString;
+		add(feature18, fv);
+		//FEAT19
+		String feature19="DOSHFEAT19:"+stack0ldepformString;
+		add(feature19, fv);
+		//FEAT20
+		String feature20="DOSHFEAT20:"+stack1rdepformString;
+		add(feature20, fv);
+		///////////////////////MERGE FEAT//////////////////////////
+		//FEAT21
+		String feature21=(stack0==-1&&stack1==-1)?"DOSHFEAT21:NULL":"DOSHFEAT21:"+stack0posString+"-"+stack1posString;
+		add(feature21, fv);
+		//FEAT22
+		String feature22=(stack0==-1&&input0==-1)?"DOSHFEAT22:NULL":"DOSHFEAT22:"+stack0formString+"-"+input0formString;
+		add(feature22, fv);
+		//FEAT23
+		String feature23=(stack0==-1)?"DOSHFEAT23:NULL":"DOSHFEAT23:"+stack0posString+"-"+stack0formString;
+		add(feature23, fv);
+		//FEAT24
+		String feature24=(stack1==-1)?"DOSHFEAT24:NULL":"DOSHFEAT24:"+stack1posString+"-"+stack1formString;
+		add(feature24, fv);
+		//FEAT25
+		String feature25=(input0==-1)?"DOSHFEAT25:NULL":"DOSHFEAT25:"+input0posString+"-"+input0formString;
+		add(feature25, fv);
+		//FEAT26
+		String feature26=(stack1rdep==-1&&stack0ldep==-1)?"DOSHFEAT26:NULL":"DOSHFEAT26:"+stack1rdep_rel+"-"+stack0ldep_rel;
+		add(feature26, fv);
+		//FEAT27
+		String feature27=(stack0==-1&&stack1==-1&&input0==-1)?"DOSHFEAT27:NULL":"DOSHFEAT27:"+stack0posString+"-"+stack1posString+"-"+input0posString;
+		add(feature27, fv);
+		//FEAT28
+		String feature28=(stack0==-1&&stack1==-1&&stack2==-1)?"DOSHFEAT28:NULL":"DOSHFEAT28:"+stack0posString+"-"+stack1posString+"-"+stack2posString;
+		add(feature28, fv);
+		//FEAT29
+		String feature29=(stack0==-1&&input0==-1&&input1==-1)?"DOSHFEAT29:NULL":"DOSHFEAT29:"+stack0posString+"-"+input0posString+"-"+input1posString;
+		add(feature29, fv);
+		//FEAT30
+		String feature30=(input0==-1&&input1==-1&&input2==-1)?"DOSHFEAT30:NULL":"DOSHFEAT30:"+input0posString+"-"+input1posString+"-"+input2posString;
+		add(feature30, fv);
+		//FEAT31
+		String feature31=(input1==-1&&input2==-1&&input3==-1)?"DOSHFEAT31:NULL":"DOSHFEAT31:"+input1posString+"-"+input2posString+"-"+input3posString;
+		add(feature31, fv);
+		//FEAT32
+		String feature32=(stack1rdep==-1&&stack1ldep==-1&&stack1==-1)?"DOSHFEAT32:NULL":"DOSHFEAT32:"+stack1rdepposString+"-"+stack1ldepposString+"-"+stack1posString;
+		add(feature32, fv);
+		//FEAT33
+		String feature33=(stack1==-1&&stack1ldep==-1&&stack1rdep==-1)?"DOSHFEAT33:NULL":"DOSHFEAT33:"+stack1posString+"-"+stack1ldep_rel+"-"+stack1rdep_rel;
+		add(feature33, fv);
 		if(print){
 			System.out.println("\t*"+stack0+"\t"+stack0ldep+"\t"+stack0rdep+"\t*"+stack1+"\t"+stack1ldep+"\t"+stack1rdep+"\t*"+stack2+"\t*"+input0+"\t*"+input1+"\t*"+input2);
-			System.out.println("\t"+feature1+"\t"+feature2+"\t"+feature3+"\t"+feature4+"\t"+feature5+"\t"+feature6+"\t"+feature7+"\t"+feature8+"\t"+feature9+"\t"+feature10+
-					"\t"+feature11+"\t"+feature12+"\t"+feature13+"\t"+feature14+"\t"+feature15+"\t"+feature16+"\t"+feature17+"\t"+feature18+"\t"+feature19+"\t"+feature20);
+//			System.out.println("\t"+feature1+"\t"+feature2+"\t"+feature3+"\t"+feature4+"\t"+feature5+"\t"+feature6+"\t"+feature7+"\t"+feature8+"\t"+feature9+"\t"+feature10+
+//					"\t"+feature11+"\t"+feature12+"\t"+feature13+"\t"+feature14+"\t"+feature15+"\t"+feature16+"\t"+feature17+"\t"+feature18+"\t"+feature19+"\t"+feature20);
 		}
 		
 	}
@@ -492,7 +608,7 @@ public class DOSHTrain {
 //		File libinstfile=new File(libinstfilestring);
 //        train.readProblem(libinstfile,-1.0);
         //train.main(new String[] {"-v", "10", "-c", "10", "-w1", "1.234", "-s","4",libinstfilestring,modelname});
-		train.main(new String[] { "-c", "1", "-e", "0.1", "-s","4",libinstfilestring,modelname});
+		train.main(new String[] { "-c", "0.1", "-e", "0.1", "-s","4",libinstfilestring,modelname});
 	}
 	
 	public void TestModelAccuracyOnInstanceFile(String liblinearmodel,String instfile) throws IOException, ClassNotFoundException{
@@ -520,4 +636,7 @@ public class DOSHTrain {
     	
     	System.out.println("Lib ActionAccuracy:"+(double)rightcount/totalcount);
 	}
+	
+	
+	
 }
