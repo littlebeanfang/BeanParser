@@ -59,7 +59,7 @@ public class DOSHParse {
 		HashSet donechild=new HashSet();//store the nodes that has been done
 		//store the max predict value of DO action of backtrace nodes
 		int backtracemaxindex=-1;
-		double backtracemaxvalue=Double.MIN_VALUE;
+		double backtracemaxvalue=Double.NEGATIVE_INFINITY;
 		//init node
 		for(int i=0;i<senlength+1;i++){
 			node[i]=i;
@@ -67,46 +67,75 @@ public class DOSHParse {
 		node[senlength+1]=-1;
 		
 		//legend is begining, fighting bean!
-		while(donechild.size()>senlength-1){//last element must do
+		while(donechild.size()<senlength-1){//last element must do
 			int endindexinnode=senlength-donechild.size();//0-endindex
 			FeatureVector fv=new FeatureVector();
 			featextractor.ExtractDoshFeature(di, donechild, pa, node, indexpointer, fv);
 			double[] predict=PredictAction(fv);
 			int action=(int) predict[0];
+			System.out.println("Actionpredict:"+action);
 			if(backtracefailed==true){
 				//read backtrace,to get index to do
 				if(backtracemaxindex!=-1){
 					action=DOSHParse.DO;
 					indexpointer=backtracemaxindex;
+					System.out.println("backtracemaxindex:"+indexpointer);
 					backtracemaxindex=-1;
-					backtracemaxvalue=Double.MIN_VALUE;
+					backtracemaxvalue=Double.NEGATIVE_INFINITY;
 				}else{
 					System.out.println("=====How come backtracemaxindex is -1 ?");
+					System.exit(1);
 				}
 			}
 			if(action==DOSHParse.DO){
 				//no need to know the fv, and the predicted relation is stored in di
-				int head=(int) decoder.FindHeadForOneWord(di, indexpointer, pa)[0];
-				pa.ChildProcess(indexpointer, head);
-				donechild.add(indexpointer);
-				
-			}else if(action==DOSHParse.UNDO&&toright==false){
-				double predictvalue=predict[1];
-				if(predictvalue>backtracemaxvalue){
-					backtracemaxindex=indexpointer;
-					backtracemaxvalue=predictvalue;
+				System.out.println();
+				int head=(int) decoder.FindHeadForOneWord(di, node[indexpointer], pa)[0];
+				pa.heads[node[indexpointer]]=head;
+				di.orders.put(donechild.size()+1, node[indexpointer]);
+				pa.ChildProcess(node[indexpointer], head);
+				donechild.add(node[indexpointer]);
+				System.out.println("DO+"+node[indexpointer]+"\t");
+				backtracemaxindex=-1;
+				backtracemaxvalue=Double.NEGATIVE_INFINITY;
+			}else if(action==DOSHParse.UNDO){
+				if(toright==false){
+					double predictvalue=predict[1];
+					System.out.println("predict value="+predictvalue+",backtracemaxvalue="+backtracemaxvalue);
+					if(predictvalue>backtracemaxvalue){
+						backtracemaxindex=indexpointer;
+						backtracemaxvalue=predictvalue;
+						System.out.println("update backtracemaxvalue:"+backtracemaxvalue+",backindex:"+backtracemaxindex);
+					}
+					System.out.println("SH+end\t");
+				}else{
+					System.out.println("SH+"+node[indexpointer+1]+"\t");
 				}
 			}else{
+				System.out.println(action);
 				System.out.println("=====Are you kidding?");
 			}
 			Object[] ret=UpdateNodeAndPointerAndFlag(node, endindexinnode, toright, indexpointer, action);
+			System.out.println("Update:");
+			System.out.print("Node:");
+			for(int elem:node){
+				System.out.print("\t"+elem);
+			}
+			System.out.println();
+			
 			indexpointer=(int) ret[0];
+			System.out.println("indexpointer:"+indexpointer);
 			toright=(boolean) ret[1];
+			System.out.println("toright:"+toright);
 			backtracefailed=(boolean) ret[2];
+			System.out.println("backtracefailed:"+backtracefailed);
 		}
 		//do last node
 		int head=(int) decoder.FindHeadForOneWord(di, node[1], pa)[0];
+		pa.heads[node[1]]=head;
 		pa.ChildProcess(node[1], head);
+		di.heads=pa.heads;
+		di.orders.put(donechild.size()+1, node[1]);
 		return pa;
 	}
 	public Object[] UpdateNodeAndPointerAndFlag(int[] node, int endindex, boolean toright,int pointer, int action){
@@ -117,9 +146,13 @@ public class DOSHParse {
 		Object[] ret=new Object[3];
 		if(toright){//normal action
 			if(action==DOSHParse.DO){
+				if(endindex==pointer){
+					newtoright=false;
+				}
 				for(int i=pointer;i<=endindex;i++){
 					node[i]=node[i+1];
 				}
+				newpointer--;
 			}else{//UNDO
 				if(pointer<endindex){//SH
 					newpointer++;
@@ -185,7 +218,7 @@ public class DOSHParse {
 
             DecodeOneInstance(di);
 
-            writer.write(new DependencyInstance(RemoveRoot(di.forms), RemoveRoot(di.postags), RemoveRoot(di.deprels), RemoveRoot(di.heads)));
+            writer.write(new DependencyInstance(RemoveRoot(di.forms), RemoveRoot(di.postags), RemoveRoot(di.deprels), RemoveRoot(di.heads)),di.orders);
         }
         long parseend = System.currentTimeMillis();
         System.out.println("\n==============================================");

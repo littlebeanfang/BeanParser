@@ -226,7 +226,8 @@ public class DOSHTrain {
 	}
 	*/
 	public void ExtractDoshFeature(DependencyInstance di, HashSet donechild,ParseAgenda pa, int[] node, int indexinnode, FeatureVector fv){
-		boolean print=true;
+		System.out.println("Extract:"+node[indexinnode]);
+		boolean print=false;
 		if(print){
 			System.out.println("feature index"+node[indexinnode]);
 		}

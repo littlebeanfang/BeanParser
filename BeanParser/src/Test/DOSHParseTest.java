@@ -14,9 +14,15 @@ public class DOSHParseTest {
 		String conllfile=System.getenv("CODEDATA")+File.separator+"1sen.txt";
 		test.TestLibPredict(libmodelfile, alphabetfile, conllfile);
 		*/
-		String doshalphabetfile=System.getenv("CODEDATA")+File.separator+"wsj_2-21.libalphabet";
-		String libmodelfile=System.getenv("CODEDATA")+File.separator+"wsj_2-21.libmodel";
+		String doshalphabetfile="wsj_2-21.libalphabet";
+		String libmodelfile="wsj_2-21.libmodel";
 		DOSHParse test=new DOSHParse(doshalphabetfile, libmodelfile, args);
 		test.Parse(test.beanParser.options.testfile, test.beanParser.options.outfile);
+		ResultEvaluator re = new ResultEvaluator();
+		re.evaluate(test.beanParser.options.outfile, test.beanParser.options.testfile);
+//		ResultEvaluator re = new ResultEvaluator();
+//		String outfile="wsj_00-01_doshparse_maltmodel.out";
+//		String testfile="wsj_00-01.conll";
+//		re.evaluate(outfile, testfile);
 	}
 }
