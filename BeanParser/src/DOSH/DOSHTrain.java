@@ -218,6 +218,167 @@ public class DOSHTrain {
 		ret[1]=order_child;
 		return ret;
 	}
+	public Object[] GenerateMaltLiblinearInstance(DependencyInstance di){
+		HashSet<LiblinearInstance> libinsts=new HashSet<LiblinearInstance>();
+		//store the nodes that haven't been processed
+		//not -1 indexs:1-(length-order_child.size)
+		ParseAgenda pa=new ParseAgenda(di.length());
+		int node[]=new int[di.length()+1];
+		for(int i=1;i<di.length();i++){
+			node[i]=i;
+		}
+		node[0]=0;
+		node[di.length()]=-1;
+		
+		Object[] ret=new Object[2];
+		TIntIntHashMap order_child=new TIntIntHashMap();
+		HashSet donechild=new HashSet();
+		TIntIntHashMap refcount=new TIntIntHashMap();
+		int length=di.length()-1;
+		for(int i=1;i<=length;i++){
+			int headi=di.heads[i];
+//			System.out.println("headi="+headi+" ");
+			if(refcount.contains(headi)){
+				refcount.put(headi, refcount.get(headi)+1);
+//				System.out.println("put head="+headi+" count="+(refcount.get(headi)));
+			}else{
+				refcount.put(headi, 1);
+//				System.out.println("put head="+headi+" count=1");
+			}
+		}
+//		System.out.println("Tranverse refcount:");
+//		TranverseTIntIntHashMap(refcount);
+		Stack<Integer> buf=new Stack<Integer>();
+		
+		int index=1;//shift index
+		int ordercount=1;
+		buf.add(0);
+		while(index<=length||buf.size()>1){
+			int top=buf.peek();
+			int topL=buf.size()-2>=0?buf.get(buf.size()-2):-1;
+			int topR=index>length?-1:index;
+//			System.out.println("top="+top);
+			if(!refcount.contains(top)&&((topL>=0&&di.heads[top]==topL)||(topR>0&&di.heads[top]==topR))){
+				//Do
+				int indexinnode=LookupElemInNode(node, top, length-order_child.size());
+				//System.out.println("top2:"+top);
+				//TODO extract feature, label DO
+				FeatureVector fv4=new FeatureVector();
+				ExtractDoshFeature(di,donechild, pa, node, indexinnode, fv4);
+				libinsts.add(new LiblinearInstance(fv4, 1));
+
+				order_child.put(ordercount++, top);
+				donechild.add(top);
+				pa.AddArc(top, di.heads[top]);
+				pa.ChildProcess(top,  di.heads[top]);
+				for(int i=indexinnode;i<=length-order_child.size()+1;i++){
+					node[i]=node[i+1];
+				}
+				int headref=di.heads[top];
+				int headrefcount=refcount.get(headref);
+				if(headrefcount==1){
+					refcount.remove(headref);
+				}else{
+					refcount.put(headref, headrefcount-1);
+				}
+				System.out.println("DO+"+top+" ");
+				buf.pop();
+			}else{
+				//cannot do
+				if(index>length){
+					//end of sentence but cannot shift any more
+					//Swap is needed, pop until one node can be done
+					Stack<Integer> temp=new Stack<Integer>();
+					int depthofswap=0;
+					//additional SH+end
+					int firstswap=buf.peek();
+					int indexinnode1=LookupElemInNode(node, firstswap, length-order_child.size());
+//					System.out.println("swaptop2:"+swaptop);
+					FeatureVector fv5=new FeatureVector();
+					ExtractDoshFeature(di,donechild, pa, node, indexinnode1, fv5);
+					libinsts.add(new LiblinearInstance(fv5, 2));
+					System.out.println("SH+end");
+					while(true){
+						temp.push(buf.pop());
+						
+						depthofswap++;
+						int swaptop=buf.peek();
+						int swaptopL=buf.size()-2>=0?buf.get(buf.size()-2):-1;
+						int swaptopR=temp.peek();
+						if(!refcount.contains(swaptop)&&(swaptopL>=0&&di.heads[swaptopL]==swaptop)||(swaptopR<length&&di.heads[swaptopR]==swaptop)){
+						
+							//DO and recover the buf stack
+							
+//							System.out.println("swaptop1:"+swaptop);
+							int indexinnode=LookupElemInNode(node, swaptop, length-order_child.size());
+							//TODO extract feature, label DO
+							FeatureVector fv1=new FeatureVector();
+							ExtractDoshFeature(di,donechild, pa, node, indexinnode, fv1);
+							libinsts.add(new LiblinearInstance(fv1, 1));
+							pa.AddArc(swaptop, di.heads[swaptop]);
+							pa.ChildProcess(swaptop,  di.heads[swaptop]);
+							System.out.println("node:");
+//							for(int i=0;i<node.length;i++){
+//								System.out.print(node[i]+"\t");
+//							}
+							for(int i=indexinnode;i<=length-order_child.size();i++){
+								node[i]=node[i+1];
+							}
+//							System.out.println();
+//							System.out.println("node:");
+//							for(int i=0;i<node.length;i++){
+//								System.out.print(node[i]+"\t");
+//							}
+							System.out.println("DO+"+swaptop+" ");
+							order_child.put(ordercount++, swaptop);
+							donechild.add(swaptop);
+							//System.out.println("swapdepth:"+depthofswap);
+							int headref=di.heads[swaptop];
+							int headrefcount=refcount.get(headref);
+							if(headrefcount==1){
+								refcount.remove(headref);
+							}else{
+								refcount.put(headref, headrefcount-1);
+							}
+							buf.pop();
+							while(!temp.empty()){
+								buf.push(temp.pop());
+							}
+							break;
+
+						}else{
+							//TODO end shift, label SH
+							int indexinnode=LookupElemInNode(node, swaptop, length-order_child.size());
+//							System.out.println("swaptop2:"+swaptop);
+							FeatureVector fv2=new FeatureVector();
+							ExtractDoshFeature(di,donechild, pa, node, indexinnode, fv2);
+							libinsts.add(new LiblinearInstance(fv2, 2));
+							System.out.println("SH+end");
+						}
+					}
+				}else{
+					
+					int indexinnode=LookupElemInNode(node, top, length-order_child.size());
+					//System.out.println("top2:"+top);
+					//TODO extract feature, label SH
+					FeatureVector fv3=new FeatureVector();
+					ExtractDoshFeature(di,donechild, pa, node, indexinnode, fv3);
+					libinsts.add(new LiblinearInstance(fv3, 2));
+					
+					System.out.println("SH+"+index+" ");
+					
+					buf.push(index++);
+				}
+			}
+		}
+		if(order_child.size()!=length){
+			System.out.println("Error: order_child size="+order_child.size()+", sentence length:"+length);
+		}
+		System.out.println();
+		ret[0]=libinsts;
+		ret[1]=order_child;
+		return ret;
+	}
 	/*
 	private String GetPOSOrForm(boolean ispos,int index, DependencyInstance di){
 		if(index==0||index==-1){
@@ -340,67 +501,109 @@ public class DOSHTrain {
 		*/
 		///////////////////////POS FEAT//////////////////////////
 		//FEAT1
-		String feature1="DOSHFEAT1:"+stack0posString;
-		add(feature1, fv);
+		
+		if(!stack0posString.equals("NULL")){
+			String feature1="DOSHFEAT1:"+stack0posString;
+			add(feature1, fv);
+		}
+		
 		//FEAT2
-		String feature2="DOSHFEAT2:"+stack1posString;
-		add(feature2, fv);
+		if(!stack1posString.equals("NULL")){
+			String feature2="DOSHFEAT2:"+stack1posString;
+			add(feature2, fv);
+		}
 		//FEAT3
-		String feature3="DOSHFEAT3:"+stack2posString;
-		add(feature3, fv);
+		if(!stack2posString.equals("NULL")){
+			String feature3="DOSHFEAT3:"+stack2posString;
+			add(feature3, fv);
+		}
 		//FEAT4
-		String feature4="DOSHFEAT4:"+stack3posString;
-		add(feature4, fv);
+		if(!stack3posString.equals("NULL")){
+			String feature4="DOSHFEAT4:"+stack3posString;
+			add(feature4, fv);
+		}
 		//FEAT5
-		String feature5="DOSHFEAT5:"+input0posString;
-		add(feature5, fv);
+		if(!input0posString.equals("NULL")){
+			String feature5="DOSHFEAT5:"+input0posString;
+			add(feature5, fv);
+		}
 		//FEAT6
-		String feature6="DOSHFEAT6:"+input1posString;
-		add(feature6, fv);
+		if(!input1posString.equals("NULL")){
+			String feature6="DOSHFEAT6:"+input1posString;
+			add(feature6, fv);
+		}
 		//FEAT7
-		String feature7="DOSHFEAT7:"+input2posString;
-		add(feature7, fv);
+		if(!input2posString.equals("NULL")){
+			String feature7="DOSHFEAT7:"+input2posString;
+			add(feature7, fv);
+		}
 		//FEAT8
-		String feature8="DOSHFEAT8:"+stack0ldepposString;
-		add(feature8, fv);
+		if(!stack0ldepposString.equals("NULL")){
+			String feature8="DOSHFEAT8:"+stack0ldepposString;
+			add(feature8, fv);
+		}
 		//FEAT9
-		String feature9="DOSHFEAT9:"+stack0rdepposString;
-		add(feature9, fv);
+		if(!stack0rdepposString.equals("NULL")){
+			String feature9="DOSHFEAT9:"+stack0rdepposString;
+			add(feature9, fv);
+		}
 		//FEAT10
-		String feature10="DOSHFEAT10:"+stack1ldepposString;
-		add(feature10, fv);
+		if(!stack1ldepposString.equals("NULL")){
+			String feature10="DOSHFEAT10:"+stack1ldepposString;
+			add(feature10, fv);
+		}
 		//FEAT11
-		String feature11="DOSHFEAT11:"+stack1rdepposString;
-		add(feature11, fv);
+		if(!stack1ldepposString.equals("NULL")){
+			String feature11="DOSHFEAT11:"+stack1rdepposString;
+			add(feature11, fv);
+		}
 		///////////////////////REL FEAT//////////////////////////
 		//FEAT12
-		String feature12="DOSHFEAT12:"+stack0ldep_rel;
-		add(feature12, fv);
+		if(!stack0ldep_rel.equals("NULL")){
+			String feature12="DOSHFEAT12:"+stack0ldep_rel;
+			add(feature12, fv);
+		}
 		//FEAT13
-		String feature13="DOSHFEAT13:"+stack1rdep_rel;
-		add(feature13, fv);
+		if(!stack1rdep_rel.equals("NULL")){
+			String feature13="DOSHFEAT13:"+stack1rdep_rel;
+			add(feature13, fv);
+		}
 		///////////////////////FORM FEAT//////////////////////////
 		//FEAT14
-		String feature14="DOSHFEAT14:"+stack0formString;
-		add(feature14, fv);
+		if(!stack0formString.equals("NULL")){
+			String feature14="DOSHFEAT14:"+stack0formString;
+			add(feature14, fv);
+		}
 		//FEAT15
-		String feature15="DOSHFEAT15:"+stack1formString;
-		add(feature15, fv);
+		if(!stack1formString.equals("NULL")){
+			String feature15="DOSHFEAT15:"+stack1formString;
+			add(feature15, fv);
+		}
 		//FEAT16
-		String feature16="DOSHFEAT16:"+stack2formString;
-		add(feature16, fv);
+		if(!stack2formString.equals("NULL")){
+			String feature16="DOSHFEAT16:"+stack2formString;
+			add(feature16, fv);
+		}
 		//FEAT17
-		String feature17="DOSHFEAT17:"+input0formString;
-		add(feature17, fv);
+		if(!input0formString.equals("NULL")){
+			String feature17="DOSHFEAT17:"+input0formString;
+			add(feature17, fv);
+		}
 		//FEAT18
-		String feature18="DOSHFEAT18:"+input1formString;
-		add(feature18, fv);
+		if(!input1formString.equals("NULL")){
+			String feature18="DOSHFEAT18:"+input1formString;
+			add(feature18, fv);
+		}
 		//FEAT19
-		String feature19="DOSHFEAT19:"+stack0ldepformString;
-		add(feature19, fv);
+		if(!stack0ldepformString.equals("NULL")){
+			String feature19="DOSHFEAT19:"+stack0ldepformString;
+			add(feature19, fv);
+		}
 		//FEAT20
-		String feature20="DOSHFEAT20:"+stack1rdepformString;
-		add(feature20, fv);
+		if(!stack1rdepformString.equals("NULL")){
+			String feature20="DOSHFEAT20:"+stack1rdepformString;
+			add(feature20, fv);
+		}
 		///////////////////////MERGE FEAT//////////////////////////
 		//FEAT21
 		String feature21=(stack0==-1&&stack1==-1)?"DOSHFEAT21:NULL":"DOSHFEAT21:"+stack0posString+"-"+stack1posString;
@@ -564,7 +767,8 @@ public class DOSHTrain {
     	int sentcount=1;
     	while(di!=null){
     		System.out.println("sent====="+sentcount);
-    		Object[] ret=GenerateLiblinearInstance(di);
+    		//Object[] ret=GenerateLiblinearInstance(di);
+    		Object[] ret=GenerateMaltLiblinearInstance(di);
     		HashSet<LiblinearInstance> libsfordi=(HashSet<LiblinearInstance>) ret[0];
     		TIntIntHashMap order_child=(TIntIntHashMap) ret[1];
     		Iterator iterator=libsfordi.iterator();

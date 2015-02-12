@@ -92,8 +92,12 @@ public class DOSHParse {
 				System.out.println();
 				int head=(int) decoder.FindHeadForOneWord(di, node[indexpointer], pa)[0];
 				pa.heads[node[indexpointer]]=head;
+				//TODO
+//				pa.heads[node[indexpointer]]=di.heads[node[indexpointer]];
 				di.orders.put(donechild.size()+1, node[indexpointer]);
 				pa.ChildProcess(node[indexpointer], head);
+				//TODO
+//				pa.ChildProcess(node[indexpointer], di.heads[node[indexpointer]]);
 				donechild.add(node[indexpointer]);
 				System.out.println("DO+"+node[indexpointer]+"\t");
 				backtracemaxindex=-1;
@@ -131,10 +135,12 @@ public class DOSHParse {
 //			System.out.println("backtracefailed:"+backtracefailed);
 		}
 		//do last node
+		//TODO
 		int head=(int) decoder.FindHeadForOneWord(di, node[1], pa)[0];
 		pa.heads[node[1]]=head;
 		pa.ChildProcess(node[1], head);
 		di.heads=pa.heads;
+//		pa.heads[node[1]]=di.heads[node[1]];
 		di.orders.put(donechild.size()+1, node[1]);
 		return pa;
 	}
@@ -214,7 +220,6 @@ public class DOSHParse {
             //  System.out.print(instcount + "\t");
             //}
             //if (instcount % 30 == 0) System.out.print('\n');
-            FeatureVector fv = new FeatureVector();//useless here, just align the param for DecodeInstance
 
             DecodeOneInstance(di);
 

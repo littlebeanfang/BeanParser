@@ -14,8 +14,8 @@ public class DOSHParseTest {
 		String conllfile=System.getenv("CODEDATA")+File.separator+"1sen.txt";
 		test.TestLibPredict(libmodelfile, alphabetfile, conllfile);
 		*/
-		String doshalphabetfile="wsj_2-21.libalphabet";
-		String libmodelfile="wsj_2-21.libmodel";
+		String doshalphabetfile="wsj_2-21.maltlibalphabet";
+		String libmodelfile="wsj_2-21.maltlibmodel";
 		DOSHParse test=new DOSHParse(doshalphabetfile, libmodelfile, args);
 		test.Parse(test.beanParser.options.testfile, test.beanParser.options.outfile);
 		ResultEvaluator re = new ResultEvaluator();

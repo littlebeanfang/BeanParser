@@ -15,8 +15,8 @@ public class ResultEvaluator{
 
     public static void main(String args[]) throws IOException {
         ResultEvaluator re = new ResultEvaluator();
-        String test_file = "wsj_rand500_features_original_parseout.txt";
-        String gold_file = "wsj_2-21_rand500_forprocessindextest.txt";
+        String test_file = "";
+        String gold_file = "wsj_00-01.conll";
         re.evaluate(test_file, gold_file);
     }
 

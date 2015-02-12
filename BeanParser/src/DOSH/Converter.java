@@ -110,6 +110,107 @@ public class Converter {
 		System.out.println();
 		return ret;
 	}
+	/**
+	 * similar to process, but process get DOSH order, here get malt order
+	 * @param di
+	 * @return
+	 */
+	public TIntIntHashMap maltprocess(DependencyInstance di){
+		TIntIntHashMap ret=new TIntIntHashMap();
+		TIntIntHashMap refcount=new TIntIntHashMap();
+		int length=di.length()-1;
+		for(int i=1;i<=length;i++){
+			int headi=di.heads[i];
+//			System.out.println("headi="+headi+" ");
+			if(refcount.contains(headi)){
+				refcount.put(headi, refcount.get(headi)+1);
+//				System.out.println("put head="+headi+" count="+(refcount.get(headi)));
+			}else{
+				refcount.put(headi, 1);
+//				System.out.println("put head="+headi+" count=1");
+			}
+		}
+//		System.out.println("Tranverse refcount:");
+//		TranverseTIntIntHashMap(refcount);
+		Stack<Integer> buf=new Stack<Integer>();
+		
+		int index=2;
+		int ordercount=1;
+		buf.add(0);
+		buf.add(1);
+		while(index<=length||buf.size()>1){
+		
+			
+			int top=buf.peek();
+			System.out.println(buf.size());
+			int topL=buf.size()-2>=0?buf.get(buf.size()-2):-1;
+			int topR=index>length?-1:index;
+			System.out.println("top="+top+",topL="+topL+",topR="+topR);
+			System.out.println("refcont="+refcount.contains(top));
+			System.out.println("head side:+"+((topL>=0&&di.heads[top]==topL)||(topR>0&&di.heads[top]==topR)));
+			if(!refcount.contains(top)&&((topL>=0&&di.heads[top]==topL)||(topR>0&&di.heads[top]==topR))){
+				//Do
+				System.out.print("DO+"+top+" ");
+				ret.put(ordercount++, top);
+				int headref=di.heads[top];
+				int headrefcount=refcount.get(headref);
+				if(headrefcount==1){
+					refcount.remove(headref);
+				}else{
+					refcount.put(headref, headrefcount-1);
+				}
+				
+				buf.pop();
+				
+			}else{
+				//Shift
+				if(index>length){
+					//end of sentence but cannot shift any more
+					//Swap is needed, pop until one node can be done
+					Stack<Integer> temp=new Stack<Integer>();
+					int depthofswap=0;
+					
+					while(true){
+						temp.push(buf.pop());
+						depthofswap++;
+						int swaptop=buf.peek();
+						int swaptopL=buf.size()-2>=0?buf.get(buf.size()-2):-1;
+						int swaptopR=temp.peek();
+						if(!refcount.contains(swaptop)){
+							if((swaptopL>=0&&di.heads[swaptopL]==swaptop)||(swaptopR<length&&di.heads[swaptopR]==swaptop)){
+								//DO and recover the buf stack
+								ret.put(ordercount++, swaptop);
+								System.out.println("DO+"+swaptop+" ");
+								System.out.println("swapdepth:"+depthofswap);
+								int headref=di.heads[swaptop];
+								int headrefcount=refcount.get(headref);
+								if(headrefcount==1){
+									refcount.remove(headref);
+								}else{
+									refcount.put(headref, headrefcount-1);
+								}
+								buf.pop();
+								while(!temp.empty()){
+									buf.push(temp.pop());
+								}
+								break;
+							}
+						}
+					}
+					
+				}else{
+					System.out.print("SH+"+index+" ");
+					buf.push(index++);
+				}
+				
+			}
+		}
+		if(ret.size()!=length){
+			System.out.println("Error: order_child size="+ret.size()+", sentence length:"+length);
+		}
+		System.out.println();
+		return ret;
+	}
 	public void GenerateDOSHOrder(String conllfile, String writefile) throws IOException{
 		CONLLReader reader=new CONLLReader();
 		reader.ordered=false;
@@ -122,6 +223,24 @@ public class Converter {
 		while(di!=null){
 			System.out.print("sent:"+sencount+"\t");
 			TIntIntHashMap ret=test.process(di);
+			writer.write(new DependencyInstance(RemoveRoot(di.forms), RemoveRoot(di.postags), RemoveRoot(di.deprels), RemoveRoot(di.heads)),ret);
+			di=reader.getNext();
+			sencount++;
+		}
+		writer.finishWriting();
+	}
+	public void GenerateMaltOrder(String conllfile, String writefile) throws IOException{
+		CONLLReader reader=new CONLLReader();
+		reader.ordered=false;
+		reader.startReading(System.getenv("CODEDATA")+File.separator+conllfile);
+		CONLLWriter writer=new CONLLWriter(true);
+		writer.startWriting(System.getenv("CODEDATA")+File.separator+writefile);
+		DependencyInstance di=reader.getNext();
+		Converter test=new Converter();
+		int sencount=1;
+		while(di!=null){
+			System.out.print("sent:"+sencount+"\t");
+			TIntIntHashMap ret=test.maltprocess(di);
 			writer.write(new DependencyInstance(RemoveRoot(di.forms), RemoveRoot(di.postags), RemoveRoot(di.deprels), RemoveRoot(di.heads)),ret);
 			di=reader.getNext();
 			sencount++;
