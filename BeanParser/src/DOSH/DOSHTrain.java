@@ -812,7 +812,7 @@ public class DOSHTrain {
 //		File libinstfile=new File(libinstfilestring);
 //        train.readProblem(libinstfile,-1.0);
         //train.main(new String[] {"-v", "10", "-c", "10", "-w1", "1.234", "-s","4",libinstfilestring,modelname});
-		train.main(new String[] { "-c", "0.1", "-e", "0.1", "-s","4",libinstfilestring,modelname});
+		train.main(new String[] { "-c", "10", "-e", "0.1", "-s","4",libinstfilestring,modelname});
 	}
 	
 	public void TestModelAccuracyOnInstanceFile(String liblinearmodel,String instfile) throws IOException, ClassNotFoundException{
@@ -831,7 +831,15 @@ public class DOSHTrain {
     			fn[i-1]=new FeatureNode(Integer.parseInt(feat_value[0]), Double.parseDouble(feat_value[1]));
     		}
             double probabilityPrediction = Linear.predictValues(libModel, fn, estimates);
-        	//System.out.println("prediction:"+probabilityPrediction);
+        	System.out.println("prediction:"+probabilityPrediction);
+        	for(double est:estimates){
+        		System.out.print("\t"+est);
+        	}
+        	int labels[]=libModel.getLabels();
+        	for(int label:labels){
+        		System.out.print("\t"+label);
+        	}
+        	System.out.println();
         	if(Integer.parseInt(columns[0])==(int)probabilityPrediction){
         		rightcount++;
         	}

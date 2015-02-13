@@ -367,5 +367,27 @@ public class Converter {
 		System.out.println("ReverseCount:"+reversecount);
 		System.out.println("=======================================");
 	}
-	
+	public void ViolationCount(String conllfile, String orderfile) throws IOException{
+		System.out.println("Order File 1:"+orderfile);
+		System.out.println("Order File 2:"+conllfile);
+		System.out.println("=======================================");
+		CONLLReader conllreader=new CONLLReader();
+		conllreader.ordered=false;
+		conllreader.startReading(System.getenv("CODEDATA")+File.separator+conllfile);
+		CONLLReader orderreader=new CONLLReader();
+		orderreader.startReading(System.getenv("CODEDATA")+File.separator+orderfile);
+		DependencyInstance di1=conllreader.getNext();
+		DependencyInstance di2=orderreader.getNext();
+		int violation=0;
+		while(di1!=null){
+			if(di2==null){
+				System.out.println("Error: The sentence is not the same.");
+			}
+			violation+=ViolationCount(di1, di2.orders);
+			di1=conllreader.getNext();
+			di2=orderreader.getNext();
+		}
+		System.out.println("Violationcount:"+violation);
+		System.out.println("=======================================");
+	}
 }

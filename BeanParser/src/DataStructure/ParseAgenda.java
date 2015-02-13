@@ -44,7 +44,7 @@ public class ParseAgenda {
 	}
 	
 	public ParseAgenda(int length, int[] heads, int[] numofleftchild, int[] numofrightchild,
-			Alphabet typealphabet, int[] set, FeatureVector fv, double score) {
+			Alphabet typealphabet, int[] set, FeatureVector fv, double score,int leftmostchilds[],int rightmostchilds[]) {
 		this.length = length;
 		this.heads = heads;
 		this.numofleftchild = numofleftchild;
@@ -53,11 +53,14 @@ public class ParseAgenda {
 		this.set = set;
 		this.fv = fv;
 		this.score = score;
+		this.leftmostchilds=leftmostchilds;
+		this.rightmostchilds=rightmostchilds;
 	}
 	
 	public ParseAgenda clone() {
-		ParseAgenda pa = new ParseAgenda(length, heads.clone(), numofleftchild.clone(), numofrightchild.clone(),
-				typealphabet, set.clone(), fv, score);
+//		ParseAgenda pa = new ParseAgenda(length, heads.clone(), numofleftchild.clone(), numofrightchild.clone(),
+//				typealphabet, set.clone(), fv, score);
+		ParseAgenda pa=new ParseAgenda(length, heads.clone(), numofleftchild.clone(), numofrightchild.clone(), typealphabet, set.clone(), fv, score,  leftmostchilds.clone(), rightmostchilds.clone());
 		pa.rightchilds = new StringBuilder[length];
 		pa.leftchilds = new StringBuilder[length];
 		for (int i = 0;i < length;i++) {

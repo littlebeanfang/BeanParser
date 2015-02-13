@@ -15,13 +15,13 @@ public class DoshTrainTest {
 //		String alphabetfile=System.getenv("CODEDATA")+File.separator+"1sen.alphabet";
 //		String libmodelfile=System.getenv("CODEDATA")+File.separator+"1sen.libmodel";
 		String conllfile=System.getenv("CODEDATA")+File.separator+"wsj_2-21.conll";
-		String liblinearfile=System.getenv("CODEDATA")+File.separator+"wsj_2-21.maltlibins";
+		String liblinearfile=System.getenv("CODEDATA")+File.separator+"1sen.maltlibins";
 		String orderfile=System.getenv("CODEDATA")+File.separator+"wsj_2-21.maltliborder";
 		String alphabetfile=System.getenv("CODEDATA")+File.separator+"wsj_2-21.maltlibalphabet";
-		String libmodelfile=System.getenv("CODEDATA")+File.separator+"wsj_2-21.maltlibmodel";
+		String libmodelfile=System.getenv("CODEDATA")+File.separator+"1sen.libmodel";
 		DOSHTrain test=new DOSHTrain();
-		test.GenerateLiblinearAndOrderFile(conllfile, liblinearfile, orderfile,alphabetfile);
-		test.TrainLiblinear(liblinearfile, libmodelfile);
+//		test.GenerateLiblinearAndOrderFile(conllfile, liblinearfile, orderfile,alphabetfile);
+//		test.TrainLiblinear(liblinearfile, libmodelfile);
 		test.TestModelAccuracyOnInstanceFile(libmodelfile, liblinearfile);
 //		String maltlibmodel=System.getenv("CODEDATA")+File.separator+"malt2-21beansave.model";
 //		String maltlibinstfile=System.getenv("CODEDATA")+File.separator+"odm0.liblinear.ins";
