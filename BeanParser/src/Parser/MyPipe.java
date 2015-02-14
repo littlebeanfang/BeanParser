@@ -34,13 +34,13 @@ public class MyPipe extends DependencyPipe {
         int large = leftToRight ? childindex : parentindex;
         addCoreFeatures(instance, small, large, leftToRight, fv);
         //System.out.println(this.options.secondOrder);
-        //this.options.secondOrder = true;
+        this.options.secondOrder = true;
         if (this.options.secondOrder) {
             addTwoOrderSiblingFeatures(instance, parentindex, childindex, pa, fv);
-            addBeamFeatures(instance, parentindex, childindex, pa, fv);
+            //addBeamFeatures(instance, parentindex, childindex, pa, fv);
         }
-        addThreeOrderSiblingFeatures(instance, parentindex, childindex, pa, fv);
-        addHMGfeatures(instance, parentindex, childindex, pa, fv);
+        //addThreeOrderSiblingFeatures(instance, parentindex, childindex, pa, fv);
+        //addHMGfeatures(instance, parentindex, childindex, pa, fv);
     }
 
 
