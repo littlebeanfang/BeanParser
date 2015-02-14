@@ -15,10 +15,10 @@ public class MaltConverterTest {
 		String maltfile=System.getenv("CODEDATA")+File.separator+"wsj_2-21.malt";
 		String maltgold=System.getenv("CODEDATA")+File.separator+"wsj_2-21_malt_processindex.txt";
 		String senconll=System.getenv("CODEDATA")+File.separator+"wsj_2-21.conll";
-		String senlib=System.getenv("CODEDATA")+File.separator+"wsj_2-21.maltlibins";
-		String senorder=System.getenv("CODEDATA")+File.separator+"wsj_2-21.order";
-		String senalphabet=System.getenv("CODEDATA")+File.separator+"wsj_2-21.maltalphabet";
-		String senlibmodel=System.getenv("CODEDATA")+File.separator+"wsj_2-21.libmodel";
+		String senlib=System.getenv("CODEDATA")+File.separator+"Order//wsj_2-21.maltlibins";
+		String senorder=System.getenv("CODEDATA")+File.separator+"Order//wsj_2-21.order";
+		String senalphabet=System.getenv("CODEDATA")+File.separator+"Order//wsj_2-21.maltalphabet";
+		String senlibmodel=System.getenv("CODEDATA")+File.separator+"Order//wsj_2-21.libmodel";
 //		MaltConverter test=new MaltConverter();
 //		test.Convert(conllfile,maltfile);
 //		Converter ordercompare=new Converter();

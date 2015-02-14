@@ -63,8 +63,9 @@ public class MaltParse {
 			
 			switch (action) {
 			case MaltParse.LA:
-				System.out.print("LA\t");
+				
 				child=alpha.get(alpha.size()-2);
+				System.out.print("LA"+child+"\t");
 //				head=(int)decoder.FindHeadForOneWord(di, child, pa)[0];
 				//TODO change the head to be gold one
 //				pa.heads[child]=head;
@@ -76,8 +77,8 @@ public class MaltParse {
 				alpha.remove(alpha.size()-2);
 				break;
 			case MaltParse.RA:
-				System.out.print("RA\t");
 				child=alpha.peek();
+				System.out.print("RA"+child+"\t");
 //				head=(int)decoder.FindHeadForOneWord(di, child, pa)[0];
 				//TODO
 //				pa.heads[child]=head;
@@ -89,12 +90,12 @@ public class MaltParse {
 				alpha.pop();
 				break;
 			case MaltParse.SH:
-				System.out.print("SH\t");
+				System.out.print("SH"+beta.peek()+"\t");
 				alpha.push(beta.pop());
 				break;
 			default:
-				System.out.print("POP\t");
 				child=alpha.peek();
+				System.out.print("POP"+child+"\t");
 //				head=(int)decoder.FindHeadForOneWord(di, child, pa)[0];
 				//TODO
 //				pa.heads[child]=head;
@@ -120,6 +121,7 @@ public class MaltParse {
 		Iterator iterator=pop.iterator();
 		while(iterator.hasNext()){
 			int child=(int) iterator.next();
+			System.out.println("DOPOP"+child+"\t");
 			pa.heads[child]=di.heads[child];
 			di.orders.put(ordercount++, child);
 		}
@@ -165,7 +167,7 @@ public class MaltParse {
         int maxindex=-1;
         int minindex=-1;
         for(int i=0;i<estimates.length;i++){
-        	if(i!=best){
+        	if(estimates[i]!=best){
 	        	if(estimates[i]<minvalue){
 	        		minvalue=estimates[i];
 	        		minindex=i;

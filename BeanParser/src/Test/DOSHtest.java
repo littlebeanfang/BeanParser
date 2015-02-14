@@ -18,13 +18,17 @@ public class DOSHtest {
 //		testConverter.OrderCompare("wsj_00-01_doshparse_doshbeanmodel.out", "wsj_00-01.dosh");
 //		testConverter.OrderCompare("wsj_00-01_doshparse_maltmodel.out", "wsj_00-01.dosh");
 //		testConverter.GenerateMaltOrder("wsj_2-21.conll", "wsj_2-21.malt");
-		testConverter.OrderCompare("wsj_00-01_malt_processindex.txt", "wsj_00-01_malt_processindex_new.txt");
-		testConverter.OrderCompare("wsj_00-01_malt_processindex.txt", "wsj_00-01.malt");
-		testConverter.OrderCompare("wsj_00-01_malt_processindex.txt", "wsj_00-01_maltparse_maltbeanmodel.out");
-		testConverter.OrderCompare("wsj_00-01_maltparse_maltbeanmodel_firsttime.out", "wsj_00-01_maltparse_maltbeanmodel.out");
-		testConverter.ViolationCount("wsj_00-01.conll", "wsj_00-01_malt_processindex_new.txt");
-		testConverter.ViolationCount("wsj_00-01.conll", "wsj_00-01_maltparse_maltbeanmodel_firsttime.out");
-		testConverter.ViolationCount("wsj_00-01.conll", "wsj_00-01_maltparse_maltbeanmodel.out");
+		
+		
+//		testConverter.OrderCompare("wsj_00-01_malt_processindex.txt", "wsj_00-01_malt_processindex_new.txt");
+//		testConverter.OrderCompare("wsj_00-01_malt_processindex.txt", "wsj_00-01.malt");
+//		testConverter.OrderCompare("wsj_00-01_malt_processindex.txt", "wsj_00-01_maltparse_maltbeanmodel.out");
+//		testConverter.OrderCompare("wsj_00-01_maltparse_maltbeanmodel_firsttime.out", "wsj_00-01_maltparse_maltbeanmodel.out");
+//		testConverter.ViolationCount("wsj_00-01.conll", "wsj_00-01_malt_processindex_new.txt");
+//		testConverter.ViolationCount("wsj_00-01.conll", "wsj_00-01_maltparse_maltbeanmodel_firsttime.out");
+		testConverter.ViolationCount("wsj_00-01.conll", "wsj_00-01_maltordertest_goldhead.out");
+		
+		
 //		testConverter.GenerateDOSHOrder("1sen.txt", "1senconvert.txt");
 //		DOSHTrain testDoshTrain=new DOSHTrain();
 //		int node[]={-1,1,2,3,4,5,-1};

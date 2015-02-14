@@ -812,7 +812,7 @@ public class DOSHTrain {
 //		File libinstfile=new File(libinstfilestring);
 //        train.readProblem(libinstfile,-1.0);
         //train.main(new String[] {"-v", "10", "-c", "10", "-w1", "1.234", "-s","4",libinstfilestring,modelname});
-		train.main(new String[] { "-c", "10", "-e", "0.1", "-s","4",libinstfilestring,modelname});
+		train.main(new String[] { "-c", "0.1", "-e", "0.1", "-s","4",libinstfilestring,modelname});
 	}
 	
 	public void TestModelAccuracyOnInstanceFile(String liblinearmodel,String instfile) throws IOException, ClassNotFoundException{

@@ -15,7 +15,7 @@ public class ResultEvaluator{
 
     public static void main(String args[]) throws IOException {
         ResultEvaluator re = new ResultEvaluator();
-        String test_file = "";
+        String test_file = "wsj_00-01_maltparse_maltbeanmodel.out";
         String gold_file = "wsj_00-01.conll";
         re.evaluate(test_file, gold_file);
     }
