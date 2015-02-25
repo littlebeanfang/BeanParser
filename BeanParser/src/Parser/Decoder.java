@@ -81,7 +81,7 @@ public class Decoder {
 			System.out.println("Head index:"+headindex);
 			System.out.println("Score:"+score);
 		}
-		
+		System.out.println("Choose head:"+headindex);
 		//Update the disjoint-set
 		set[childindex] = headindex;
 		
