@@ -52,18 +52,21 @@ public class Decoder {
 	}
 	
 	public Object[] FindHeadForOneWord(DependencyInstance inst,int childindex, ParseAgenda pa, int[] set){
+		System.out.println("FindHeadFor:"+childindex+"========================");
 		Object[] ret=new Object[2];
 		boolean verbose=false;
 		int headindex=-1;
 		double score=Double.NEGATIVE_INFINITY;
 		FeatureVector actfv=new FeatureVector();
 		for(int head=0; head<inst.length();head++){
-			if ((head!=childindex) && (FindRoot(head, set) != childindex)) { //Jia: if the root of the head is not child
+			if ((head!=childindex) ) { //Jia: if the root of the head is not child
 				FeatureVector fv=new FeatureVector();
 				//pipe.AddNewFeature(inst, childindex, head, pa, fv);
 				pipe.extractFeatures(inst, childindex, head, pa, fv);
 				double temp=fv.getScore(param.parameters);
-				if(temp>score){
+				boolean circle=FindRoot(head, set) != childindex?false:true;
+				System.out.println("Head:"+head+",score:"+temp+",circle:"+circle);
+				if(temp>score&& (FindRoot(head, set) != childindex)){
 					score=temp;
 					headindex=head;
 					//must store best fv in DependencyInstance
