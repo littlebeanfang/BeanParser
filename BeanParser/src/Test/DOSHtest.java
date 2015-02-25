@@ -21,7 +21,7 @@ public class DOSHtest {
 		
 		
 //		testConverter.OrderCompare("wsj_00-01_malt_processindex.txt", "wsj_00-01_malt_processindex_new.txt");
-//		testConverter.OrderCompare("wsj_00-01_malt_processindex.txt", "wsj_00-01.malt");
+		testConverter.OrderCompare("wsj_00-01_maltordertest_goldhead.out", "wsj_00-01.malt");
 //		testConverter.OrderCompare("wsj_00-01_malt_processindex.txt", "wsj_00-01_maltparse_maltbeanmodel.out");
 //		testConverter.OrderCompare("wsj_00-01_maltparse_maltbeanmodel_firsttime.out", "wsj_00-01_maltparse_maltbeanmodel.out");
 //		testConverter.ViolationCount("wsj_00-01.conll", "wsj_00-01_malt_processindex_new.txt");

@@ -158,6 +158,7 @@ public class MaltParse {
 	 */
 	private int[] PredictActionRank(FeatureVector fv){
 		int[] retlabel=new int[3];
+		int labels[]=libModel.getLabels();
 		LiblinearInstance test=new LiblinearInstance(fv);
     	//double predict=Linear.predict(libModel, test.TransformXfeat());
     	double[] estimates = new double[libModel.getNrClass()];
@@ -167,7 +168,7 @@ public class MaltParse {
         int maxindex=-1;
         int minindex=-1;
         for(int i=0;i<estimates.length;i++){
-        	if(estimates[i]!=best){
+        	if(labels[i]!=best){
 	        	if(estimates[i]<minvalue){
 	        		minvalue=estimates[i];
 	        		minindex=i;
@@ -179,7 +180,7 @@ public class MaltParse {
         	}
         }
         	
-        int labels[]=libModel.getLabels();
+        
         retlabel[0]=best;
         retlabel[1]=labels[maxindex];
         retlabel[2]=labels[minindex];

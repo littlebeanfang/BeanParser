@@ -356,11 +356,17 @@ public class Converter {
 		DependencyInstance di1=reader1.getNext();
 		DependencyInstance di2=reader2.getNext();
 		int reversecount=0;
+		int sencount=0;
 		while(di1!=null){
+			sencount++;
 			if(di2==null){
 				System.out.println("Error: The sentence is not the same.");
 			}
-			reversecount+=CountReverse(di1.orders, di2.orders);
+			int curreverse=CountReverse(di1.orders, di2.orders);
+			if(curreverse!=0){
+				System.out.println(""+sencount+"\t"+curreverse+"\t"+(di1.length()-1));
+			}
+			reversecount+=curreverse;
 			di1=reader1.getNext();
 			di2=reader2.getNext();
 		}

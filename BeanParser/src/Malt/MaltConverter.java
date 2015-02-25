@@ -54,7 +54,7 @@ public class MaltConverter {
 					donenodes.add(i);
 					order_child.put(order++, i);
 					action=true;
-					System.out.println("LA+"+di.deprels[i]);
+					System.out.print("LA+"+di.deprels[i]+" ");
 				}
 			}
 			if(!action&&i!=-1&&head_dependent[i][j]==true){
@@ -70,7 +70,7 @@ public class MaltConverter {
 					donenodes.add(j);
 					order_child.put(order++, j);
 					action=true;
-					System.out.println("RA+"+di.deprels[j]);
+					System.out.print("RA+"+di.deprels[j]+" ");
 				}
 			}
 			/*
@@ -89,7 +89,7 @@ public class MaltConverter {
 			if(!action){
 				//SH
 				alpha.push(beta.pop());
-				System.out.println("SH");
+				System.out.print("SH ");
 			}
 //			System.out.println("size:"+donenodes.size());
 		}
@@ -150,8 +150,9 @@ public class MaltConverter {
 		writer.startWriting(orderfile);
 		int i=1;
 		while(di!=null){
-			System.out.println("sent "+i++);
+			System.out.print(""+i+++" ");
 			TIntIntHashMap order_child=Process(di);
+			System.out.println();
 			writer.write(new DependencyInstance(RemoveRoot(di.forms), RemoveRoot(di.postags), RemoveRoot(di.deprels), RemoveRoot(di.heads)), order_child);
 			di=reader.getNext();
 		}

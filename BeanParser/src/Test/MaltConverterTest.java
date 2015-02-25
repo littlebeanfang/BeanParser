@@ -19,14 +19,16 @@ public class MaltConverterTest {
 		String senorder=System.getenv("CODEDATA")+File.separator+"Order//wsj_2-21.order";
 		String senalphabet=System.getenv("CODEDATA")+File.separator+"Order//wsj_2-21.maltalphabet";
 		String senlibmodel=System.getenv("CODEDATA")+File.separator+"Order//wsj_2-21.libmodel";
-//		MaltConverter test=new MaltConverter();
-//		test.Convert(conllfile,maltfile);
+		MaltConverter test=new MaltConverter();
+		test.Convert(conllfile,maltfile);
 //		Converter ordercompare=new Converter();
 //		ordercompare.OrderCompare("wsj_2-21.malt","wsj_2-21.maltliborder" );
-		MaltTrain test=new MaltTrain();
-		test.GenerateLiblinearAndOrderFile(senconll, senlib, senorder, senalphabet);
-		DOSHTrain train=new DOSHTrain();
-		train.TrainLiblinear(senlib, senlibmodel);
-		train.TestModelAccuracyOnInstanceFile(senlibmodel, senlib);
+		
+		
+//		MaltTrain test=new MaltTrain();
+//		test.GenerateLiblinearAndOrderFile(senconll, senlib, senorder, senalphabet);
+//		DOSHTrain train=new DOSHTrain();
+//		train.TrainLiblinear(senlib, senlibmodel);
+//		train.TestModelAccuracyOnInstanceFile(senlibmodel, senlib);
 	}
 }
