@@ -192,6 +192,9 @@ public class MyPipe extends DependencyPipe {
             //System.out.println("children: "+children.toString());
 
             String[] grandchildren = grandchildren_sb.toString().split("\t");
+/*            System.out.println("lsb: "+lsb);
+            System.out.println("rsb: "+rsb);
+            System.out.println("grandchildren: "+grandchildren_sb.toString());*/
 
 /*            if (childindex > parentindex) {
                 if (rsb != null) {  // add the structure G-H-M
@@ -356,19 +359,20 @@ public class MyPipe extends DependencyPipe {
 
         add("YZ_PPCPGP_DIR=" + parent_child_dir + "_" + child_grandchild_dir + "_" + parent_pos + "_" + child_pos + "_" + grandchild_pos, 1.0, fv);
         add("YZ_PPGP_DIR=" + parent_child_dir + "_" + child_grandchild_dir + "_" + parent_pos + "_" + grandchild_pos, 1.0, fv);
+
+
+        //add("YZ_PPCPGP_DIR=" + parent_child_dir + "_" + child_grandchild_dir + "_" + parent_word + "_" + child_word + "_" + grandchild_word, 1.0, fv);
+
+        /*add("YZ_PPGP_DIR=" + parent_child_dir + "_" + child_grandchild_dir + "_" + parent_pos + "_" + grandchild_pos, 1.0, fv);
         add("YZ_PWGW_DIR=" + parent_child_dir + "_" + child_grandchild_dir + "_" + parent_word + "_" + grandchild_word, 1.0, fv);
         add("YZ_PPGW_DIR=" + parent_child_dir + "_" + child_grandchild_dir + "_" + parent_pos + "_" + grandchild_word, 1.0, fv);
-        add("YZ_PWGP_DIR=" + parent_child_dir + "_" + child_grandchild_dir + "_" + parent_word + "_" + grandchild_pos, 1.0, fv);
+        add("YZ_PWGP_DIR=" + parent_child_dir + "_" + child_grandchild_dir + "_" + parent_word + "_" + grandchild_pos, 1.0, fv);*/
 
-        add("YZ_PPCPGP=" + parent_pos + "_" + child_pos + "_" + grandchild_pos, 1.0, fv);
+        /*add("YZ_PPCPGP=" + parent_pos + "_" + child_pos + "_" + grandchild_pos, 1.0, fv);
         add("YZ_PPGP=" + parent_pos + "_" + grandchild_pos, 1.0, fv);
-        //add("YZ_CPGP=" + child_pos + "_" + grandchild_pos, 1.0, fv);
         add("YZ_PWGW=" + parent_word + "_" + grandchild_word, 1.0, fv);
-        //add("YZ_CWGW=" + child_word + "_" + grandchild_word, 1.0, fv);
         add("YZ_PPGW=" + parent_pos + "_" + grandchild_word, 1.0, fv);
-        //add("YZ_CPGW=" + child_pos + "_" + grandchild_word, 1.0, fv);
-        add("YZ_PWGP=" + parent_word + "_" + grandchild_pos, 1.0, fv);
-        //add("YZ_CWGP=" + child_word + "_" + grandchild_pos, 1.0, fv);
+        add("YZ_PWGP=" + parent_word + "_" + grandchild_pos, 1.0, fv);*/
     }
 
 
