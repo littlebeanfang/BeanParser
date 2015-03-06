@@ -12,6 +12,8 @@
 
 package mstparser;
 
+import DataStructure.Parameters;
+
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
@@ -95,6 +97,23 @@ public class Alphabet implements Serializable {
         numEntries = in.readInt();
         map = (gnu.trove.TObjectIntHashMap) in.readObject();
         growthStopped = in.readBoolean();
+    }
+
+    public void refine(Parameters para) {
+        this.allowGrowth();
+        int remove_num = 0;
+        for (Object key : map.keys()) {
+            //System.out.println(para.parameters[map.get(key)]);
+            if (para.parameters[map.get(key)] == 0) {
+                map.remove(key);
+                //System.out.println("Remove: " + para.parameters[map.get(key)]);
+                numEntries--;
+                remove_num++;
+            }
+        }
+        //System.out.println("Remove Features: " + remove_num + "\tLeft: " + numEntries);
+        System.out.println("Model Feature Num: " + numEntries);
+        this.stopGrowth();
     }
 
 }

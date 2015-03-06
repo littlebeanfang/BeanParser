@@ -44,7 +44,7 @@ public final class ParserOptions {
     public String goldfile = null;
     //public int trainK = 1;
     //public int testK = 1;
-    public boolean secondOrder = false;
+    public boolean secondOrder = true;
     //public boolean useRelationalFeatures = false;
     //public boolean discourseMode = false;
     //public String confidenceEstimator = null;
