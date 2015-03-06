@@ -34,11 +34,9 @@ public class Parser {
     public void loadModel(String file) throws Exception {
         ObjectInputStream in = new ObjectInputStream(new BufferedInputStream(new FileInputStream(System.getenv("CODEDATA") + File.separator + file)));
         params.parameters = (double[]) in.readObject();
-        //System.out.println("Parameters loaded!");
         pipe.dataAlphabet = (Alphabet) in.readObject();
-        //System.out.println("dataAlphabet loaded!");
+        pipe.dataAlphabet.refine(params);
         pipe.typeAlphabet = (Alphabet) in.readObject();
-        //System.out.println("typeAlphabet loaded!");
         System.out.println("Model loaded!");
         in.close();
         pipe.closeAlphabets();
