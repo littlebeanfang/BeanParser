@@ -23,7 +23,6 @@ import java.io.File;
  *
  * @author Jason Baldridge
  * @version $Id: CONLLReader.java 103 2007-01-21 20:26:39Z jasonbaldridge $
- * @see mstparser.io.DependencyReader
  */
 public final class ParserOptions {
 
