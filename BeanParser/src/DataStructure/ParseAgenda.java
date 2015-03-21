@@ -15,8 +15,8 @@ public class ParseAgenda {
     public TIntIntHashMap tii;
     public TIntIntHashMap numofleftchild;
     public TIntIntHashMap numofrightchild;
-    public Map<Integer, StringBuffer> rightchilds = new HashMap<Integer, StringBuffer>();//split by \t
-    public Map<Integer, StringBuffer> leftchilds = new HashMap<Integer, StringBuffer>(); //StringBuffer is unordered
+    public Map<Integer, StringBuilder> rightchilds = new HashMap<Integer, StringBuilder>();//split by \t
+    public Map<Integer, StringBuilder> leftchilds = new HashMap<Integer, StringBuilder>(); //StringBuffer is unordered
     private Alphabet typealphabet;
 
     public ParseAgenda() {
@@ -79,7 +79,7 @@ public class ParseAgenda {
                 this.leftchilds.get(parentindex).append("\t" + childindex);
 //        		System.out.println(this.leftchilds.get(parentindex));
             } else {
-                this.leftchilds.put(parentindex, new StringBuffer().append(childindex));
+                this.leftchilds.put(parentindex, new StringBuilder().append(childindex));
 //        		System.out.println(this.leftchilds.get(parentindex));
             }
         } else {
@@ -96,7 +96,7 @@ public class ParseAgenda {
                 this.rightchilds.get(parentindex).append("\t" + childindex);
 //        		System.out.println(this.rightchilds.get(parentindex));
             } else {
-                this.rightchilds.put(parentindex, new StringBuffer().append(childindex));
+                this.rightchilds.put(parentindex, new StringBuilder().append(childindex));
 //        		System.out.println(this.rightchilds.get(parentindex));
             }
         }

@@ -71,18 +71,18 @@ public class Parser {
                 System.out.print(instcount + "\t");
             }
             //if (instcount % 30 == 0) System.out.print('\n');
-            FeatureVector fv = new FeatureVector();//useless here, just align the param for DecodeInstance
+            //FeatureVector fv = new FeatureVector();//useless here, just align the param for DecodeInstance
 
             ParseAgenda pa = (ParseAgenda) decoder.DecodeInstance(di, di.orders)[0];
 
-            writer.write(new DependencyInstance(RemoveRoot(di.forms), RemoveRoot(di.postags), RemoveRoot(di.deprels), RemoveRoot(di.heads)));
+            //writer.write(new DependencyInstance(RemoveRoot(di.forms), RemoveRoot(di.postags), RemoveRoot(di.deprels), RemoveRoot(di.heads)));
         }
         long parseend = System.currentTimeMillis();
         System.out.println("\n==============================================");
         System.out.println("Test File:" + options.testfile);
         System.out.println("Model Name:" + options.modelName);
         System.out.println("Sentence Number:" + instcount);
-        System.out.println("Train Time Total:" + (parseend - parsestart) / 1000.0);
+        System.out.println("Parse Time Total:" + (parseend - parsestart) / 1000.0);
         System.out.println("==============================================");
         writer.finishWriting();
     }
@@ -98,17 +98,19 @@ public class Parser {
 
     private String[] RemoveRoot(String[] form) {
         String[] ret = new String[form.length - 1];
-        for (int i = 0; i < ret.length; i++) {
-            ret[i] = form[i + 1];
-        }
+        System.arraycopy(form, 1, ret, 0, form.length - 1);
+//        for (int i = 0; i < ret.length; i++) {
+//            ret[i] = form[i + 1];
+//        }
         return ret;
     }
 
     private int[] RemoveRoot(int[] form) {
         int[] ret = new int[form.length - 1];
-        for (int i = 0; i < ret.length; i++) {
-            ret[i] = form[i + 1];
-        }
+        System.arraycopy(form, 1, ret, 0, form.length - 1);
+//        for (int i = 0; i < ret.length; i++) {
+//            ret[i] = form[i + 1];
+//        }
         return ret;
     }
 }

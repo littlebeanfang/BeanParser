@@ -91,7 +91,7 @@ public class MyPipe extends DependencyPipe {
 //                }
 //            }
             //----------------------------------------------------
-            StringBuffer lsb = pa.leftchilds.get(parentindex);
+        	StringBuilder lsb = pa.leftchilds.get(parentindex);
             if (lsb != null) {
                 String[] left_childrens = lsb.toString().split("\t");
                 for (String existing_child : left_childrens) {     //MST 2nd order features
@@ -104,7 +104,7 @@ public class MyPipe extends DependencyPipe {
                     //        true, fv);
                 }
             }
-            StringBuffer rsb = pa.rightchilds.get(parentindex);
+            StringBuilder rsb = pa.rightchilds.get(parentindex);
             if (rsb != null) {
                 String[] right_childrens = rsb.toString().split("\t");
                 for (String existing_child : right_childrens) {    //MST 2nd order features
@@ -124,7 +124,7 @@ public class MyPipe extends DependencyPipe {
                                               int parentindex, int childindex, ParseAgenda pa, FeatureVector fv) {
         if (pa.tii.containsValue(parentindex)) {
             if (childindex < parentindex) {
-                StringBuffer lsb = pa.leftchilds.get(parentindex);
+            	StringBuilder lsb = pa.leftchilds.get(parentindex);
                 if (lsb != null) {
                     String[] left_childrens = lsb.toString().split("\t");
                     int right_nearest = parentindex;
@@ -146,7 +146,7 @@ public class MyPipe extends DependencyPipe {
             }
 
             if (childindex > parentindex) {
-                StringBuffer rsb = pa.rightchilds.get(parentindex);
+            	StringBuilder rsb = pa.rightchilds.get(parentindex);
                 if (rsb != null) {
                     String[] right_childrens = rsb.toString().split("\t");
                     int left_nearest = parentindex;
@@ -173,8 +173,8 @@ public class MyPipe extends DependencyPipe {
         //TODO: It still needs further discussion how to add this structure : the GHM or GMH or MGH or MHG and so on.
         if (pa.tii.containsValue(childindex)) { // this shows that the child
             // candidate is already used as another word's parent
-            StringBuffer lsb = pa.leftchilds.get(childindex);
-            StringBuffer rsb = pa.rightchilds.get(childindex);
+        	StringBuilder lsb = pa.leftchilds.get(childindex);
+        	StringBuilder rsb = pa.rightchilds.get(childindex);
 
             StringBuffer grandchildren_sb = new StringBuffer();
 
@@ -387,7 +387,7 @@ public class MyPipe extends DependencyPipe {
         String M_pos = pos[modifier];
 
         int clc_index = modifier;
-        StringBuffer lsb = pa.leftchilds.get(modifier);
+        StringBuilder lsb = pa.leftchilds.get(modifier);
 //        for (int i = 0; i < forms.length; i++) {
 //            System.out.print(forms[i] + " ");
 //        }
@@ -405,7 +405,7 @@ public class MyPipe extends DependencyPipe {
         }
 
         int crc_index = modifier;
-        StringBuffer rsb = pa.rightchilds.get(modifier);
+        StringBuilder rsb = pa.rightchilds.get(modifier);
 //        System.out.println(rsb);
         if (rsb != null) {
             String[] right_children = rsb.toString().split("\t");

@@ -11,6 +11,7 @@ import mstparser.Alphabet;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
+import java.util.ArrayList;
 
 public class DependencyPipe {
 
@@ -249,9 +250,14 @@ public class DependencyPipe {
 
         String attDist = "&" + att + "&" + distBool;
 
+//        ArrayList<String> linearFeatures = getLinearFeaturesWithoutPrefix(
+//        		pos, small, large, attDist);
+//        for (String feature : linearFeatures) {
+//        	add("POS" + feature, fv);
+//        	add("CPOS" + feature, fv);
+//        }
         addLinearFeatures("POS", pos, small, large, attDist, fv);
         addLinearFeatures("CPOS", posA, small, large, attDist, fv);
-
 
         //////////////////////////////////////////////////////////////////////
 
@@ -262,6 +268,14 @@ public class DependencyPipe {
             childIndex = small;
         }
 
+//        ArrayList<String> twoObsFeatures = getTwoObsFeaturesWithoutPrefix(forms[headIndex],
+//        		pos[headIndex], forms[childIndex], pos[childIndex], attDist);
+//        for (String feature : twoObsFeatures) {
+//        	add("HC" + feature, fv);
+//        	add("HCA" + feature, fv);
+//        	add("HCC" + feature, fv);
+//        	add("HCD" + feature, fv);
+//        }
         addTwoObsFeatures("HC", forms[headIndex], pos[headIndex],
                 forms[childIndex], pos[childIndex], attDist, fv);
 
@@ -277,6 +291,7 @@ public class DependencyPipe {
         addTwoObsFeatures("HCD", instance.lemmas[headIndex], posA[headIndex],
                 instance.lemmas[childIndex], posA[childIndex],
                 attDist, fv);
+        
 /*
         if (options.discourseMode) {
 		// Note: The features invoked here are designed for
@@ -295,7 +310,7 @@ public class DependencyPipe {
         // each item. For example, nouns might have a
         // different number of morphological features than
         // verbs.
-
+        
         for (int i = 0; i < instance.feats[headIndex].length; i++) {
             for (int j = 0; j < instance.feats[childIndex].length; j++) {
                 addTwoObsFeatures("FF" + i + "*" + j,
@@ -361,7 +376,28 @@ public class DependencyPipe {
 
     }
 
-
+    private ArrayList<String> getLinearFeaturesWithoutPrefix(String[] obsVals,
+    											int first, int second,
+    											String attachDistance) {
+    	ArrayList<String> features = new ArrayList<String>();
+        String pLeft = first > 0 ? obsVals[first - 1] : "STR";
+        String pRight = second < obsVals.length - 1 ? obsVals[second + 1] : "END";
+        String pLeftRight = first < second - 1 ? obsVals[first + 1] : "MID";
+        String pRightLeft = second > first + 1 ? obsVals[second - 1] : "MID";
+    	
+        String featPos = "PC=" + obsVals[first] + " " + obsVals[second];
+        for (int i = first + 1;i < second;i++) {
+        	features.add(featPos + ' ' + obsVals[i]);
+        	features.add(featPos + ' ' + obsVals[i] + attachDistance);
+        }
+        
+        features.addAll(getCorePosFeaturesWithoutPrefix(
+        		"PT", pLeft, obsVals[first], pLeftRight, pRightLeft,
+        		obsVals[second], pRight, attachDistance));
+        
+        return features;
+    }
+    
     private void addCorePosFeatures(String prefix,
                                     String leftOf1, String one, String rightOf1,
                                     String leftOf2, String two, String rightOf2,
@@ -440,7 +476,82 @@ public class DependencyPipe {
 
     }
 
+    private ArrayList<String> getCorePosFeaturesWithoutPrefix(String prefix,
+                                    String leftOf1, String one, String rightOf1,
+                                    String leftOf2, String two, String rightOf2,
+                                    String attachDistance) {
+    	ArrayList<String> features = new ArrayList<String>();
+    	
+    	features.add(prefix + "=" + leftOf1 + " " + one + " " + two + "*" + attachDistance);
 
+        StringBuilder feat =
+                new StringBuilder(prefix + "1=" + leftOf1 + " " + one + " " + two);
+        features.add(feat.toString());
+        feat.append(' ').append(rightOf2);
+        features.add(feat.toString());
+        feat.append('*').append(attachDistance);
+        features.add(feat.toString());
+
+        feat = new StringBuilder(prefix + "2=" + leftOf1 + " " + two + " " + rightOf2);
+        features.add(feat.toString());
+        feat.append('*').append(attachDistance);
+        features.add(feat.toString());
+
+        feat = new StringBuilder(prefix + "3=" + leftOf1 + " " + one + " " + rightOf2);
+        features.add(feat.toString());
+        feat.append('*').append(attachDistance);
+        features.add(feat.toString());
+
+        feat = new StringBuilder(prefix + "4=" + one + " " + two + " " + rightOf2);
+        features.add(feat.toString());
+        feat.append('*').append(attachDistance);
+        features.add(feat.toString());
+
+        /////////////////////////////////////////////////////////////
+        prefix = "A" + prefix;
+
+        // feature posL posL+1 posR-1 posR
+        features.add(prefix + "1=" + one + " " + rightOf1 + " " + leftOf2 + "*" + attachDistance);
+
+        feat = new StringBuilder(prefix + "1=" + one + " " + rightOf1 + " " + leftOf2);
+        features.add(feat.toString());
+        feat.append(' ').append(two);
+        features.add(feat.toString());
+        feat.append('*').append(attachDistance);
+        features.add(feat.toString());
+
+        feat = new StringBuilder(prefix + "2=" + one + " " + rightOf1 + " " + two);
+        features.add(feat.toString());
+        feat.append('*').append(attachDistance);
+        features.add(feat.toString());
+
+        feat = new StringBuilder(prefix + "3=" + one + " " + leftOf2 + " " + two);
+        features.add(feat.toString());
+        feat.append('*').append(attachDistance);
+        features.add(feat.toString());
+
+        feat = new StringBuilder(prefix + "4=" + rightOf1 + " " + leftOf2 + " " + two);
+        features.add(feat.toString());
+        feat.append('*').append(attachDistance);
+        features.add(feat.toString());
+
+        ///////////////////////////////////////////////////////////////
+        prefix = "B" + prefix;
+
+        //// feature posL-1 posL posR-1 posR
+        feat = new StringBuilder(prefix + "1=" + leftOf1 + " " + one + " " + leftOf2 + " " + two);
+        features.add(feat.toString());
+        feat.append('*').append(attachDistance);
+        features.add(feat.toString());
+
+        //// feature posL posL+1 posR posR+1
+        feat = new StringBuilder(prefix + "2=" + one + " " + rightOf1 + " " + two + " " + rightOf2);
+        features.add(feat.toString());
+        feat.append('*').append(attachDistance);
+        features.add(feat.toString());
+        
+        return features;
+    }
     /**
      * Add features for two items, each with two observations, e.g. head,
      * head pos, child, and child pos.
@@ -524,6 +635,51 @@ public class DependencyPipe {
 
     }
 
+    private ArrayList<String> getTwoObsFeaturesWithoutPrefix(String item1F1, String item1F2,
+    												String item2F1, String item2F2,
+    												String attachDistance) {
+    	ArrayList<String> features = new ArrayList<String>(26);
+    	features.add("2FF1=" + item1F1);
+        features.add("2FF1=" + item1F1 + '*' + attachDistance);
+
+        features.add("2FF1=" + item1F1 + " " + item1F2);
+        features.add("2FF1=" + item1F1 + " " + item1F2 + '*' + attachDistance);
+
+        features.add("2FF1=" + item1F1 + " " + item1F2 + " " + item2F2);
+        features.add("2FF1=" + item1F1 + " " + item1F2 + " " + item2F2 + '*' + attachDistance);
+
+        features.add("2FF1=" + item1F1 + " " + item1F2 + " " + item2F2 + " " + item2F1);
+        features.add("2FF1=" + item1F1 + " " + item1F2 + " " + item2F2 + " " + item2F1 + '*' + attachDistance);
+
+        features.add("2FF2=" + item1F1 + " " + item2F1);
+        features.add("2FF2=" + item1F1 + " " + item2F1 + '*' + attachDistance);
+
+        features.add("2FF3=" + item1F1 + " " + item2F2);
+        features.add("2FF3=" + item1F1 + " " + item2F2 + '*' + attachDistance);
+
+        features.add("2FF4=" + item1F2 + " " + item2F1);
+        features.add("2FF4=" + item1F2 + " " + item2F1 + '*' + attachDistance);
+
+        features.add("2FF4=" + item1F2 + " " + item2F1 + " " + item2F2);
+        features.add("2FF4=" + item1F2 + " " + item2F1 + " " + item2F2 + '*' + attachDistance);
+
+        features.add("2FF5=" + item1F2 + " " + item2F2);
+        features.add("2FF5=" + item1F2 + " " + item2F2 + '*' + attachDistance);
+
+        features.add("2FF6=" + item2F1 + " " + item2F2);
+        features.add("2FF6=" + item2F1 + " " + item2F2 + '*' + attachDistance);
+
+        features.add("2FF7=" + item1F2);
+        features.add("2FF7=" + item1F2 + '*' + attachDistance);
+
+        features.add("2FF8=" + item2F1);
+        features.add("2FF8=" + item2F1 + '*' + attachDistance);
+        
+        features.add("2FF9=" + item2F2);
+        features.add("2FF9=" + item2F2 + '*' + attachDistance);
+        return features;
+    }
+    
     public void addLabeledFeatures(DependencyInstance instance,
                                    int word,
                                    String type,
