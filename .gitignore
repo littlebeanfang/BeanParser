@@ -214,3 +214,9 @@ pip-log.txt
 
 #Mr Developer
 .mr.developer.cfg
+
+# data
+test.out
+test.out_
+time.maltorder
+wsj_itertest_iter_10.model
