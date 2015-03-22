@@ -225,8 +225,7 @@ public class DependencyPipe {
     protected void addExtendedFeatures(DependencyInstance instance,
                                        FeatureVector fv) {
     }
-
-
+    
     public void addCoreFeatures(DependencyInstance instance,
                                 int small,
                                 int large,
@@ -250,15 +249,29 @@ public class DependencyPipe {
 
         String attDist = "&" + att + "&" + distBool;
 
-//        ArrayList<String> linearFeatures = getLinearFeaturesWithoutPrefix(
-//        		pos, small, large, attDist);
-//        for (String feature : linearFeatures) {
-//        	add("POS" + feature, fv);
-//        	add("CPOS" + feature, fv);
-//        }
-        addLinearFeatures("POS", pos, small, large, attDist, fv);
-        addLinearFeatures("CPOS", posA, small, large, attDist, fv);
-
+        if (small > 1) {
+        	ArrayList<String> linearFeatures = getLinearFeaturesWithoutPrefix(
+        			pos, small, large, attDist);
+        	for (String feature : linearFeatures) {
+        		if (feature.charAt(0) == 'A') {
+        			add("APOS" + feature.substring(1, feature.length()), fv);
+        			add("ACPOS" + feature.substring(1, feature.length()), fv);
+        		}
+        		else if (feature.charAt(0) == 'B') {
+        			add("BAPOS" + feature.substring(2, feature.length()), fv);
+        			add("BACPOS" + feature.substring(2, feature.length()), fv);
+        		}
+        		else {
+        			add("POS" + feature, fv);
+        			add("CPOS" + feature, fv);
+        		}
+        	}
+        }
+        else {
+        	addLinearFeatures("POS", pos, small, large, attDist, fv);
+        	addLinearFeatures("CPOS", posA, small, large, attDist, fv);
+        }
+        
         //////////////////////////////////////////////////////////////////////
 
         int headIndex = small;
@@ -268,86 +281,59 @@ public class DependencyPipe {
             childIndex = small;
         }
 
-//        ArrayList<String> twoObsFeatures = getTwoObsFeaturesWithoutPrefix(forms[headIndex],
-//        		pos[headIndex], forms[childIndex], pos[childIndex], attDist);
-//        for (String feature : twoObsFeatures) {
-//        	add("HC" + feature, fv);
-//        	add("HCA" + feature, fv);
-//        	add("HCC" + feature, fv);
-//        	add("HCD" + feature, fv);
-//        }
-        addTwoObsFeatures("HC", forms[headIndex], pos[headIndex],
-                forms[childIndex], pos[childIndex], attDist, fv);
-
-        //if (isCONLL) {
-
-        addTwoObsFeatures("HCA", forms[headIndex], posA[headIndex],
-                forms[childIndex], posA[childIndex], attDist, fv);
-
-        addTwoObsFeatures("HCC", instance.lemmas[headIndex], pos[headIndex],
-                instance.lemmas[childIndex], pos[childIndex],
-                attDist, fv);
-
-        addTwoObsFeatures("HCD", instance.lemmas[headIndex], posA[headIndex],
-                instance.lemmas[childIndex], posA[childIndex],
-                attDist, fv);
-        
-/*
-        if (options.discourseMode) {
-		// Note: The features invoked here are designed for
-		// discourse parsing (as opposed to sentential
-		// parsing). It is conceivable that they could help for
-		// sentential parsing, but current testing indicates that
-		// they hurt sentential parsing performance.
-
-		addDiscourseFeatures(instance, small, large,
-				     headIndex, childIndex, 
-				     attDist, fv);
-
-	    } else {*/
-        // Add in features from the feature lists. It assumes
-        // the feature lists can have different lengths for
-        // each item. For example, nouns might have a
-        // different number of morphological features than
-        // verbs.
-        
-        for (int i = 0; i < instance.feats[headIndex].length; i++) {
-            for (int j = 0; j < instance.feats[childIndex].length; j++) {
-                addTwoObsFeatures("FF" + i + "*" + j,
-                        instance.forms[headIndex],
-                        instance.feats[headIndex][i],
-                        instance.forms[childIndex],
-                        instance.feats[childIndex][j],
-                        attDist, fv);
-
-                addTwoObsFeatures("LF" + i + "*" + j,
-                        instance.lemmas[headIndex],
-                        instance.feats[headIndex][i],
-                        instance.lemmas[childIndex],
-                        instance.feats[childIndex][j],
-                        attDist, fv);
-            }
+        if (small > 0) {
+        	ArrayList<String> twoObsFeatures = getTwoObsFeaturesWithoutPrefix(forms[headIndex],
+        			pos[headIndex], forms[childIndex], pos[childIndex], attDist);
+        	for (String feature : twoObsFeatures) {
+        		add("HC" + feature, fv);
+        		add("HCA" + feature, fv);
+        		add("HCC" + feature, fv);
+        		add("HCD" + feature, fv);
+        	}
         }
-        // }
+        else {
+	        addTwoObsFeatures("HC", forms[headIndex], pos[headIndex],
+	                forms[childIndex], pos[childIndex], attDist, fv);
+	        
+	        addTwoObsFeatures("HCA", forms[headIndex], posA[headIndex],
+	                forms[childIndex], posA[childIndex], attDist, fv);
+	
+	        addTwoObsFeatures("HCC", instance.lemmas[headIndex], pos[headIndex],
+	                instance.lemmas[childIndex], pos[childIndex],
+	                attDist, fv);
+	
+	        addTwoObsFeatures("HCD", instance.lemmas[headIndex], posA[headIndex],
+	                instance.lemmas[childIndex], posA[childIndex],
+	                attDist, fv);
+        }
+        
+        if (small > 0) {
+        	ArrayList<String> twoObsFeatures = getTwoObsFeaturesWithoutPrefix(
+                        instance.forms[headIndex],
+                        instance.feats[headIndex][0],
+                        instance.forms[childIndex],
+                        instance.feats[childIndex][0],
+                        attDist);
+        	for (String feature : twoObsFeatures) {
+        		add("FF0*0" + feature, fv);
+        		add("LF0*0" + feature, fv);
+        	}
+        }
+        else {
+                addTwoObsFeatures("FF" + 0 + "*" + 0,
+                        instance.forms[headIndex],
+                        instance.feats[headIndex][0],
+                        instance.forms[childIndex],
+                        instance.feats[childIndex][0],
+                        attDist, fv);
 
-        //}
-
-	/*
-    else {
-	    // We are using the old MST format.  Pick up stem features
-	    // the way they used to be done. This is kept for
-	    // replicability of results for old versions.
-	    int hL = forms[headIndex].length();
-	    int cL = forms[childIndex].length();
-	    if (hL > 5 || cL > 5) {
-		addOldMSTStemFeatures(instance.lemmas[headIndex], 
-				      pos[headIndex],
-				      instance.lemmas[childIndex], 
-				      pos[childIndex],
-				      attDist, hL, cL, fv);
-	    }
-	}				       
-	*/
+                addTwoObsFeatures("LF" + 0 + "*" + 0,
+                        instance.lemmas[headIndex],
+                        instance.feats[headIndex][0],
+                        instance.lemmas[childIndex],
+                        instance.feats[childIndex][0],
+                        attDist, fv);
+        }
     }
 
     private void addLinearFeatures(String type, String[] obsVals,
@@ -379,7 +365,7 @@ public class DependencyPipe {
     private ArrayList<String> getLinearFeaturesWithoutPrefix(String[] obsVals,
     											int first, int second,
     											String attachDistance) {
-    	ArrayList<String> features = new ArrayList<String>();
+    	ArrayList<String> features = new ArrayList<String>(30);
         String pLeft = first > 0 ? obsVals[first - 1] : "STR";
         String pRight = second < obsVals.length - 1 ? obsVals[second + 1] : "END";
         String pLeftRight = first < second - 1 ? obsVals[first + 1] : "MID";
@@ -391,9 +377,9 @@ public class DependencyPipe {
         	features.add(featPos + ' ' + obsVals[i] + attachDistance);
         }
         
-        features.addAll(getCorePosFeaturesWithoutPrefix(
+        getCorePosFeaturesWithPrefix(
         		"PT", pLeft, obsVals[first], pLeftRight, pRightLeft,
-        		obsVals[second], pRight, attachDistance));
+        		obsVals[second], pRight, attachDistance, features);
         
         return features;
     }
@@ -476,12 +462,10 @@ public class DependencyPipe {
 
     }
 
-    private ArrayList<String> getCorePosFeaturesWithoutPrefix(String prefix,
+    private ArrayList<String> getCorePosFeaturesWithPrefix(String prefix,
                                     String leftOf1, String one, String rightOf1,
                                     String leftOf2, String two, String rightOf2,
-                                    String attachDistance) {
-    	ArrayList<String> features = new ArrayList<String>();
-    	
+                                    String attachDistance, ArrayList<String> features) {    	
     	features.add(prefix + "=" + leftOf1 + " " + one + " " + two + "*" + attachDistance);
 
         StringBuilder feat =
@@ -638,7 +622,7 @@ public class DependencyPipe {
     private ArrayList<String> getTwoObsFeaturesWithoutPrefix(String item1F1, String item1F2,
     												String item2F1, String item2F2,
     												String attachDistance) {
-    	ArrayList<String> features = new ArrayList<String>(26);
+    	ArrayList<String> features = new ArrayList<String>(30);
     	features.add("2FF1=" + item1F1);
         features.add("2FF1=" + item1F1 + '*' + attachDistance);
 

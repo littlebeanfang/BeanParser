@@ -68,7 +68,7 @@ public class ParseAgenda {
         if (childindex < parentindex) {
             //LA
             if (this.numofleftchild.containsKey(parentindex)) {
-                this.numofleftchild.put(parentindex, this.numofleftchild.get(parentindex) + 1);
+            	this.numofleftchild.increment(parentindex);
 //        		System.out.println("parent:"+parentindex+",leftcount:"+this.numofleftchild.get(parentindex)+",rightcount:"+this.numofrightchild.get(parentindex));
             } else {
                 this.numofleftchild.put(parentindex, 1);
@@ -85,7 +85,7 @@ public class ParseAgenda {
         } else {
             //RA
             if (this.numofrightchild.containsKey(parentindex)) {
-                this.numofrightchild.put(parentindex, this.numofrightchild.get(parentindex) + 1);
+                this.numofrightchild.increment(parentindex);
 //        		System.out.println("parent:"+parentindex+",leftcount:"+this.numofleftchild.get(parentindex)+",rightcount:"+this.numofrightchild.get(parentindex));
             } else {
                 this.numofrightchild.put(parentindex, 1);

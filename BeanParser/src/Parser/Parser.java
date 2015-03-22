@@ -75,7 +75,7 @@ public class Parser {
 
             ParseAgenda pa = (ParseAgenda) decoder.DecodeInstance(di, di.orders)[0];
 
-            writer.write(new DependencyInstance(RemoveRoot(di.forms), RemoveRoot(di.postags), RemoveRoot(di.deprels), RemoveRoot(di.heads)));
+            //writer.write(new DependencyInstance(RemoveRoot(di.forms), RemoveRoot(di.postags), RemoveRoot(di.deprels), RemoveRoot(di.heads)));
         }
         long parseend = System.currentTimeMillis();
         System.out.println("\n==============================================");

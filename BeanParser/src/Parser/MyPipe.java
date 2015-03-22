@@ -41,7 +41,6 @@ public class MyPipe extends DependencyPipe {
         //addHMGfeatures(instance, parentindex, childindex, pa, fv);
     }
 
-
     private void addTwoOrderSiblingFeatures(DependencyInstance instance,
                                             int parentindex, int childindex, ParseAgenda pa, FeatureVector fv) {
 
