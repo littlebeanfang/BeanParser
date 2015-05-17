@@ -346,10 +346,12 @@ public class EasyFirstScoreCheck {
 		//model is used to get score
 		//output file for write arc score matrix
 		EasyFirstScoreCheck test=new EasyFirstScoreCheck();
-//		test.PrintOutAll1orderArcScore(args);
+		test.PrintOutAll1orderArcScore(args);
 //		test.GenerateArcscorePairFiles("ArcScore_God_wsj2-21train_wsj00-01test_first100sent.score", "ArcScore_Increase_wsj2-21train_wsj00-01test_first100sent.score", "Arcscore100sen_GodIncrease");
 
 //		test.GenerateArcscoreSingleFile("ArcScore_God_wsj2-21train_wsj00-01test_first100sent.score", "Arcscore100sen_combinetest", "God");
+		test.GenerateArcscoreSingleFile("ArcScore_Maltpredict_wsj2-21train_wsj00-01test_first100sent.score", "Arcscore100sen_combinetest", "MaltPredict");
+		
 		/*
 		CONLLReader reader=new CONLLReader();
 		reader.startReading(System.getenv("CODEDATA")+File.separator+"1sen.txt");
@@ -362,7 +364,7 @@ public class EasyFirstScoreCheck {
 //		test.AddEasyFirstOrderProcessIndex("mst_wsj2-21_2order_10iter_proj_51.model", System.getenv("CODEDATA")+File.separator+"wsj_2-21_godorder_processindex.txt", System.getenv("CODEDATA")+File.separator+"wsj_2-21_easyfirstorder_mstmodel.txt");
 //		test.AddEasyFirstOrderProcessIndex("mst_wsj2-21_2order_10iter_proj_51.model", System.getenv("CODEDATA")+File.separator+"wsj_00-01_godorder_processindex.txt", System.getenv("CODEDATA")+File.separator+"wsj_00-01_easyfirstorder_mstmodel.txt");
 //		test.AddEasyFirstOrderProcessIndex("wsj_2-21_malt_features_MST2_beam_1.model", System.getenv("CODEDATA")+File.separator+"wsj_00-01_godorder_processindex.txt", System.getenv("CODEDATA")+File.separator+"wsj_00-01_easyfirstorder_maltmodel.txt");
-		test.AddEasyFirstOrderProcessIndex("wsj_2-21_malt_features_MST2_beam_1.model", System.getenv("CODEDATA")+File.separator+"wsj_2-21_godorder_processindex.txt", System.getenv("CODEDATA")+File.separator+"wsj_2-21_easyfirstorder_maltmodel.txt");
+//		test.AddEasyFirstOrderProcessIndex("wsj_2-21_malt_features_MST2_beam_1.model", System.getenv("CODEDATA")+File.separator+"wsj_2-21_godorder_processindex.txt", System.getenv("CODEDATA")+File.separator+"wsj_2-21_easyfirstorder_maltmodel.txt");
 //		test.GenerateArcscoreSingleFile("ArcScore_Increase_wsj2-21train_wsj00-01test_first100sent.score", "Arcscore100sen_combinetest", "Increase");
 //		test.GenerateCombineBat("combile1-100.bat");
 
