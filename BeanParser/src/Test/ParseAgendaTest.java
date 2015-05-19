@@ -25,7 +25,7 @@ public class ParseAgendaTest {
         DependencyInstance instance = reader.getNext();
         Map<String, Integer> structurecount = new HashMap<String, Integer>();
         while (instance != null) {
-            ParseAgenda pa = new ParseAgenda();
+            ParseAgenda pa = new ParseAgenda(instance.length());
             TIntIntHashMap ordermap = instance.orders;
             int[] heads = instance.heads;
             for (int orderindex = 1; orderindex < instance.length(); orderindex++) {

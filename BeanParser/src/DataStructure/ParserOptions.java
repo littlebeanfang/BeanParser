@@ -48,6 +48,8 @@ public final class ParserOptions {
     //public boolean useRelationalFeatures = false;
     //public boolean discourseMode = false;
     //public String confidenceEstimator = null;
+    public boolean beam = false;
+    public int beamwidth = 1;
 
     public ParserOptions(String[] args) {
 
@@ -116,11 +118,21 @@ public final class ParserOptions {
 	    rankEdgesByConfidence = true;
 	    }	   
 	    */
+            if (pair[0].equals("beam")) {
+                beam = pair[1].equals("true") ? true : false;
+            }
+            if (pair[0].equals("beam-width")) {
+                beamwidth = Integer.parseInt(pair[1]);
+            }
         }
 
 
         try {
-            File tmpDir = new File(System.getenv("CODEDATA") + "/tmp");
+            File tmpDir = new File(System.getenv("CODEDATA") + File.separator+"tmp");
+            System.out.println(tmpDir);
+            if(!tmpDir.exists()){
+            	tmpDir.mkdir();
+            }
             if (null != trainfile) {
                 trainforest = File.createTempFile("train", ".forest", tmpDir);
                 trainforest.deleteOnExit();
@@ -133,6 +145,7 @@ public final class ParserOptions {
 */
         } catch (java.io.IOException e) {
             System.out.println("Unable to create tmp files for feature forests!");
+            
             System.out.println(e);
             System.exit(0);
         }

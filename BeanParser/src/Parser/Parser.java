@@ -21,7 +21,7 @@ public class Parser {
         this.options = options;
         // Set up arrays
         params = new Parameters(pipe.dataAlphabet.size());
-        decoder = new Decoder(pipe, params);
+        decoder = new Decoder(pipe, params, options);
     }
 
     //constructor for trainer
@@ -73,7 +73,7 @@ public class Parser {
             //if (instcount % 30 == 0) System.out.print('\n');
             FeatureVector fv = new FeatureVector();//useless here, just align the param for DecodeInstance
 
-            ParseAgenda pa = (ParseAgenda) decoder.DecodeInstance(di, di.orders)[0];
+            decoder.DecodeInstance(di, di.orders);
 
             writer.write(new DependencyInstance(RemoveRoot(di.forms), RemoveRoot(di.postags), RemoveRoot(di.deprels), RemoveRoot(di.heads)));
         }

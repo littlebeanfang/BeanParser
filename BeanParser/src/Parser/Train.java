@@ -37,7 +37,7 @@ public class Train {
         System.out.println(".\tNum Edge Labels: " + numTypes);
         params = new Parameters(pipe.dataAlphabet.size());
 //			    System.out.println("Init param:"+java.util.Arrays.toString(params.parameters));
-        train(numInstances, options.trainfile, pipe);
+        train(numInstances, options.trainfile, pipe, options);
         Parser dp = new Parser(pipe, options, params);
 //			    System.out.println("Train param:"+java.util.Arrays.toString(params.parameters));
         System.out.print("Saving model...");
@@ -45,7 +45,7 @@ public class Train {
         System.out.print("done.");
     }
 
-    public void train(int numInstances, String trainfile, MyPipe pipe)
+    public void train(int numInstances, String trainfile, MyPipe pipe, ParserOptions options)
             throws IOException, ClassNotFoundException {
 
         //System.out.print("About to train. ");
@@ -62,7 +62,7 @@ public class Train {
 
             long start = System.currentTimeMillis();
 
-            trainingIter(numInstances, trainfile, i + 1, pipe);
+            trainingIter(numInstances, trainfile, i + 1, pipe, options);
 
             long end = System.currentTimeMillis();
             //System.out.println("Training iter took: " + (end-start));
@@ -80,7 +80,7 @@ public class Train {
         System.out.println("==============================================");
     }
 
-    private void trainingIter(int numInstances, String trainfile, int iter, MyPipe pipe)
+    private void trainingIter(int numInstances, String trainfile, int iter, MyPipe pipe, ParserOptions options)
             throws IOException, ClassNotFoundException {
         /**
          * Author: Yizhong
@@ -145,17 +145,25 @@ public class Train {
              * 2. may call decoder and turn ParseAgenda into tree string
              * 3. send pipe in createInstance and param in train
              */
-            Decoder decoder = new Decoder(pipe, params);
             //FeatureVector fvforinst=new FeatureVector();
+            Decoder decoder = new Decoder(pipe, params, options);
             Object[] decodeinstret = decoder.DecodeInstance(inst, inst.orders);
-            ParseAgenda parseAgenda = (ParseAgenda) decodeinstret[0];
-            FeatureVector fvforinst = (FeatureVector) decodeinstret[1];
-            d = new Object[1][2];//K=1, means best parse
+            //ParseAgenda parseAgenda = (ParseAgenda) decodeinstret[0];
+            //FeatureVector fvforinst = (FeatureVector) decodeinstret[1];
+            //d = new Object[1][2];//K=1, means best parse
 //				System.out.println("trainingIter===================");
 //				System.out.println("fvforinst:"+fvforinst.toString());
 //				System.out.println("trainingIter END===================");
-            d[0][0] = fvforinst;
-            d[0][1] = parseAgenda.toActParseTree();
+            ParseAgenda[] agendaArr = (ParseAgenda[]) decodeinstret[2];
+            d = new Object[options.beamwidth][2];
+            for (int i = 0; i < options.beamwidth; i++) {
+                if (agendaArr[i] != null) {
+                    d[i][0] = agendaArr[i].fv;
+                    d[i][1] = agendaArr[i].toActParseTree();
+                }
+            }
+            //d[0][0] = fvforinst;
+            //d[0][1] = parseAgenda.toActParseTree();
             //Bean: ignore labeled errors in inst
                 /*
                 if(options.decodeType.equals("proj")) {
