@@ -136,6 +136,18 @@ public class DependencyInstance implements Serializable {
         sb.append(this.length() + "\n");
         return sb.toString();
     }
+    
+    public String toArcFilterString(){
+    	StringBuffer sb = new StringBuffer();
+        sb.append("ROOT_ROOT_*");
+    	for(int i=0;i<forms.length;i++){
+    		if(forms[i].equals("<root>")){
+    			continue;
+    		}
+    		sb.append(" "+forms[i]+"_"+postags[i]+"_"+"*");
+    	}
+    	return sb.toString();
+    }
 
 
     private void writeObject(ObjectOutputStream out) throws IOException {

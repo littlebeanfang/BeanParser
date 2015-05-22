@@ -1,19 +1,23 @@
 package Parser;
 
+import ArcFilter.JNAArcFilter2;
 import DataStructure.*;
 import gnu.trove.TIntIntHashMap;
 
 import java.io.*;
+import java.util.HashSet;
 
 public class Decoder {
     private MyPipe pipe;
     private Parameters param;
     private Beam beam;
+    private JNAArcFilter2 arcFilter2;
 
     public Decoder(DependencyPipe pipe, Parameters param, ParserOptions options) {
         this.pipe = (MyPipe) pipe;
         this.param = param;
         this.beam = new Beam(options.beamwidth);
+        this.arcFilter2=new JNAArcFilter2();
     }
 
     public Object[] DecodeInstance(DependencyInstance inst, TIntIntHashMap ordermap) throws IOException {
@@ -23,24 +27,29 @@ public class Decoder {
         ParseAgenda pa;
         //FeatureVector fvforinst = new FeatureVector();
 
+        HashSet<String> headmodifier=arcFilter2.ArcFilter(inst);
         for (int orderindex = 1; orderindex < inst.length(); orderindex++) {
             //skip root node
             int childindex = ordermap.get(orderindex);
             pa = beam.getNext();
             while (pa != null) {
                 for (int head = 0; head < inst.length(); head++) {
-                    if ((head != childindex) && (pa.FindRoot(head) != childindex)) {
+//                	System.out.println("head:"+head+",child:"+childindex);
+                    if ((head != childindex) && (pa.FindRoot(head) != childindex &&headmodifier.contains(head+"_"+childindex))) {//
+                    	
                         FeatureVector fv = new FeatureVector();
                         pipe.extractFeatures(inst, childindex, head, pa, fv);
                         double temp = fv.getScore(param.parameters);
                         beam.addAgenda(pa.getScore() + temp, childindex, head, fv);
                     }
                 }
+                
                 pa = beam.getNext();
             }
             beam.finishIteration();
 //            inst.heads[childindex] = parsehead;
         }
+//        arcFilter2.TranverseHashset(headmodifier);
         pa = beam.findBest();
         //System.out.println(": " + pa.getScore());
         pa.AddArc(0, -1);//add root
