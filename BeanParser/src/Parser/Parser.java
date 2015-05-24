@@ -67,6 +67,7 @@ public class Parser {
         long parsestart = System.currentTimeMillis();
         while ((di = reader.getNext()) != null) {
             ++instcount;
+            System.out.println("sennum:"+instcount + "\t");
             if (instcount % 50 == 0) {
                 System.out.print(instcount + "\t");
             }

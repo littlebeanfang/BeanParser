@@ -1,4 +1,5 @@
 package ArcFilter;
+import java.lang.invoke.ConstantCallSite;
 import java.util.HashSet;
 import java.util.Iterator;
 
@@ -16,6 +17,7 @@ public class JNAArcFilter2 {
 		int InitModel(String[] argv);
 
 		String CallFilter(String input);
+		String SeudoCall(String input);
 	}
 
 	private int CallInitModel(String[] argv) {
@@ -23,7 +25,12 @@ public class JNAArcFilter2 {
 	}
 
 	private String CallFilter(String input) {
-		return LgetLib.INSTANCE.CallFilter(input);
+		String out=LgetLib.INSTANCE.CallFilter(input);
+		//System.out.println("receive:"+out);
+		return out;
+	}
+	public String SeudoCall(String input){
+		return LgetLib.INSTANCE.SeudoCall(input);
 	}
 
 	public JNAArcFilter2() {
@@ -34,7 +41,12 @@ public class JNAArcFilter2 {
 	
 	public HashSet<String> ArcFilter(String word_pos_head){
 		String out = this.CallFilter(word_pos_head);
-		System.out.println("out:"+out);
+		System.out.println(out.hashCode());
+		//System.out.println("word_pos_head:"+word_pos_head);
+//		if(out.equals("")){
+//			System.out.println("empty");
+//		}
+//		System.out.println("out:"+out);
 		HashSet<String> headmodifier=new HashSet<String>();
 		String columns[]=out.split("\t");
 		for(int i=0;i<columns.length;i++){
@@ -45,10 +57,11 @@ public class JNAArcFilter2 {
 				headmodifier.add(head+"_"+modifier);
 			}
 		}
+		//System.gc();
 		return headmodifier;
 	}
 	public HashSet<String> ArcFilter(DependencyInstance di){
-		System.out.println("arc fil str:"+di.toArcFilterString());
+		//System.out.println("arc fil str:"+di.toArcFilterString());
 		return ArcFilter(di.toArcFilterString());
 	}
 	

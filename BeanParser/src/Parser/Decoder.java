@@ -1,6 +1,7 @@
 package Parser;
 
 import ArcFilter.JNAArcFilter2;
+import ArcFilter.JNIArcFilter;
 import DataStructure.*;
 import gnu.trove.TIntIntHashMap;
 
@@ -11,13 +12,15 @@ public class Decoder {
     private MyPipe pipe;
     private Parameters param;
     private Beam beam;
-    private JNAArcFilter2 arcFilter2;
+    //private JNAArcFilter2 arcFilter2;
+    private JNIArcFilter arcFilter2;
 
     public Decoder(DependencyPipe pipe, Parameters param, ParserOptions options) {
         this.pipe = (MyPipe) pipe;
         this.param = param;
         this.beam = new Beam(options.beamwidth);
-        this.arcFilter2=new JNAArcFilter2();
+        //this.arcFilter2=new JNAArcFilter2();
+        this.arcFilter2=new JNIArcFilter();
     }
 
     public Object[] DecodeInstance(DependencyInstance inst, TIntIntHashMap ordermap) throws IOException {
@@ -28,6 +31,7 @@ public class Decoder {
         //FeatureVector fvforinst = new FeatureVector();
 
         HashSet<String> headmodifier=arcFilter2.ArcFilter(inst);
+        //System.out.println("size:"+headmodifier.size());
         for (int orderindex = 1; orderindex < inst.length(); orderindex++) {
             //skip root node
             int childindex = ordermap.get(orderindex);
@@ -35,12 +39,16 @@ public class Decoder {
             while (pa != null) {
                 for (int head = 0; head < inst.length(); head++) {
 //                	System.out.println("head:"+head+",child:"+childindex);
-                    if ((head != childindex) && (pa.FindRoot(head) != childindex &&headmodifier.contains(head+"_"+childindex))) {//
-                    	
-                        FeatureVector fv = new FeatureVector();
-                        pipe.extractFeatures(inst, childindex, head, pa, fv);
-                        double temp = fv.getScore(param.parameters);
-                        beam.addAgenda(pa.getScore() + temp, childindex, head, fv);
+//                	System.out.println(pa.toActParseTree());
+                    if ((head != childindex) && (pa.FindRoot(head) != childindex )) {//
+//                    	System.out.println("22head:"+head+",child:"+childindex);
+                    	//!size==1,is a JNA bug !
+                    	if( headmodifier.contains(head+"_"+childindex)){//headmodifier.size()==1 ||
+                    		FeatureVector fv = new FeatureVector();
+                            pipe.extractFeatures(inst, childindex, head, pa, fv);
+                            double temp = fv.getScore(param.parameters);
+                            beam.addAgenda(pa.getScore() + temp, childindex, head, fv);
+                    	}
                     }
                 }
                 
