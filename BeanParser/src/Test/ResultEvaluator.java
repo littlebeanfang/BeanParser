@@ -5,6 +5,8 @@ import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
 
+import DataStructure.DependencyInstance;
+
 /**
  * Created by wangyizhong on 2014/12/4.
  */
@@ -48,6 +50,7 @@ public class ResultEvaluator {
         fi_out.close();
         fi_gold.close();
     }
+   
 }
 //0.8539988373058716 MST Original 2nd order features
 //0.8487667137280956 with Beam

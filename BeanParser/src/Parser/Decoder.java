@@ -20,7 +20,9 @@ public class Decoder {
         this.param = param;
         this.beam = new Beam(options.beamwidth);
         //this.arcFilter2=new JNAArcFilter2();
-        this.arcFilter2=new JNIArcFilter();
+        if( pipe.options.filterarc==true){
+        	this.arcFilter2=new JNIArcFilter();
+        }
     }
 
     public Object[] DecodeInstance(DependencyInstance inst, TIntIntHashMap ordermap) throws IOException {
@@ -29,8 +31,10 @@ public class Decoder {
         Object[] instret = new Object[3];
         ParseAgenda pa;
         //FeatureVector fvforinst = new FeatureVector();
-
-        HashSet<String> headmodifier=arcFilter2.ArcFilter(inst);
+        HashSet<String> headmodifier=null;
+        if( pipe.options.filterarc==true){
+        	headmodifier=arcFilter2.ArcFilter(inst);
+        }
         //System.out.println("size:"+headmodifier.size());
         for (int orderindex = 1; orderindex < inst.length(); orderindex++) {
             //skip root node
@@ -43,7 +47,7 @@ public class Decoder {
                     if ((head != childindex) && (pa.FindRoot(head) != childindex )) {//
 //                    	System.out.println("22head:"+head+",child:"+childindex);
                     	//!size==1,is a JNA bug !
-                    	if( headmodifier.contains(head+"_"+childindex)){//headmodifier.size()==1 ||
+                    	if( pipe.options.filterarc==false||headmodifier.contains(head+"_"+childindex)){//headmodifier.size()==1 ||
                     		FeatureVector fv = new FeatureVector();
                             pipe.extractFeatures(inst, childindex, head, pa, fv);
                             double temp = fv.getScore(param.parameters);

@@ -76,6 +76,8 @@ public class Train {
         System.out.println("Model Name:" + options.modelName);
         System.out.println("Sentence Number:" + numInstances);
         System.out.println("Iteration Number:" + options.numIters);
+        System.out.println("Beam width:"+pipe.options.beam+" "+pipe.options.beamwidth);
+        System.out.println("Arcfilter:"+pipe.options.filterarc);
         System.out.println("Train Time Total:" + (traintimeend - traintimestart) / 1000.0);
         System.out.println("==============================================");
     }

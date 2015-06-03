@@ -1,5 +1,6 @@
 package ArcFilter;
 
+import java.io.File;
 import java.util.HashSet;
 import java.util.Iterator;
 
@@ -7,9 +8,11 @@ import DataStructure.DependencyInstance;
 
 public class JNIArcFilter {
 	//arguments: anystring, ultraLinWeights, ultraPairWeights
-	private String arcfilterlibpath="/home/bean/git/BeanParser/BeanParser/bin/libarcfilter.so";
+	File filterlibFile=new File("libarcfilter.so");
+	private String arcfilterlibpath=filterlibFile.getAbsolutePath();//"/home/bean/git/BeanParser/BeanParser/bin/libarcfilter.so";
 	public native int InitModel();
 	public native String CallFilter(String text);  
+	//public native void DeleteLocalRef(String text);
 	public JNIArcFilter(){
 		System.load(arcfilterlibpath);
 		this.InitModel();
@@ -17,7 +20,7 @@ public class JNIArcFilter {
 	}
 	public HashSet<String> ArcFilter(String word_pos_head){
 		String out = this.CallFilter(word_pos_head);
-		System.out.println("Java receive:"+out);
+		//System.out.println("Java receive:"+out);
 		HashSet<String> headmodifier=new HashSet<String>();
 		String columns[]=out.split("\t");
 		for(int i=0;i<columns.length;i++){

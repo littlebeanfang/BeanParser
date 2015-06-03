@@ -67,7 +67,7 @@ public class Parser {
         long parsestart = System.currentTimeMillis();
         while ((di = reader.getNext()) != null) {
             ++instcount;
-            System.out.println("sennum:"+instcount + "\t");
+            //System.out.println("sennum:"+instcount + "\t"+di.toString());
             if (instcount % 50 == 0) {
                 System.out.print(instcount + "\t");
             }
@@ -83,7 +83,9 @@ public class Parser {
         System.out.println("Test File:" + options.testfile);
         System.out.println("Model Name:" + options.modelName);
         System.out.println("Sentence Number:" + instcount);
-        System.out.println("Train Time Total:" + (parseend - parsestart) / 1000.0);
+        System.out.println("Beam width:"+pipe.options.beam+" "+pipe.options.beamwidth);
+        System.out.println("Arcfilter:"+pipe.options.filterarc);
+        System.out.println("Test Time Total:" + (parseend - parsestart) / 1000.0);
         System.out.println("==============================================");
         writer.finishWriting();
     }

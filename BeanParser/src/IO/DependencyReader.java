@@ -36,7 +36,9 @@ public abstract class DependencyReader {
     protected boolean labeled = true;
     protected boolean confScores = false;
     protected boolean ordered = true;
-
+    public void SetOrdered(boolean ordered){
+    	
+    }
     public static DependencyReader createDependencyReader(String format,
                                                           boolean discourseMode)
             throws IOException {
