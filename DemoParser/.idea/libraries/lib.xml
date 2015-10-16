@@ -1,0 +1,14 @@
+<component name="libraryTable">
+  <library name="lib">
+    <CLASSES>
+      <root url="jar://$PROJECT_DIR$/lib/trove.jar!/" />
+      <root url="jar://$PROJECT_DIR$/lib/MST051.jar!/" />
+      <root url="jar://$PROJECT_DIR$/lib/liblinear-1.8.jar!/" />
+      <root url="jar://$PROJECT_DIR$/lib/log4j.jar!/" />
+      <root url="jar://$PROJECT_DIR$/lib/maltparser-1.7.1.jar!/" />
+      <root url="jar://$PROJECT_DIR$/lib/stanford-postagger.jar!/" />
+    </CLASSES>
+    <JAVADOC />
+    <SOURCES />
+  </library>
+</component>
